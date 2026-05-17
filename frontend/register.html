@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Register — StrangerNear</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080f;--bg2:#0f0f1a;--bg3:#141426;--sr:#1a1a2e;--bd:rgba(120,100,255,.15);--b2:rgba(120,100,255,.28);--pr:#7c5cfc;--pr2:#9b7ffe;--pg:rgba(124,92,252,.35);--gn:#06d6a0;--rd:#ef4565;--tx:#f0eeff;--t2:#a89fd8;--t3:#6b638f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+h1{font-family:'Syne',sans-serif;font-weight:800}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .25s}
+input,select{font-family:'DM Sans',sans-serif}
+a{text-decoration:none}
+.card{width:100%;max-width:480px;background:var(--sr);border:1px solid var(--bd);border-radius:22px;padding:34px 30px;animation:fi .5s ease}
+.top{text-align:center;margin-bottom:20px}
+.icon{font-size:28px;color:var(--pr);display:block;margin-bottom:10px}
+.top h1{font-size:21px;margin-bottom:4px}
+.top p{color:var(--t2);font-size:13px}
+.prog{display:flex;gap:7px;justify-content:center;margin-bottom:20px}
+.dot{width:30px;height:4px;border-radius:2px;background:var(--bd);transition:background .3s}
+.dot.on{background:var(--pr)}
+.step{display:none}.step.on{display:block}
+.slbl{font-family:'Syne',sans-serif;font-size:14px;color:var(--t2);margin-bottom:14px}
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+label{font-size:12px;font-weight:600;color:var(--t2)}
+.iw{position:relative}
+.iw input{width:100%;padding:10px 40px 10px 13px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx);border-radius:9px;font-size:13px;transition:border .2s;font-family:'DM Sans',sans-serif}
+.iw input:focus{outline:none;border-color:var(--pr)}
+.iw input::placeholder{color:var(--t3)}
+.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;line-height:1}
+.eye:hover{color:var(--pr2)}
+input:not(.iw input),select{background:var(--bg3);border:1px solid var(--bd);color:var(--tx);padding:10px 13px;border-radius:9px;font-size:13px;transition:border .2s;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--pr)}
+input::placeholder{color:var(--t3)}
+select option{background:var(--bg3);color:var(--tx)}
+select:disabled{opacity:.4;cursor:not-allowed}
+.hint{font-size:11px;min-height:14px;margin-top:2px}
+.hint.ok{color:var(--gn)}.hint.err{color:var(--rd)}.hint.inf{color:var(--t3)}
+.urow{display:flex;gap:7px;align-items:flex-start}
+.urow>div{flex:1}
+.dice{padding:10px 11px;border-radius:9px;background:rgba(124,92,252,.12);border:1px solid var(--b2);color:var(--pr2);font-size:16px;cursor:pointer;flex-shrink:0;transition:all .2s}
+.dice:hover{background:rgba(124,92,252,.25);transform:rotate(20deg)}
+.grow{display:flex;gap:7px}
+.gb{flex:1;padding:9px 4px;border-radius:9px;background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.gb.on{background:rgba(124,92,252,.15);border-color:var(--pr);color:var(--pr2)}
+.btnp{width:100%;background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;padding:11px;border-radius:50px;font-weight:600;font-size:13px;box-shadow:0 4px 20px var(--pg);margin-top:4px}
+.btnp:hover{transform:translateY(-2px)}.btnp:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btns{background:transparent;color:var(--t2);padding:11px;border-radius:50px;font-weight:500;font-size:13px;border:1px solid var(--b2);width:100%;margin-top:4px}
+.btns:hover{border-color:var(--pr);color:var(--pr2)}
+.row{display:flex;gap:9px}.row .btns{flex:1}.row .btnp{flex:2}
+/* Interest tags with categories */
+.int-section{margin-bottom:10px}
+.int-cat{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{padding:4px 10px;border-radius:50px;background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-size:11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.tag.on{background:rgba(124,92,252,.15);border-color:var(--pr);color:var(--pr2)}
+.err{background:rgba(239,69,101,.1);border:1px solid rgba(239,69,101,.3);color:var(--rd);border-radius:9px;padding:9px 13px;font-size:12px;margin-bottom:12px;display:none}
+.ckrow{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--t2)}
+.ckrow input[type=checkbox]{width:14px;height:14px;accent-color:var(--pr);flex-shrink:0}
+.ft{text-align:center;margin-top:16px;color:var(--t2);font-size:13px}
+.ft a{color:var(--pr2);font-weight:600}
+.bl{display:inline-block;margin-bottom:12px;color:var(--t2);font-size:13px}
+.int-count{color:var(--t3);font-size:11px;font-weight:400}
+@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="card">
+  <a href="index.html" class="bl">← Back</a>
+  <div class="top"><span class="icon">◈</span><h1>Create Account</h1><p>Join free — takes 2 minutes</p></div>
+  <div class="prog">
+    <div class="dot on" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+  </div>
+  <div class="err" id="err"></div>
+
+  <!-- Step 1: Account -->
+  <div class="step on" id="s1">
+    <div class="slbl">Account Info</div>
+    <div class="field">
+      <label>Email</label>
+      <div class="iw"><input type="email" id="email" placeholder="you@example.com" oninput="chkEmail()"/></div>
+      <span class="hint" id="emailHint"></span>
+    </div>
+    <div class="field">
+      <label>Username</label>
+      <div class="urow">
+        <div>
+          <div class="iw"><input type="text" id="uname" placeholder="coolstranger99" maxlength="20" oninput="chkUname()"/></div>
+          <span class="hint" id="unameHint"></span>
+        </div>
+        <button class="dice" title="Random username" onclick="randUname()">🎲</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <div class="iw">
+        <input type="password" id="pass" placeholder="Min 6 characters" oninput="chkPass()"/>
+        <button class="eye" id="eye1" onclick="togEye('pass','eye1')">👁</button>
+      </div>
+      <span class="hint" id="passHint"></span>
+    </div>
+    <div class="field">
+      <label>Confirm Password</label>
+      <div class="iw">
+        <input type="password" id="pass2" placeholder="Re-enter password" oninput="chkPass2()"/>
+        <button class="eye" id="eye2" onclick="togEye('pass2','eye2')">👁</button>
+      </div>
+      <span class="hint" id="pass2Hint"></span>
+    </div>
+    <button class="btnp" onclick="next1()">Continue →</button>
+  </div>
+
+  <!-- Step 2: About -->
+  <div class="step" id="s2">
+    <div class="slbl">About You</div>
+    <div class="field">
+      <label>Gender</label>
+      <div class="grow">
+        <button class="gb" onclick="setG('male',this)">♂ Male</button>
+        <button class="gb" onclick="setG('female',this)">♀ Female</button>
+        <button class="gb" onclick="setG('other',this)">⚧ Other</button>
+      </div>
+    </div>
+    <div class="field"><label>Age</label><input type="number" id="age" placeholder="18" min="18" max="100"/></div>
+    <div class="field">
+      <label class="ckrow"><input type="checkbox" id="ageChk"/> I confirm I am 18 or older</label>
+    </div>
+    <div class="row">
+      <button class="btns" onclick="goStep(1)">← Back</button>
+      <button class="btnp" onclick="next2()">Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Location + Interests -->
+  <div class="step" id="s3">
+    <div class="slbl">Location & Interests</div>
+    <div class="field">
+      <label>Country (optional)</label>
+      <select id="country" onchange="onCountry()"><option value="">Select country</option></select>
+    </div>
+    <div class="field">
+      <label>State / Province (optional)</label>
+      <select id="state" disabled onchange="onState()"><option value="">Select country first</option></select>
+    </div>
+    <div class="field">
+      <label>City / District (optional)</label>
+      <select id="city" disabled><option value="">Select state first</option></select>
+    </div>
+    <div class="field">
+      <label>Interests — pick up to 8 <span class="int-count" id="intCnt">(0/8)</span></label>
+      <div id="tagBox"></div>
+    </div>
+    <div class="row">
+      <button class="btns" onclick="goStep(2)">← Back</button>
+      <button class="btnp" id="regBtn" onclick="doReg()">Create Account 🎉</button>
+    </div>
+  </div>
+
+  <p class="ft">Already have an account? <a href="login.html">Sign in</a></p>
+</div>
+
+<script>
+const API = 'http://127.0.0.1:5000';
+
+/* ── Interest categories ── */
+const INTEREST_CATS = {
+  'Entertainment': ['Gaming','Movies','Anime','Manga','K-Drama','Netflix','Music','Concerts','Stand-up Comedy','Podcasts'],
+  'Personality': ['Introvert','Extrovert','Ambivert','Night Owl','Early Bird','Empath','Overthinker','Dreamer'],
+  'Lifestyle': ['Travel','Food','Cooking','Coffee','Fitness','Yoga','Meditation','Minimalism','Fashion','Photography'],
+  'Knowledge': ['Tech','Books','Science','History','Philosophy','Psychology','Politics','Art','Writing','Journalism'],
+  'Social': ['Sports','Cricket','Football','Basketball','Gym','Dancing','Hiking','Cycling','Swimming','Chess'],
+  'Vibe': ['Chill','Deep Talks','Memes','Dark Humor','Motivational','Spiritual','Aesthetic','Vintage','Lo-fi'],
+};
+
+const LOC = {'India':{'Andhra Pradesh':['Visakhapatnam','Vijayawada','Guntur','Tirupati','Kurnool','Nellore'],'Arunachal Pradesh':['Itanagar','Naharlagun'],'Assam':['Guwahati','Silchar','Dibrugarh','Jorhat'],'Bihar':['Patna','Gaya','Bhagalpur','Muzaffarpur'],'Chhattisgarh':['Raipur','Bhilai','Bilaspur'],'Goa':['Panaji','Margao','Vasco da Gama'],'Gujarat':['Ahmedabad','Surat','Vadodara','Rajkot','Bhavnagar'],'Haryana':['Faridabad','Gurugram','Panipat','Ambala','Hisar'],'Himachal Pradesh':['Shimla','Manali','Dharamshala','Kullu'],'Jharkhand':['Ranchi','Jamshedpur','Dhanbad'],'Karnataka':['Bengaluru','Mysuru','Hubli','Mangaluru','Belagavi'],'Kerala':['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kollam','Palakkad','Kannur','Alappuzha','Malappuram','Kottayam','Idukki','Wayanad','Pathanamthitta','Kasaragod'],'Madhya Pradesh':['Bhopal','Indore','Jabalpur','Gwalior','Ujjain'],'Maharashtra':['Mumbai','Pune','Nagpur','Nashik','Aurangabad','Solapur','Thane'],'Manipur':['Imphal','Churachandpur'],'Meghalaya':['Shillong','Tura'],'Mizoram':['Aizawl','Lunglei'],'Nagaland':['Kohima','Dimapur'],'Odisha':['Bhubaneswar','Cuttack','Rourkela','Sambalpur'],'Punjab':['Ludhiana','Amritsar','Jalandhar','Patiala','Bathinda'],'Rajasthan':['Jaipur','Jodhpur','Udaipur','Kota','Bikaner','Ajmer'],'Sikkim':['Gangtok','Namchi'],'Tamil Nadu':['Chennai','Coimbatore','Madurai','Tiruchirappalli','Salem','Tirunelveli','Vellore','Erode'],'Telangana':['Hyderabad','Warangal','Nizamabad','Khammam','Karimnagar'],'Tripura':['Agartala','Udaipur'],'Uttar Pradesh':['Lucknow','Kanpur','Agra','Varanasi','Meerut','Allahabad','Ghaziabad','Noida'],'Uttarakhand':['Dehradun','Haridwar','Roorkee','Haldwani'],'West Bengal':['Kolkata','Howrah','Durgapur','Asansol','Siliguri','Bardhaman'],'Delhi':['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi','Central Delhi'],'Jammu & Kashmir':['Srinagar','Jammu','Anantnag','Baramulla'],'Ladakh':['Leh','Kargil']},'United States':{'California':['Los Angeles','San Francisco','San Diego','San Jose','Sacramento','Oakland','Fresno'],'Texas':['Houston','Dallas','Austin','San Antonio','Fort Worth','El Paso'],'Florida':['Miami','Orlando','Tampa','Jacksonville','St. Petersburg'],'New York':['New York City','Buffalo','Rochester','Yonkers','Syracuse'],'Illinois':['Chicago','Aurora','Rockford','Joliet','Naperville'],'Pennsylvania':['Philadelphia','Pittsburgh','Allentown','Erie'],'Ohio':['Columbus','Cleveland','Cincinnati','Toledo'],'Georgia':['Atlanta','Augusta','Columbus','Savannah'],'North Carolina':['Charlotte','Raleigh','Greensboro','Durham'],'Michigan':['Detroit','Grand Rapids','Warren','Ann Arbor'],'Washington':['Seattle','Spokane','Tacoma','Vancouver'],'Arizona':['Phoenix','Tucson','Mesa','Chandler','Scottsdale'],'Massachusetts':['Boston','Worcester','Springfield','Cambridge'],'Colorado':['Denver','Colorado Springs','Aurora','Fort Collins'],'Tennessee':['Nashville','Memphis','Knoxville','Chattanooga']},'United Kingdom':{'England':['London','Manchester','Birmingham','Leeds','Sheffield','Liverpool','Bristol','Newcastle','Nottingham','Leicester'],'Scotland':['Edinburgh','Glasgow','Aberdeen','Dundee','Inverness'],'Wales':['Cardiff','Swansea','Newport','Wrexham'],'Northern Ireland':['Belfast','Londonderry','Lisburn']},'Canada':{'Ontario':['Toronto','Ottawa','Mississauga','Brampton','Hamilton','London'],'Quebec':['Montreal','Quebec City','Laval','Gatineau'],'British Columbia':['Vancouver','Surrey','Burnaby','Richmond','Victoria'],'Alberta':['Calgary','Edmonton','Red Deer','Lethbridge'],'Manitoba':['Winnipeg','Brandon'],'Saskatchewan':['Saskatoon','Regina'],'Nova Scotia':['Halifax','Dartmouth']},'Australia':{'New South Wales':['Sydney','Newcastle','Wollongong','Central Coast'],'Victoria':['Melbourne','Geelong','Ballarat','Bendigo'],'Queensland':['Brisbane','Gold Coast','Sunshine Coast','Townsville','Cairns'],'Western Australia':['Perth','Fremantle','Bunbury'],'South Australia':['Adelaide','Mount Gambier'],'Tasmania':['Hobart','Launceston']},'Germany':{'Bavaria':['Munich','Nuremberg','Augsburg','Regensburg'],'Berlin':['Berlin'],'Hamburg':['Hamburg'],'Hesse':['Frankfurt','Wiesbaden','Kassel','Darmstadt'],'Baden-Württemberg':['Stuttgart','Mannheim','Karlsruhe','Freiburg'],'North Rhine-Westphalia':['Cologne','Düsseldorf','Dortmund','Essen','Bonn']},'France':{'Île-de-France':['Paris','Boulogne-Billancourt','Versailles'],'PACA':['Marseille','Nice','Toulon','Cannes'],'Auvergne-Rhône-Alpes':['Lyon','Grenoble','Saint-Étienne'],'Occitanie':['Toulouse','Montpellier','Nîmes']},'Brazil':{'São Paulo':['São Paulo','Campinas','Santos','Ribeirão Preto'],'Rio de Janeiro':['Rio de Janeiro','Niterói','Duque de Caxias'],'Minas Gerais':['Belo Horizonte','Uberlândia','Juiz de Fora'],'Bahia':['Salvador','Feira de Santana'],'Paraná':['Curitiba','Londrina','Maringá']},'Japan':{'Tokyo':['Shinjuku','Shibuya','Minato','Chiyoda','Setagaya','Nerima'],'Osaka':['Osaka','Sakai','Higashiosaka'],'Kanagawa':['Yokohama','Kawasaki','Sagamihara'],'Aichi':['Nagoya','Toyota','Okazaki'],'Hokkaido':['Sapporo','Asahikawa','Hakodate'],'Kyoto':['Kyoto','Uji'],'Fukuoka':['Fukuoka','Kitakyushu','Kurume']},'Other':{'Other':['Other City']}};
+
+let gender='', selInt=[];
+
+/* ── Build interest tags with categories ── */
+function buildTagBox() {
+  const box = document.getElementById('tagBox');
+  box.innerHTML = '';
+  Object.entries(INTEREST_CATS).forEach(([cat, tags]) => {
+    const sec = document.createElement('div'); sec.className = 'int-section';
+    sec.innerHTML = `<div class="int-cat">${cat}</div>`;
+    const row = document.createElement('div'); row.className = 'tags';
+    tags.forEach(tag => {
+      const b = document.createElement('button');
+      b.className = 'tag'; b.textContent = tag;
+      b.onclick = () => togTag(b, tag);
+      row.appendChild(b);
+    });
+    sec.appendChild(row);
+    box.appendChild(sec);
+  });
+}
+
+function togTag(el, tag) {
+  if (selInt.includes(tag)) {
+    selInt = selInt.filter(i => i !== tag); el.classList.remove('on');
+  } else if (selInt.length < 8) {
+    selInt.push(tag); el.classList.add('on');
+  }
+  document.getElementById('intCnt').textContent = `(${selInt.length}/8)`;
+}
+
+/* ── Location ── */
+const cSel = document.getElementById('country');
+Object.keys(LOC).forEach(c => { const o=document.createElement('option');o.value=c;o.textContent=c;cSel.appendChild(o); });
+
+function onCountry() {
+  const c=document.getElementById('country').value;
+  const ss=document.getElementById('state'), cs=document.getElementById('city');
+  ss.innerHTML='<option value="">Select state</option>';
+  cs.innerHTML='<option value="">Select state first</option>'; cs.disabled=true;
+  if(!c){ss.disabled=true;return;} ss.disabled=false;
+  Object.keys(LOC[c]||{}).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+}
+function onState() {
+  const c=document.getElementById('country').value, s=document.getElementById('state').value;
+  const cs=document.getElementById('city');
+  cs.innerHTML='<option value="">Select city</option>';
+  if(!s){cs.disabled=true;return;} cs.disabled=false;
+  (LOC[c]||{})[s]?.forEach(city=>{const o=document.createElement('option');o.value=city;o.textContent=city;cs.appendChild(o);});
+}
+
+/* ── Validation ── */
+let eT,uT;
+function chkEmail() {
+  const v=document.getElementById('email').value.trim(), h=document.getElementById('emailHint');
+  if(!v){h.textContent='';h.className='hint';return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){h.textContent='Invalid email';h.className='hint err';return;}
+  clearTimeout(eT);h.textContent='Checking...';h.className='hint inf';
+  eT=setTimeout(async()=>{
+    try{const r=await fetch(`${API}/api/auth/check-email?email=${encodeURIComponent(v)}`),d=await r.json();
+    h.textContent=d.taken?'❌ Email taken':'✓ Available';h.className='hint '+(d.taken?'err':'ok');}
+    catch{h.textContent='';h.className='hint';}
+  },600);
+}
+function chkUname() {
+  const v=document.getElementById('uname').value.trim(), h=document.getElementById('unameHint');
+  if(!v){h.textContent='';h.className='hint';return;}
+  if(v.length<3){h.textContent='Min 3 characters';h.className='hint err';return;}
+  if(!/^[a-zA-Z0-9_]+$/.test(v)){h.textContent='Letters, numbers, _ only';h.className='hint err';return;}
+  clearTimeout(uT);h.textContent='Checking...';h.className='hint inf';
+  uT=setTimeout(async()=>{
+    try{const r=await fetch(`${API}/api/auth/check-username?username=${encodeURIComponent(v)}`),d=await r.json();
+    h.textContent=d.taken?'❌ Username taken':'✓ Available';h.className='hint '+(d.taken?'err':'ok');}
+    catch{h.textContent='';h.className='hint';}
+  },600);
+}
+function chkPass() {
+  const v=document.getElementById('pass').value, h=document.getElementById('passHint');
+  if(!v){h.textContent='';return;}
+  if(v.length<6){h.textContent='Min 6 characters';h.className='hint err';}
+  else{h.textContent='✓ Good password';h.className='hint ok';}
+  if(document.getElementById('pass2').value) chkPass2();
+}
+function chkPass2() {
+  const v=document.getElementById('pass2').value, p=document.getElementById('pass').value, h=document.getElementById('pass2Hint');
+  if(!v){h.textContent='';return;}
+  h.textContent=v!==p?'❌ Passwords do not match':'✓ Passwords match';
+  h.className='hint '+(v!==p?'err':'ok');
+}
+function togEye(id,bid){const i=document.getElementById(id),b=document.getElementById(bid);i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈';}
+
+const ADJ=['Cool','Swift','Bold','Dark','Epic','Neon','Wild','Zen','Iron','Luna','Nova','Turbo','Cyber','Storm','Blaze','Ghost','Pixel','Hyper','Sonic','Viper','Shadow','Frost','Rogue','Mystic'];
+const NOU=['Tiger','Falcon','Phoenix','Comet','Hawk','Wolf','Eagle','Raven','Titan','Knight','Ninja','Ranger','Wizard','Sniper','Rider','Spark','Hunter','Dragon','Samurai','Phantom'];
+function randUname(){document.getElementById('uname').value=ADJ[Math.floor(Math.random()*ADJ.length)]+NOU[Math.floor(Math.random()*NOU.length)]+Math.floor(Math.random()*999);chkUname();}
+
+function setG(g,el){gender=g;document.querySelectorAll('.gb').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s'+n).classList.add('on');
+  [1,2,3].forEach(i=>document.getElementById('d'+i).classList.toggle('on',i<=n));
+  document.getElementById('err').style.display='none';
+}
+function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';}
+
+function next1(){
+  const email=document.getElementById('email').value.trim();
+  const uname=document.getElementById('uname').value.trim();
+  const pass=document.getElementById('pass').value;
+  const pass2=document.getElementById('pass2').value;
+  if(!email||!uname||!pass||!pass2)return showErr('All fields are required');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return showErr('Enter a valid email');
+  if(uname.length<3)return showErr('Username must be at least 3 characters');
+  if(pass.length<6)return showErr('Password must be at least 6 characters');
+  if(pass!==pass2)return showErr('Passwords do not match');
+  goStep(2);
+}
+function next2(){
+  const age=parseInt(document.getElementById('age').value);
+  if(!gender)return showErr('Please select your gender');
+  if(!age||age<18)return showErr('You must be 18 or older');
+  if(!document.getElementById('ageChk').checked)return showErr('Please confirm you are 18+');
+  goStep(3);
+}
+
+async function doReg(){
+  const btn=document.getElementById('regBtn');
+  btn.disabled=true;btn.textContent='Creating account...';
+  document.getElementById('err').style.display='none';
+  const body={
+    email:document.getElementById('email').value.trim(),
+    password:document.getElementById('pass').value,
+    username:document.getElementById('uname').value.trim(),
+    gender, age:parseInt(document.getElementById('age').value),
+    country:document.getElementById('country').value,
+    state:document.getElementById('state').value,
+    city:document.getElementById('city').value,
+    interests:selInt, ageConfirmed:true
+  };
+  try{
+    const r=await fetch(`${API}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!r.ok){showErr(d.message||'Registration failed');return;}
+    localStorage.setItem('sc_token',d.token);
+    localStorage.setItem('sc_user',JSON.stringify(d.user));
+    location.href='dashboard.html';
+  }catch(e){console.error(e);showErr('Cannot connect to server. Is the backend running?');}
+  finally{btn.disabled=false;btn.textContent='Create Account 🎉';}
+}
+
+buildTagBox();
+if(localStorage.getItem('sc_token'))location.href='dashboard.html';
+</script>
+</body>
+</html>
