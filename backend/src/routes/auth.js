@@ -122,16 +122,7 @@ router.post('/login', async (req, res) => {
       await supabase.from('users').update({ is_banned: false }).eq('id', u.id);
     }
 
-    // 2FA check
-    if (u.two_fa_enabled) {
-      const partial = sign(u.id, { expiresIn: '10m' });
-      // generate and store OTP
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      await supabase.from('users').update({ two_fa_secret: otp }).eq('id', u.id);
-      console.log(`🔐 OTP for ${u.email}: ${otp}`); // dev only
-      // In production: send via nodemailer
-      return res.json({ requires2FA: true, partialToken: partial, otp_dev: otp });
-    }
+
 
     res.json({ token: sign(u.id), user: clean(u) });
   } catch (err) {
@@ -140,37 +131,6 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ── verify 2FA ──
-router.post('/verify-2fa', async (req, res) => {
-  try {
-    const { partialToken, otp } = req.body;
-    if (!partialToken || !otp)
-      return res.status(400).json({ message: 'Token and OTP required' });
 
-    let decoded;
-    try {
-      decoded = jwt.verify(partialToken, process.env.JWT_SECRET);
-    } catch {
-      return res.status(401).json({ message: 'OTP expired. Please login again.' });
-    }
-
-    const { data: u } = await supabase.from('users').select('*')
-      .eq('id', decoded.id).maybeSingle();
-
-    if (!u) return res.status(404).json({ message: 'User not found' });
-    if (!u.two_fa_secret)
-      return res.status(400).json({ message: 'No OTP found. Please login again.' });
-    if (u.two_fa_secret !== otp.trim())
-      return res.status(401).json({ message: 'Wrong OTP code. Try again.' });
-
-    // Clear OTP after use
-    await supabase.from('users').update({ two_fa_secret: null }).eq('id', u.id);
-
-    res.json({ token: sign(u.id), user: clean(u) });
-  } catch (err) {
-    console.error('2FA verify error:', err);
-    res.status(500).json({ message: 'Server error during verification' });
-  }
-});
 
 module.exports = router;

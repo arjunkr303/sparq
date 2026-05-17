@@ -24,6 +24,14 @@ CREATE TABLE IF NOT EXISTS users (
   two_fa_enabled BOOLEAN DEFAULT FALSE,
   two_fa_secret TEXT DEFAULT NULL,
   profile_photo TEXT DEFAULT NULL,
+  chat_theme TEXT DEFAULT 'default',
+  theme_expiry TIMESTAMPTZ DEFAULT NULL,
+  profile_lock_expiry TIMESTAMPTZ DEFAULT NULL,
+  queue_boost_expiry TIMESTAMPTZ DEFAULT NULL,
+  spotlight_interest TEXT DEFAULT NULL,
+  spotlight_expiry TIMESTAMPTZ DEFAULT NULL,
+  reveal_likes_expiry TIMESTAMPTZ DEFAULT NULL,
+  last_claim_date TIMESTAMPTZ DEFAULT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -53,3 +61,41 @@ END $$;
 
 -- If upgrading from old schema, add new column:
 ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_photo TEXT DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS chat_theme TEXT DEFAULT 'default';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS theme_expiry TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_lock_expiry TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS queue_boost_expiry TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS spotlight_interest TEXT DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS spotlight_expiry TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS reveal_likes_expiry TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_claim_date TIMESTAMPTZ DEFAULT NULL;
+
+CREATE TABLE IF NOT EXISTS user_interactions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  interaction_type TEXT NOT NULL CHECK (interaction_type IN ('superlike', 'compliment')),
+  is_anonymous BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE user_interactions ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='user_interactions' AND policyname='Service full access interactions') THEN
+    CREATE POLICY "Service full access interactions" ON user_interactions FOR ALL USING (TRUE);
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS rematch_requests (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  receiver_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending','accepted','rejected')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(sender_id, receiver_id)
+);
+ALTER TABLE rematch_requests ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='rematch_requests' AND policyname='Service full access rematch') THEN
+    CREATE POLICY "Service full access rematch" ON rematch_requests FOR ALL USING (TRUE);
+  END IF;
+END $$;

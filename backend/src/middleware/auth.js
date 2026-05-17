@@ -7,7 +7,7 @@ module.exports = async (req, res, next) => {
   try {
     const { id } = jwt.verify(h.split(' ')[1], process.env.JWT_SECRET);
     const { data: u } = await supabase.from('users')
-      .select('id,username,email,gender,age,country,state,city,interests,is_verified,is_premium,coins,trust_score,is_banned')
+      .select('id,username,email,gender,age,country,state,city,interests,is_verified,is_premium,is_admin,admin_title,coins,trust_score,report_count,is_banned,two_fa_enabled,created_at,profile_photo')
       .eq('id', id).maybeSingle();
     if (!u) return res.status(401).json({ message: 'User not found' });
     req.user = u;

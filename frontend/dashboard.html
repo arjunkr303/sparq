@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Dashboard — StrangerNear</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <style>
 :root{--bg:#08080f;--bg2:#0f0f1a;--bg3:#141426;--sr:#1a1a2e;--s2:#1f1f35;--bd:rgba(120,100,255,.15);--b2:rgba(120,100,255,.28);--pr:#7c5cfc;--pr2:#9b7ffe;--pg:rgba(124,92,252,.35);--ac:#00e5ff;--gd:#ffd166;--gn:#06d6a0;--rd:#ef4565;--tx:#f0eeff;--t2:#a89fd8;--t3:#6b638f}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -12,23 +13,24 @@ h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800}
 button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .2s}
 input,select{font-family:'DM Sans',sans-serif}
 a{color:inherit;text-decoration:none}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--bd);animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both}
 .ni{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
 .logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
 .logo span:first-child{color:var(--pr)}
 .bp{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;padding:9px 20px;border-radius:50px;font-weight:600;font-size:13px;box-shadow:0 4px 16px var(--pg)}
 .bp:hover{transform:translateY(-2px)}
-.page{max-width:1000px;margin:0 auto;padding:84px 24px 60px;animation:fi .4s ease}
-.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page{max-width:1000px;margin:0 auto;padding:84px 24px 60px}
+.ph{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;flex-wrap:wrap;gap:12px;animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s both}
 .ph h1{font-size:26px}.ph p{color:var(--t2);font-size:13px;margin-top:3px}
 .toast{padding:10px 14px;border-radius:10px;font-size:12px;margin-bottom:14px;display:none}
 .toast.ok{background:rgba(6,214,160,.1);border:1px solid rgba(6,214,160,.25);color:var(--gn)}
 .toast.err{background:rgba(239,69,101,.1);border:1px solid rgba(239,69,101,.3);color:var(--rd)}
 /* tabs */
-.tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--bg2);padding:4px;border-radius:12px;width:fit-content;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--bg2);padding:4px;border-radius:12px;width:fit-content;flex-wrap:wrap;animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both}
 .tab{padding:7px 16px;border-radius:9px;font-size:12px;font-weight:500;color:var(--t2);background:none;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
 .tab.on{background:var(--sr);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.3)}
-.tpanel{display:none}.tpanel.on{display:block}
+.tpanel{display:none;animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) 0.3s both}.tpanel.on{display:block}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;margin-bottom:16px}
 .card{background:var(--sr);border:1px solid var(--bd);border-radius:16px;padding:20px}
 
@@ -46,6 +48,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
 .bvip{background:linear-gradient(135deg,rgba(255,209,102,.2),rgba(255,150,50,.1));color:#ffd166;border:1px solid rgba(255,209,102,.4)}
 .bdev{background:linear-gradient(135deg,rgba(124,92,252,.3),rgba(0,229,255,.2));color:#b4a0ff;border:1px solid rgba(124,92,252,.5)}
 .badm{background:linear-gradient(135deg,rgba(255,50,50,.25),rgba(255,150,0,.15));color:#ff8844;border:1px solid rgba(255,100,50,.5)}
+.bani{background:linear-gradient(135deg,rgba(255,140,0,.2),rgba(200,0,100,.2));color:#ff9f43;border:1px solid rgba(255,140,0,.45);text-shadow:0 0 6px rgba(255,140,0,.4)}
 .bkoc{background:linear-gradient(135deg,rgba(80,0,120,.5),rgba(20,0,40,.8));color:#df80ff;border:1px solid rgba(180,0,255,.5);text-shadow:0 0 8px rgba(180,0,255,.6);box-shadow:0 0 8px rgba(120,0,200,.3)}
 
 .avw{display:flex;align-items:center;gap:13px;margin-bottom:16px}
@@ -87,12 +90,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
 .sbtn{display:none;width:100%;background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;padding:9px;border-radius:50px;font-weight:600;font-size:12px;margin-top:6px}
 
 /* security */
-.tfa-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.tfa-lbl{font-size:13px;font-weight:600}
-.tfa-on{color:var(--gn)}.tfa-off{color:var(--t3)}
-.tfa-btn{padding:7px 14px;border-radius:50px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;border:none}
-.tfa-enable{background:rgba(6,214,160,.1);border:1px solid rgba(6,214,160,.3) !important;color:var(--gn)}
-.tfa-disable{background:rgba(239,69,101,.1);border:1px solid rgba(239,69,101,.3) !important;color:var(--rd)}
+.sec-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.sec-row:last-of-type{border-bottom:none}
+.sec-lbl{font-size:13px;font-weight:600}
+.sec-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.sec-val{font-size:12px;font-weight:600;color:var(--t2)}
+.sec-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:50px;font-size:11px;font-weight:700}
+.sec-badge.verified{background:rgba(6,214,160,.12);border:1px solid rgba(6,214,160,.3);color:var(--gn)}
+.sec-badge.unverified{background:rgba(107,99,143,.1);border:1px solid var(--bd);color:var(--t3)}
 
 /* friends */
 .friend-card{background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px;margin-bottom:7px}
@@ -117,7 +122,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
 .mbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
 .mbp{background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;padding:8px 18px;border-radius:50px;font-weight:600;font-size:12px}
 .mbs{background:transparent;border:1px solid var(--b2);color:var(--t2);padding:8px 14px;border-radius:50px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif}
-@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -126,7 +130,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
     <div class="logo"><span>◈</span><span>StrangerNear</span></div>
     <div style="display:flex;gap:12px;align-items:center">
       <a href="premium.html" style="color:var(--gd);font-size:13px;font-weight:600">✦ Premium</a>
-      <a href="chat.html"><button class="bp">Start Chat →</button></a>
+      <a href="chat.html" id="navChatBtn"><button class="bp">Start Chat →</button></a>
     </div>
   </div>
 </nav>
@@ -137,7 +141,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
     <button class="mclose" onclick="closeVM()">✕</button>
     <div style="font-size:32px;margin-bottom:10px">🪪</div>
     <h2 style="font-size:18px;margin-bottom:7px">Identity Verification</h2>
-    <p style="color:var(--t2);font-size:12px;margin-bottom:14px;line-height:1.5">Camera confirms you're a real person. No photo is saved to our servers.</p>
+    <p style="color:var(--t2);font-size:12px;margin-bottom:14px;line-height:1.5">Look at the camera to verify your identity. No photo is saved to our servers.</p>
     <video id="wcam" autoplay playsinline muted></video>
     <div id="vstat" style="font-size:12px;color:var(--t2);margin-bottom:10px;min-height:16px"></div>
     <div class="mbtns">
@@ -151,12 +155,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
 <div class="page">
   <div class="ph">
     <div><h1>My Profile</h1><p>Manage your account</p></div>
-    <a href="chat.html"><button class="bp">Start Chatting →</button></a>
   </div>
   <div class="toast" id="toast"></div>
 
   <div class="tabs">
     <button class="tab on" onclick="switchTab('profile',this)">👤 Profile</button>
+    <button class="tab"    onclick="switchTab('admirers',this)">🌟 Admirers</button>
     <button class="tab"    onclick="switchTab('friends',this)">👥 Friends <span id="frBadge" style="background:var(--rd);color:#fff;padding:1px 5px;border-radius:50px;font-size:9px;margin-left:2px;display:none">0</span></button>
     <button class="tab"    onclick="switchTab('security',this)">🔐 Security</button>
   </div>
@@ -190,7 +194,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
           <div class="vsteps">
             <div class="vstep"><div class="vsn">1</div>Click the button below</div>
             <div class="vstep"><div class="vsn">2</div>Allow camera access when asked</div>
-            <div class="vstep"><div class="vsn">3</div>Look at camera, then click Verify</div>
+            <div class="vstep"><div class="vsn">3</div>Look at the camera, then click Verify</div>
           </div>
           <button class="vbtn" onclick="openVM()">🪪 Start Verification</button>
         </div>
@@ -218,6 +222,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
     </div>
   </div>
 
+  <!-- ADMIRERS TAB -->
+  <div class="tpanel" id="tab-admirers">
+    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(124,92,252,.05),var(--sr));border-color:var(--b2)">
+      <h2 class="ct" style="margin-bottom:10px">🌟 See Who Liked You</h2>
+      <p style="color:var(--t2);font-size:12px;line-height:1.6;margin-bottom:14px">
+        Find out who sent you a Super Like or an Anonymous Compliment! 
+        Without the "Reveal Likes" premium feature, usernames remain hidden.
+      </p>
+      <a href="premium.html"><button style="padding:8px 16px;border-radius:50px;background:var(--sr);border:1px solid var(--pr);color:var(--pr2);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Get "Reveal Likes" in the Coin Shop →</button></a>
+    </div>
+    
+    <div class="card">
+      <h2 class="ct" style="margin-bottom:14px">Recent Admirers</h2>
+      <div id="admirersList"><p class="empty-msg">No admirers yet. Keep chatting to get Super Likes and Compliments!</p></div>
+    </div>
+  </div>
+
   <!-- FRIENDS TAB -->
   <div class="tpanel" id="tab-friends">
     <div class="grid">
@@ -241,32 +262,61 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
   <!-- SECURITY TAB -->
   <div class="tpanel" id="tab-security">
     <div class="grid">
+
+      <!-- Account Security card -->
       <div class="card">
-        <h2 class="ct" style="margin-bottom:14px">Two-Factor Authentication</h2>
-        <div class="tfa-row">
+        <h2 class="ct" style="margin-bottom:16px">🔐 Account Security</h2>
+
+        <div class="sec-row">
           <div>
-            <div class="tfa-lbl">Login Protection</div>
-            <div id="tfaStatus" class="tfa-off" style="font-size:12px;margin-top:2px">Loading...</div>
+            <div class="sec-lbl">Identity Verification</div>
+            <div class="sec-sub">Verified badge shown to all strangers</div>
           </div>
-          <button class="tfa-btn" id="tfaBtn" onclick="toggle2FA()">—</button>
+          <span class="sec-badge" id="verBadge">—</span>
         </div>
-        <p style="color:var(--t2);font-size:11px;line-height:1.6;margin-bottom:12px">When enabled, a 6-digit code is required at each login. The code appears on screen (email sending in production).</p>
-        <div id="tfaPwField" style="display:none">
-          <div class="field"><label>Confirm your password</label><input type="password" id="tfaPw" placeholder="Enter your password"/></div>
-          <button class="bp" id="tfaConfBtn" style="width:100%;padding:9px;font-size:12px" onclick="confirm2FA()">Confirm</button>
+
+        <div class="sec-row">
+          <div>
+            <div class="sec-lbl">Account Status</div>
+            <div class="sec-sub">Your account standing</div>
+          </div>
+          <span class="sec-val" style="color:var(--gn)">✓ Active</span>
+        </div>
+
+
+        <div style="margin-top:18px;padding:14px;background:rgba(239,69,101,.05);border:1px solid rgba(239,69,101,.15);border-radius:12px">
+          <div style="font-size:12px;font-weight:700;color:var(--rd);margin-bottom:6px">⚠️ Danger Zone</div>
+          <p style="font-size:11px;color:var(--t2);margin-bottom:10px;line-height:1.6">Signing out removes your session from this device only. Your data is kept safe.</p>
+          <button onclick="doLogout()" style="width:100%;padding:9px;border-radius:50px;background:transparent;border:1px solid rgba(239,69,101,.35);color:var(--rd);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s" onmouseover="this.style.background='rgba(239,69,101,.1)'" onmouseout="this.style.background='transparent'">Sign Out</button>
         </div>
       </div>
+
+      <!-- Account Info card -->
       <div class="card">
-        <h2 class="ct" style="margin-bottom:14px">Account Stats</h2>
-        <div class="ir"><span class="ik">Member Since</span><span id="secSince" style="color:var(--t2)">—</span></div>
-        <div class="ir"><span class="ik">Trust Score</span><span id="trustScore" style="color:var(--gn)">—</span></div>
-        <div class="ir"><span class="ik">Reports Received</span><span id="repCount">—</span></div>
-        <div style="margin-top:14px;padding:12px;background:rgba(239,69,101,.05);border:1px solid rgba(239,69,101,.15);border-radius:10px">
-          <div style="font-size:12px;font-weight:600;color:var(--rd);margin-bottom:5px">⚠️ Danger Zone</div>
-          <p style="font-size:11px;color:var(--t2);margin-bottom:9px">Signing out removes your session from this device only.</p>
-          <button onclick="doLogout()" style="width:100%;padding:8px;border-radius:50px;background:transparent;border:1px solid rgba(239,69,101,.3);color:var(--rd);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif">Sign Out</button>
+        <h2 class="ct" style="margin-bottom:16px">📋 Account Info</h2>
+
+        <div class="sec-row">
+          <div>
+            <div class="sec-lbl">Member Since</div>
+            <div class="sec-sub">Account creation date</div>
+          </div>
+          <span class="sec-val" id="secSince">—</span>
+        </div>
+
+
+        <div class="sec-row">
+          <div>
+            <div class="sec-lbl">Membership</div>
+            <div class="sec-sub">Your current plan</div>
+          </div>
+          <span class="sec-val" id="secPlan">—</span>
+        </div>
+
+        <div style="margin-top:18px">
+          <a href="premium.html"><button style="width:100%;padding:9px;border-radius:50px;background:linear-gradient(135deg,rgba(124,92,252,.15),rgba(0,229,255,.07));border:1px solid var(--b2);color:var(--pr2);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">✦ Upgrade to VIP →</button></a>
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -286,7 +336,7 @@ const INTEREST_CATS = {
 
 const LOC = {'India':{'Andhra Pradesh':['Visakhapatnam','Vijayawada','Guntur','Tirupati'],'Assam':['Guwahati','Silchar','Dibrugarh'],'Bihar':['Patna','Gaya','Bhagalpur'],'Gujarat':['Ahmedabad','Surat','Vadodara','Rajkot'],'Haryana':['Faridabad','Gurugram','Panipat'],'Karnataka':['Bengaluru','Mysuru','Hubli','Mangaluru'],'Kerala':['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kollam','Palakkad','Kannur','Alappuzha','Malappuram','Kottayam','Idukki','Wayanad','Pathanamthitta','Kasaragod'],'Madhya Pradesh':['Bhopal','Indore','Jabalpur'],'Maharashtra':['Mumbai','Pune','Nagpur','Nashik','Thane'],'Odisha':['Bhubaneswar','Cuttack','Rourkela'],'Punjab':['Ludhiana','Amritsar','Jalandhar'],'Rajasthan':['Jaipur','Jodhpur','Udaipur','Kota'],'Tamil Nadu':['Chennai','Coimbatore','Madurai','Salem','Vellore'],'Telangana':['Hyderabad','Warangal','Nizamabad'],'Uttar Pradesh':['Lucknow','Kanpur','Agra','Varanasi','Noida','Ghaziabad'],'West Bengal':['Kolkata','Howrah','Durgapur','Siliguri'],'Delhi':['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi'],'Jammu & Kashmir':['Srinagar','Jammu'],'Goa':['Panaji','Margao'],'Himachal Pradesh':['Shimla','Manali'],'Uttarakhand':['Dehradun','Haridwar'],'Jharkhand':['Ranchi','Jamshedpur'],'Chhattisgarh':['Raipur','Bhilai'],'Nagaland':['Kohima','Dimapur'],'Manipur':['Imphal'],'Meghalaya':['Shillong'],'Arunachal Pradesh':['Itanagar'],'Mizoram':['Aizawl'],'Tripura':['Agartala'],'Sikkim':['Gangtok'],'Ladakh':['Leh','Kargil']},'United States':{'California':['Los Angeles','San Francisco','San Diego','San Jose'],'Texas':['Houston','Dallas','Austin'],'Florida':['Miami','Orlando','Tampa'],'New York':['New York City','Buffalo'],'Illinois':['Chicago'],'Washington':['Seattle'],'Arizona':['Phoenix','Tucson']},'United Kingdom':{'England':['London','Manchester','Birmingham'],'Scotland':['Edinburgh','Glasgow'],'Wales':['Cardiff'],'Northern Ireland':['Belfast']},'Canada':{'Ontario':['Toronto','Ottawa'],'Quebec':['Montreal'],'British Columbia':['Vancouver']},'Australia':{'New South Wales':['Sydney'],'Victoria':['Melbourne'],'Queensland':['Brisbane']},'Germany':{'Bavaria':['Munich'],'Berlin':['Berlin'],'Hamburg':['Hamburg']},'Other':{'Other':['Other City']}};
 
-let user=null, token=null, editing=false, selInt=[], camStream=null, tfa2Enable=false;
+let user=null, token=null, editing=false, selInt=[], camStream=null, modelsLoaded=false;
 token = localStorage.getItem('sc_token');
 if (!token) { location.href = 'login.html'; }
 user = JSON.parse(localStorage.getItem('sc_user') || '{}');
@@ -299,6 +349,7 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
   $('tab-'+name).classList.add('on'); el.classList.add('on');
   if (name === 'friends') loadFriends();
+  if (name === 'admirers') loadAdmirers();
 }
 
 /* ── location ── */
@@ -323,8 +374,9 @@ function onES() { popCity($('eCi'),$('eC').value,$('eS').value,''); }
 function buildBadges(u) {
   let h = '';
   if (DEV.includes(u.username)) { h += '<span class="bm bkoc">🩸 King of Curses</span><span class="bm bdev">⚡ Dev</span>'; }
-  if (u.isAdmin)    h += '<span class="bm badm">🛡️ Admin</span>';
-  if (u.isPremium)  h += '<span class="bm bvip">👑 VIP</span>';
+  if (u.isAdmin)     h += '<span class="bm badm">🛡️ Admin</span>';
+  if (u.adminTitle)  h += `<span class="bm bani">✦ ${u.adminTitle}</span>`;
+  if (u.isPremium)   h += '<span class="bm bvip">👑 VIP</span>';
   else if (u.isVerified) h += '<span class="bm bv">✦ Verified</span>';
   return h;
 }
@@ -363,6 +415,22 @@ function loadUI() {
   if (user.isVerified) $('vSec').style.display = 'none';
   if (user.isPremium)  $('pBanner').style.display = 'none';
 
+  // Chat button block
+  const navChat = $('navChatBtn');
+  if (navChat) {
+    if (user.isVerified) {
+      navChat.href = 'chat.html';
+      navChat.onclick = null;
+    } else {
+      navChat.removeAttribute('href');
+      navChat.onclick = (e) => {
+        e.preventDefault();
+        openVM();
+        showToast('Please verify your identity to start chatting!', 'err');
+      };
+    }
+  }
+
   $('eU').value = user.username || '';
   popCountry($('eC'), user.country || '');
   popState($('eS'), user.country || '', user.state || '');
@@ -371,14 +439,14 @@ function loadUI() {
   buildTags();
 
   // Security tab
-  const on = user.twoFAEnabled;
-  $('tfaStatus').textContent = on ? '✓ Enabled' : '✗ Disabled';
-  $('tfaStatus').className   = on ? 'tfa-on' : 'tfa-off';
-  $('tfaBtn').textContent    = on ? 'Disable 2FA' : 'Enable 2FA';
-  $('tfaBtn').className      = 'tfa-btn ' + (on ? 'tfa-disable' : 'tfa-enable');
-  $('secSince').textContent  = fmtDate(user.memberSince);
-  $('trustScore').textContent= user.trustScore ?? '100';
-  $('repCount').textContent  = user.reportCount ?? '0';
+  $('secSince').textContent = fmtDate(user.memberSince);
+  $('secPlan').textContent  = user.isPremium ? '👑 VIP' : 'Free';
+  $('secPlan').style.color  = user.isPremium ? 'var(--gd)' : 'var(--t2)';
+  const vb = $('verBadge');
+  if (vb) {
+    vb.textContent  = user.isVerified ? '✦ Verified' : 'Not Verified';
+    vb.className    = 'sec-badge ' + (user.isVerified ? 'verified' : 'unverified');
+  }
 }
 
 /* ── interest tags ── */
@@ -500,64 +568,70 @@ async function startCam() {
 
 async function doVerify() {
   const btn = $('verOkBtn'); btn.disabled = true; btn.textContent = 'Verifying...';
-  $('vstat').textContent = 'Analyzing...'; $('vstat').style.color = 'var(--t2)';
-
-  // Use FaceDetector API if available (Chrome/Edge)
-  const video = $('wcam');
-  if (window.FaceDetector) {
-    try {
-      const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      const fd = new FaceDetector({ maxDetectedFaces: 1 });
-      const faces = await fd.detect(canvas);
-      if (faces.length === 0) {
-        $('vstat').textContent = '❌ No face detected. Make sure your face is clearly visible and well-lit.';
-        $('vstat').style.color = 'var(--rd)';
-        btn.disabled = false; btn.textContent = '✓ Verify Me'; return;
-      }
-    } catch (e) { console.warn('FaceDetector:', e); /* fallback if API fails */ }
-  } else {
-    // Fallback delay for browsers without FaceDetector
-    await new Promise(r => setTimeout(r, 1500));
-  }
-
+  const vstat = $('vstat');
+  
   try {
+    if (!modelsLoaded) {
+      vstat.textContent = 'Loading AI models (this may take a moment)...';
+      vstat.style.color = 'var(--t2)';
+      // Load lightweight models for face detection and gender
+      const MODEL_URL = 'https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model';
+      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+      await faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL);
+      modelsLoaded = true;
+    }
+
+    vstat.textContent = 'Analyzing face...';
+    const video = $('wcam');
+    
+    // Run detection
+    const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+      .withAgeAndGender();
+
+    if (!detection) {
+      vstat.textContent = '❌ No face detected. Make sure your face is clearly visible.';
+      vstat.style.color = 'var(--rd)';
+      btn.disabled = false; btn.textContent = '✓ Verify Me';
+      return;
+    }
+
+    // Gender matching check
+    const detectedGender = detection.gender; // 'male' or 'female'
+    const profileGender = (user.gender || '').toLowerCase();
+    
+    if (profileGender === 'male' || profileGender === 'female') {
+       if (detectedGender !== profileGender) {
+          vstat.textContent = `❌ Gender mismatch. Profile says ${profileGender}, but AI detected ${detectedGender}.`;
+          vstat.style.color = 'var(--rd)';
+          btn.disabled = false; btn.textContent = '✓ Verify Me';
+          return;
+       }
+    }
+
+    // Success - call API
+    vstat.textContent = 'Contacting server...';
     const r = await fetch(`${API}/api/user/verify`, { method:'POST', headers:{ 'Authorization':`Bearer ${token}` } });
     const d = await r.json();
-    if (!r.ok) { $('vstat').textContent = 'Verification failed. Try again.'; $('vstat').style.color = 'var(--rd)'; return; }
+    if (!r.ok) { vstat.textContent = 'Verification failed. Try again.'; vstat.style.color = 'var(--rd)'; return; }
+    
     stopCam();
     user = { ...user, ...d.user, isVerified: true };
     localStorage.setItem('sc_user', JSON.stringify(user));
-    $('vstat').textContent = '✅ Verified successfully!'; $('vstat').style.color = 'var(--gn)';
+    vstat.textContent = '✅ Verified successfully!'; vstat.style.color = 'var(--gn)';
     setTimeout(() => { closeVM(); loadUI(); showToast('✅ You are now verified!', 'ok'); }, 1200);
-  } catch { $('vstat').textContent = 'Server error. Try again.'; $('vstat').style.color = 'var(--rd)'; }
-  finally { btn.disabled = false; btn.textContent = '✓ Verify Me'; }
+
+  } catch (e) {
+    console.error('Face verification error:', e);
+    vstat.textContent = `Error: ${e.message || 'Unknown error occurred.'}`;
+    vstat.style.color = 'var(--rd)';
+  } finally {
+    if ($('vMod').classList.contains('on')) {
+      btn.disabled = false; btn.textContent = '✓ Verify Me';
+    }
+  }
 }
 
-/* ── 2FA ── */
-function toggle2FA() {
-  tfa2Enable = !user.twoFAEnabled;
-  $('tfaPwField').style.display = 'block';
-  $('tfaConfBtn').textContent = tfa2Enable ? 'Enable 2FA' : 'Disable 2FA';
-}
-async function confirm2FA() {
-  const pw = $('tfaPw').value;
-  if (!pw) return showToast('Enter your password', 'err');
-  try {
-    const r = await fetch(`${API}/api/user/2fa/toggle`, {
-      method: 'POST',
-      headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
-      body: JSON.stringify({ enable: tfa2Enable, password: pw })
-    });
-    const d = await r.json();
-    if (!r.ok) return showToast(d.message || 'Error', 'err');
-    user = { ...user, ...d.user };
-    localStorage.setItem('sc_user', JSON.stringify(user));
-    $('tfaPwField').style.display = 'none'; $('tfaPw').value = '';
-    showToast(d.message, 'ok'); loadUI();
-  } catch (e) { console.error(e); showToast('Server error', 'err'); }
-}
+
 
 /* ── Friends ── */
 async function loadFriends() {
@@ -611,6 +685,41 @@ async function respondFriend(id, action) {
     const d = await r.json();
     showToast(d.message, 'ok'); loadFriends();
   } catch { showToast('Error', 'err'); }
+}
+
+/* ── Admirers ── */
+async function loadAdmirers() {
+  try {
+    const r = await fetch(`${API}/api/user/interactions`, { headers: { 'Authorization':`Bearer ${token}` } });
+    const d = await r.json();
+    const rows = d.admirers || [];
+    const aEl = $('admirersList');
+    
+    if (rows.length === 0) {
+      aEl.innerHTML = '<p class="empty-msg">No admirers yet. Keep chatting!</p>';
+      return;
+    }
+    
+    aEl.innerHTML = '';
+    rows.forEach(a => {
+      const div = document.createElement('div');
+      div.className = 'friend-card';
+      const icon = a.type === 'superlike' ? '🌟' : (a.type === 'compliment' ? '💌' : '👍');
+      const actionTxt = a.type === 'superlike' ? 'sent you a Super Like' : 'sent you a Compliment';
+      const isBlurred = !a.isRevealed;
+      const blurStyle = isBlurred ? 'filter: blur(4px); user-select: none; opacity: 0.7' : '';
+      
+      div.innerHTML = `
+        <div class="fav" style="background:${a.type==='superlike'?'linear-gradient(135deg,#ffd166,#ff9f43)':'linear-gradient(135deg,#ff6496,#ff3278)'}">${icon}</div>
+        <div>
+          <div class="fname" style="${blurStyle}">${a.senderName}</div>
+          <div style="font-size:10px;color:var(--t3)">${actionTxt} • ${new Date(a.date).toLocaleDateString()}</div>
+        </div>
+        ${isBlurred ? `<a href="premium.html" class="fml" style="text-decoration:none"><button class="faccept" style="background:transparent;border-color:var(--pr);color:var(--pr2)">Reveal 👀</button></a>` : ''}
+      `;
+      aEl.appendChild(div);
+    });
+  } catch (e) { console.error('Admirers error:', e); }
 }
 
 function doLogout() { localStorage.removeItem('sc_token'); localStorage.removeItem('sc_user'); location.href = 'index.html'; }

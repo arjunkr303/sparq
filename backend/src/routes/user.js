@@ -84,66 +84,63 @@ router.post('/verify', authMw, async (req, res) => {
 // ── spend coins ──
 router.post('/spend-coins', authMw, async (req, res) => {
   try {
-    const { amount } = req.body;
-    if (!amount || amount < 1) return res.status(400).json({ message: 'Invalid amount' });
+    const { amount, itemId, extra } = req.body;
+    if (!amount || amount < 1 || !itemId) return res.status(400).json({ message: 'Invalid request' });
     if ((req.user.coins || 0) < amount)
       return res.status(400).json({ message: 'Not enough coins' });
+    
+    const upd = { coins: req.user.coins - amount };
+    const now = new Date();
+
+    if (itemId === 'boost') {
+      upd.queue_boost_expiry = new Date(now.getTime() + 60*60*1000).toISOString();
+    } else if (itemId === 'theme') {
+      upd.chat_theme = extra?.themeColor || 'premium';
+      upd.theme_expiry = new Date(now.getTime() + 7*24*60*60*1000).toISOString();
+    } else if (itemId === 'lock') {
+      upd.profile_lock_expiry = new Date(now.getTime() + 30*24*60*60*1000).toISOString();
+    } else if (itemId === 'likes') {
+      upd.reveal_likes_expiry = new Date(now.getTime() + 7*24*60*60*1000).toISOString();
+    } else if (itemId === 'spotlight') {
+      upd.spotlight_interest = extra?.interest || (req.user.interests && req.user.interests[0]) || '';
+      upd.spotlight_expiry = new Date(now.getTime() + 24*60*60*1000).toISOString();
+    }
+
     const { data: u } = await supabase.from('users')
-      .update({ coins: req.user.coins - amount }).eq('id', req.user.id).select().single();
-    res.json({ user: clean(u) });
-  } catch { res.status(500).json({ message: 'Server error' }); }
-});
+      .update(upd).eq('id', req.user.id).select().single();
 
-// ── toggle 2FA ──
-router.post('/2fa/toggle', authMw, async (req, res) => {
-  try {
-    const { enable, password } = req.body;
-    if (!password) return res.status(400).json({ message: 'Password required' });
+    // Log interactions for superlike, compliment, or rematch if target is provided
+    if (['superlike', 'compliment', 'rematch'].includes(itemId) && extra?.targetUserId) {
+      if (itemId === 'rematch') {
+        await supabase.from('rematch_requests').insert({
+          sender_id: req.user.id, receiver_id: extra.targetUserId
+        });
+      } else {
+        await supabase.from('user_interactions').insert({
+          sender_id: req.user.id, receiver_id: extra.targetUserId,
+          interaction_type: itemId, is_anonymous: (itemId === 'compliment')
+        });
+      }
+    }
 
-    const { data: u } = await supabase.from('users')
-      .select('password').eq('id', req.user.id).maybeSingle();
-    if (!u) return res.status(404).json({ message: 'User not found' });
+    // Include the new fields in the clean object if needed, or just return the standard clean(u)
+    const cleaned = clean(u);
+    cleaned.queueBoostExpiry = u.queue_boost_expiry;
+    cleaned.themeExpiry = u.theme_expiry;
+    cleaned.chatTheme = u.chat_theme;
+    cleaned.profileLockExpiry = u.profile_lock_expiry;
+    cleaned.revealLikesExpiry = u.reveal_likes_expiry;
+    cleaned.spotlightExpiry = u.spotlight_expiry;
+    cleaned.spotlightInterest = u.spotlight_interest;
 
-    const valid = await bcrypt.compare(password, u.password);
-    if (!valid) return res.status(401).json({ message: 'Wrong password' });
-
-    const { data: updated } = await supabase.from('users')
-      .update({ two_fa_enabled: !!enable }).eq('id', req.user.id).select().single();
-    res.json({ user: clean(updated), message: enable ? '2FA enabled!' : '2FA disabled.' });
+    res.json({ user: cleaned });
   } catch (err) {
-    console.error('2FA toggle error:', err);
+    console.error('Spend coins error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// ── send 2FA OTP (called from login flow) ──
-router.post('/2fa/send-otp', async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email required' });
 
-    const { data: u } = await supabase.from('users').select('id, two_fa_enabled')
-      .eq('email', email.toLowerCase()).maybeSingle();
-    if (!u) return res.status(404).json({ message: 'User not found' });
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    await supabase.from('users').update({ two_fa_secret: otp }).eq('id', u.id);
-    console.log(`🔐 2FA OTP for ${email}: ${otp}`);
-
-    // In production: send email via nodemailer
-    // const transporter = nodemailer.createTransport({...})
-    // await transporter.sendMail({ to: email, subject: 'Your OTP', text: `Your code: ${otp}` })
-
-    res.json({
-      message: 'OTP sent',
-      // Only in dev — remove before going live!
-      otp_dev: process.env.NODE_ENV === 'development' ? otp : undefined
-    });
-  } catch (err) {
-    console.error('OTP send error:', err);
-    res.status(500).json({ message: 'Server error sending OTP' });
-  }
-});
 
 // ── friends: send request ──
 router.post('/friends/request', authMw, async (req, res) => {
@@ -214,6 +211,39 @@ router.post('/admin/badge', authMw, async (req, res) => {
     await supabase.from('users').update(upd).eq('id', target.id);
     res.json({ message: `Done` });
   } catch { res.status(500).json({ message: 'Server error' }); }
+});
+
+// ── interactions: get admirers ──
+router.get('/interactions', authMw, async (req, res) => {
+  try {
+    const { data: rows } = await supabase.from('user_interactions')
+      .select('id, interaction_type, is_anonymous, created_at, sender:users!user_interactions_sender_id_fkey(username, gender)')
+      .eq('receiver_id', req.user.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+      
+    const now = new Date();
+    const canSee = req.user.reveal_likes_expiry && new Date(req.user.reveal_likes_expiry) > now;
+    
+    const admirers = (rows || []).map(r => {
+      let name = r.sender?.username || 'Unknown';
+      if (r.is_anonymous || !canSee) {
+        name = 'Someone (' + (r.sender?.gender || 'unknown') + ')';
+      }
+      return {
+        id: r.id,
+        type: r.interaction_type,
+        senderName: name,
+        date: r.created_at,
+        isRevealed: canSee && !r.is_anonymous
+      };
+    });
+    
+    res.json({ admirers, canSee });
+  } catch (err) {
+    console.error('Interactions error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
 module.exports = router;

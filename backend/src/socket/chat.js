@@ -20,8 +20,16 @@ function genderOk(me, other) {
 }
 
 function findMatch(me) {
-  const pool = [...queue.values()].filter(q => q.sid !== me.sid);
+  // Sort pool to prioritize boosted users first
+  const pool = [...queue.values()].filter(q => q.sid !== me.sid).sort((a, b) => {
+    if (a.boosted && !b.boosted) return -1;
+    if (!a.boosted && b.boosted) return 1;
+    return 0;
+  });
+
   const levels = [
+    // Level 0: Spotlight interest match (highest priority)
+    q => (me.spotlight && q.int.includes(me.spotlight)) || (q.spotlight && me.int.includes(q.spotlight)),
     q => norm(q.city)    && norm(me.city)    && norm(q.city)    === norm(me.city)    && common(me.int, q.int) > 0,
     q => norm(q.city)    && norm(me.city)    && norm(q.city)    === norm(me.city),
     q => norm(q.state)   && norm(me.state)   && norm(q.state)   === norm(me.state)   && common(me.int, q.int) > 0,
@@ -47,10 +55,17 @@ module.exports = io => {
     try {
       const { id } = jwt.verify(token, process.env.JWT_SECRET);
       const { data: u } = await supabase.from('users')
-        .select('id,username,gender,is_verified,is_premium,is_admin,admin_title,country,state,city,interests,is_banned')
+        .select('id,username,gender,is_verified,is_premium,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,spotlight_interest,spotlight_expiry,chat_theme,profile_lock_expiry')
         .eq('id', id).maybeSingle();
       if (!u)          return next(new Error('User not found'));
       if (u.is_banned) return next(new Error('Banned'));
+      
+      const now = new Date();
+      const isBoosted = u.queue_boost_expiry && new Date(u.queue_boost_expiry) > now;
+      const isSpotlight = u.spotlight_expiry && new Date(u.spotlight_expiry) > now;
+      const isLocked = u.profile_lock_expiry && new Date(u.profile_lock_expiry) > now;
+      const hasTheme = u.theme_expiry && new Date(u.theme_expiry) > now;
+
       socket.u = {
         id: u.id, guest: false, name: u.username,
         gender: u.gender||'other',
@@ -60,6 +75,10 @@ module.exports = io => {
         adminTitle: u.admin_title || null,
         country: u.country||'', state: u.state||'', city: u.city||'',
         int: u.interests||[],
+        boosted: isBoosted,
+        spotlight: isSpotlight ? u.spotlight_interest : null,
+        locked: isLocked,
+        theme: hasTheme ? u.chat_theme : 'default',
       };
       next();
     } catch { next(new Error('Auth failed')); }
@@ -69,15 +88,16 @@ module.exports = io => {
     const u = socket.u;
     console.log(`🔌 ${u.name} (${u.guest?'guest':'user'}) sid=${socket.id}`);
 
-    socket.on('find_match', ({ genderFilter } = {}) => {
+    socket.on('find_match', async ({ genderFilter } = {}) => {
       if (chats.has(socket.id)) return;
       queue.delete(socket.id);
       const me = {
-        sid: socket.id, name: u.name, gender: u.gender,
+        sid: socket.id, id: u.id||null, name: u.name, gender: u.gender,
         verified: u.verified, premium: u.premium, dev: u.dev,
         admin: u.admin, adminTitle: u.adminTitle,
         country: u.country, state: u.state, city: u.city,
         int: u.int, gf: genderFilter||'any', guest: u.guest,
+        boosted: u.boosted, spotlight: u.spotlight, locked: u.locked, theme: u.theme,
       };
       console.log(`🔍 ${me.name} | city="${me.city}" state="${me.state}" gf="${me.gf}" queue=${queue.size}`);
       const partner = findMatch(me);
@@ -89,17 +109,69 @@ module.exports = io => {
         chats.set(socket.id,   { partnerId:partner.sid, roomId:room, partnerUserId: partner.id||null });
         chats.set(partner.sid, { partnerId:socket.id,   roomId:room, partnerUserId: u.id||null });
         const ci = common(me.int, partner.int);
-        const mkPayload = (them) => ({
-          partnerUsername: them.name, partnerGender: them.gender,
-          partnerVerified: them.verified, partnerVip: them.premium,
-          partnerDev: them.dev, partnerAdmin: them.admin,
-          partnerAdminTitle: them.adminTitle,
-          partnerUserId: them.id||null,
-          commonInterests: ci, roomId: room,
+
+        // Check friendship status for both sides
+        let meStatus = 'none', partnerStatus = 'none';
+        if (u.id && partner.id) {
+          const { data: fs } = await supabase.from('friendships').select('user_id,friend_id,status')
+            .or(`and(user_id.eq.${u.id},friend_id.eq.${partner.id}),and(user_id.eq.${partner.id},friend_id.eq.${u.id})`);
+          if (fs && fs.length > 0) {
+            const row = fs[0];
+            const accepted = row.status === 'accepted';
+            meStatus      = accepted ? 'friends' : (row.user_id === u.id       ? 'pending' : 'incoming');
+            partnerStatus = accepted ? 'friends' : (row.user_id === partner.id ? 'pending' : 'incoming');
+          }
+        }
+
+        // Get partner's live socket for fresh badge data
+        const partnerSocket = io.sockets.sockets.get(partner.sid);
+        const pu = partnerSocket?.u || {};
+
+        const mkPayload = (name, gender, id, verified, premium, dev, admin, adminTitle, myStatus, locked, theme, country, state, city) => ({
+          partnerUsername:   name,
+          partnerGender:     gender,
+          partnerVerified:   verified,
+          partnerVip:        premium,
+          partnerDev:        dev,
+          partnerAdmin:      admin,
+          partnerAdminTitle: adminTitle,
+          partnerUserId:     id || null,
+          commonInterests:   ci, roomId: room,
+          friendshipStatus:  myStatus,
+          profileLocked:     locked,
+          chatTheme:         theme,
+          country:           country,
+          state:             state,
+          city:              city,
         });
-        io.to(socket.id).emit('matched', mkPayload(partner));
-        io.to(partner.sid).emit('matched', { ...mkPayload(me), partnerUserId: u.id||null });
-        console.log(`🎉 ${me.name} <-> ${partner.name} room=${room}`);
+
+        // Current user → gets partner's info (from live partner socket.u)
+        io.to(socket.id).emit('matched', mkPayload(
+          pu.name    || partner.name,
+          pu.gender  || partner.gender,
+          pu.id      || partner.id,
+          pu.verified !== undefined ? pu.verified : partner.verified,
+          pu.premium  !== undefined ? pu.premium  : partner.premium,
+          pu.dev      !== undefined ? pu.dev      : partner.dev,
+          pu.admin    !== undefined ? pu.admin    : partner.admin,
+          pu.adminTitle !== undefined ? pu.adminTitle : partner.adminTitle,
+          meStatus,
+          pu.locked !== undefined ? pu.locked : partner.locked,
+          pu.theme || partner.theme || 'default',
+          pu.country || partner.country,
+          pu.state || partner.state,
+          pu.city || partner.city
+        ));
+
+        // Partner → gets current user's info (from live socket.u — always fresh)
+        io.to(partner.sid).emit('matched', mkPayload(
+          u.name, u.gender, u.id,
+          u.verified, u.premium, u.dev, u.admin, u.adminTitle,
+          partnerStatus,
+          u.locked, u.theme, u.country, u.state, u.city
+        ));
+
+        console.log(`🎉 ${me.name} <-> ${partner.name} room=${room} | verified: me=${u.verified} partner=${pu.verified !== undefined ? pu.verified : partner.verified}`);
       } else {
         queue.set(socket.id, me);
         socket.emit('searching', { position: queue.size });
@@ -183,6 +255,19 @@ module.exports = io => {
         io.to(c.partnerId).emit('banned',{message:'Suspended 24h.'});
       }
       socket.emit('report_sent');
+    });
+
+    // ── Premium Actions ──
+    socket.on('send_superlike', ({ targetUserId, roomId }) => {
+      const c = chats.get(socket.id);
+      if (!c || c.roomId !== roomId) return;
+      io.to(c.partnerId).emit('receive_superlike');
+    });
+
+    socket.on('send_compliment', ({ targetUserId, roomId }) => {
+      const c = chats.get(socket.id);
+      if (!c || c.roomId !== roomId) return;
+      io.to(c.partnerId).emit('receive_compliment');
     });
 
     socket.on('disconnect', () => {

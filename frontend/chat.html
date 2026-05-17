@@ -90,7 +90,9 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;
 .mr.me{justify-content:flex-end}.mr.them{justify-content:flex-start}
 .bub{max-width:70%;border-radius:13px;padding:7px 10px;word-break:break-word;animation:fi .25s ease}
 .bub.me{background:linear-gradient(135deg,var(--pr),var(--pr2));border-bottom-right-radius:3px}
+.bub.me.premium{background:linear-gradient(135deg,rgba(255,209,102,.25),rgba(255,150,50,.2));border:1px solid rgba(255,209,102,.5);color:#ffd166}
 .bub.them{background:var(--s2);border:1px solid var(--bd);border-bottom-left-radius:3px}
+.bub.them.premium{background:linear-gradient(135deg,rgba(255,209,102,.15),rgba(255,150,50,.1));border-color:rgba(255,209,102,.4)}
 .bt{font-size:13px;line-height:1.5}
 .btime{font-size:9px;color:rgba(255,255,255,.3);margin-top:2px;text-align:right}
 .bub.them .btime{color:var(--t3)}
@@ -132,15 +134,22 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);color:var(--tx);padding:9px 20px;border-radius:50px;font-size:12px;z-index:3000;display:none;white-space:nowrap}
 .toast.ok{border-color:rgba(6,214,160,.4);color:var(--gn)}
 .toast.err{border-color:rgba(239,69,101,.4);color:var(--rd)}
-#ipm{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;align-items:center;justify-content:center;cursor:pointer}
+#ipm{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;align-items:center;justify-content:center}
 #ipm.on{display:flex}
-#ipm img{max-width:92vw;max-height:92vh;border-radius:9px}
+#ipm img{max-width:92vw;max-height:92vh;border-radius:9px;cursor:default}
+#ipm-close{position:fixed;top:14px;right:16px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2001;transition:background .2s}
+#ipm-close:hover{background:rgba(239,69,101,.5)}
 #fi{display:none}
-@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes wave{0%,100%{height:3px}50%{height:14px}}
+.sl-anim{position:fixed;inset:0;pointer-events:none;z-index:9999;display:flex;align-items:center;justify-content:center;font-size:100px;animation:zoomFade 2.5s ease forwards;text-shadow:0 0 40px rgba(255,209,102,0.8)}
+.cp-anim{position:fixed;inset:0;pointer-events:none;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;animation:floatUpFade 3s ease forwards}
+.cp-anim .msg{background:linear-gradient(135deg,#ff6496,#ff3278);color:#fff;padding:12px 24px;border-radius:50px;font-family:'Syne',sans-serif;font-size:24px;font-weight:800;box-shadow:0 10px 30px rgba(255,100,150,0.5);margin-top:10px}
+@keyframes zoomFade{0%{transform:scale(0);opacity:0}20%{transform:scale(1.2);opacity:1}80%{transform:scale(1);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes floatUpFade{0%{transform:translateY(50px);opacity:0}20%{transform:translateY(0);opacity:1}80%{transform:translateY(-20px);opacity:1}100%{transform:translateY(-50px);opacity:0}}
 </style>
 </head>
 <body>
@@ -182,6 +191,8 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;
       <button class="cb csk" id="btnSk" onclick="doSkip()"    style="display:none">Next Stranger →</button>
       <button class="cb ccl" id="btnC"  onclick="doCancel()"  style="display:none">✕ Cancel</button>
       <button class="cb crp" id="btnR"  onclick="togRep()"    style="display:none">⚑ Report</button>
+      <button class="cb" id="btnSL" onclick="sendPremiumAction('superlike', 8)" style="display:none;background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);color:var(--gd)">🌟 Super Like (8 🪙)</button>
+      <button class="cb" id="btnCp" onclick="sendPremiumAction('compliment', 5)" style="display:none;background:rgba(255,100,150,.1);border:1px solid rgba(255,100,150,.3);color:#ff6496">💌 Compliment (5 🪙)</button>
       <div class="rm" id="rm">
         <button class="ri" onclick="doReport('Fake profile')">Fake profile</button>
         <button class="ri" onclick="doReport('Harassment')">Harassment</button>
@@ -225,7 +236,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;
       <input type="file" id="fi" accept="image/*" onchange="sendImg(this)"/>
       <button class="iab" id="btnImg" onclick="document.getElementById('fi').click()" disabled title="Sign in to send images">🖼</button>
       <button class="iab" id="btnVc" disabled title="Hold to record voice"
-              onmousedown="startRec()" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
+              onmousedown="startRec(event)" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
       <input type="text" id="mi" placeholder="Start a chat first..." disabled maxlength="500"/>
       <button id="sb" onclick="sendMsg()">↑</button>
     </div>
@@ -245,7 +256,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;
   </div>
 </div>
 
-<div id="ipm" onclick="this.classList.remove('on')"><img id="ipmsrc" src="" alt=""/></div>
+<div id="ipm" onclick="closeImgPreview(event)"><img id="ipmsrc" src="" alt=""/><button id="ipm-close" onclick="document.getElementById('ipm').classList.remove('on')" title="Close">✕</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -265,6 +276,8 @@ let gf = 'any';
 let sock=null, state='idle', room=null, rpSent=false;
 let mediaRec=null, audioCh=[], recMime='audio/webm';
 let typT=null, partnerUserId=null;
+let partnerTheme = 'default';
+let ourTheme = 'default';
 
 const $=id=>document.getElementById(id);
 
@@ -334,8 +347,10 @@ function initSocket(){
     $('htxt').textContent='Searching...';
   });
 
-  sock.on('matched',({partnerUsername:pn,partnerGender:pg,partnerVerified:pv,partnerVip:pvip,partnerDev:pd,partnerAdmin:padm,partnerAdminTitle:pat,partnerUserId:puid,commonInterests:ci,roomId:rid})=>{
+  sock.on('matched',({partnerUsername:pn,partnerGender:pg,partnerVerified:pv,partnerVip:pvip,partnerDev:pd,partnerAdmin:padm,partnerAdminTitle:pat,partnerUserId:puid,commonInterests:ci,roomId:rid,friendshipStatus:fst,profileLocked:plock,chatTheme:ptheme})=>{
     room=rid; rpSent=false; partnerUserId=puid||null;
+    partnerTheme = ptheme || 'default';
+    ourTheme = user?.chatTheme || 'default'; // fallback if we want to theme our own bubbles
 
     // Header
     $('hdIdle').style.display='none';
@@ -354,11 +369,26 @@ function initSocket(){
     let mh=`<span class="gtg" style="background:${gb};color:${gc};border:1px solid ${gc}44">${gi} ${pg}</span>`;
     mh+=buildBadgeHTML({name:pn,verified:pv,vip:pvip,dev:pd,admin:padm,adminTitle:pat});
     $('pm').innerHTML=mh;
-    $('pci').textContent=ci>0?`🎯 ${ci} shared interest${ci>1?'s':''}`:' ';
+    
+    if (plock) {
+      $('pci').innerHTML = `<span style="color:var(--rd);font-weight:600">🔒 Profile Locked</span>`;
+    } else {
+      $('pci').textContent=ci>0?`🎯 ${ci} shared interest${ci>1?'s':''}`:' ';
+    }
 
-    // Add friend button (only for logged-in users chatting with non-guests)
-    if(isIn&&puid){$('afBtn').style.display='block';$('afBtn').disabled=false;$('afBtn').textContent='➕ Add Friend';}
-    else{$('afBtn').style.display='none';}
+    // Add friend button — reflect existing friendship state
+    if(isIn&&puid){
+      $('afBtn').style.display='block';
+      if(fst==='friends'){
+        $('afBtn').textContent='✓ Already Friends';$('afBtn').disabled=true;
+      }else if(fst==='pending'){
+        $('afBtn').textContent='✓ Request Sent';$('afBtn').disabled=true;
+      }else if(fst==='incoming'){
+        $('afBtn').textContent='👋 Accept Request';$('afBtn').disabled=false;
+      }else{
+        $('afBtn').textContent='➕ Add Friend';$('afBtn').disabled=false;
+      }
+    }else{$('afBtn').style.display='none';}
 
     setState('chatting');
     addSys(`Now chatting with ${pn}${ci>0?` — ${ci} shared interest${ci>1?'s':''}`:''}`);
@@ -397,10 +427,55 @@ function initSocket(){
   sock.on('incoming_friend_request',({fromUsername})=>{
     showToast(`👋 ${fromUsername} sent you a friend request!`,'ok');
   });
+
+  // Premium Animations
+  sock.on('receive_superlike', () => {
+    const d = document.createElement('div');
+    d.className = 'sl-anim';
+    d.innerHTML = '🌟';
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 2600);
+  });
+  sock.on('receive_compliment', () => {
+    const d = document.createElement('div');
+    d.className = 'cp-anim';
+    d.innerHTML = '<div style="font-size:70px">💌</div><div class="msg">You\'re amazing!</div>';
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 3100);
+  });
+}
+
+/* ══ PREMIUM ACTIONS ══ */
+function sendPremiumAction(itemId, cost) {
+  if (!isIn || !partnerUserId) return;
+  const coins = user?.coins || 0;
+  if (coins < cost) {
+    showToast(`Not enough coins! (Need ${cost}🪙)`, 'err');
+    return;
+  }
+  fetch(`${API}/api/user/spend-coins`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ amount: cost, itemId, extra: { targetUserId: partnerUserId } })
+  }).then(r => r.json()).then(d => {
+    if (d.user) {
+      Object.assign(user, { coins: d.user.coins });
+      localStorage.setItem('sc_user', JSON.stringify(user));
+    }
+    showToast(`Sent ${itemId}!`, 'ok');
+    sock?.emit(`send_${itemId}`, { targetUserId: partnerUserId, roomId: room });
+    if (itemId === 'superlike') $('btnSL').disabled = true;
+    if (itemId === 'compliment') $('btnCp').disabled = true;
+  }).catch(() => showToast('Failed to send', 'err'));
 }
 
 /* ══ ACTIONS ══ */
 function startSearch(){
+  if (isIn && !user.isVerified) {
+    showToast('Please verify your account in the Dashboard to start chatting!', 'err');
+    setTimeout(() => location.href = 'dashboard.html', 2000);
+    return;
+  }
   if(!sock?.connected)return;
   setState('searching');
   $('srchLbl').textContent='Finding your match...';
@@ -428,36 +503,67 @@ $('mi').addEventListener('input',()=>{
 
 function sendImg(inp){
   if(!inp.files[0]||state!=='chatting')return;
-  const r=new FileReader();r.onload=e=>sock?.emit('send_image',{dataUrl:e.target.result,roomId:room});
-  r.readAsDataURL(inp.files[0]);inp.value='';
+  const file=inp.files[0];inp.value='';
+  const img=new Image();
+  const objUrl=URL.createObjectURL(file);
+  img.onload=()=>{
+    const MAX=1280;
+    let w=img.width,h=img.height;
+    if(w>MAX||h>MAX){const r=Math.min(MAX/w,MAX/h);w=Math.round(w*r);h=Math.round(h*r);}
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+    cv.getContext('2d').drawImage(img,0,0,w,h);
+    URL.revokeObjectURL(objUrl);
+    const dataUrl=cv.toDataURL('image/jpeg',0.82);
+    if(dataUrl.length>5*1024*1024){showToast('Image still too large after compression','err');return;}
+    sock?.emit('send_image',{dataUrl,roomId:room});
+  };
+  img.onerror=()=>{URL.revokeObjectURL(objUrl);showToast('Could not read image','err');};
+  img.src=objUrl;
 }
 
-/* ── Voice recording — fixed ── */
+/* ── Voice recording ── */
+let recStartTime=0;
 async function startRec(e){
-  if(e)e.preventDefault();
+  if(e){e.preventDefault();e.stopPropagation();}
+  // Block the paired mousedown that fires after touchstart
+  if(e&&e.type==='touchstart'){
+    $('btnVc').addEventListener('mousedown',function stopMD(ev){ev.preventDefault();$('btnVc').removeEventListener('mousedown',stopMD);},{once:true,capture:true});
+  }
   if(state!=='chatting')return;
+  if(mediaRec&&mediaRec.state==='recording')return;
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
     audioCh=[];
-    // Try supported mime types in order
+    recStartTime=Date.now();
     const mimes=['audio/webm;codecs=opus','audio/webm','audio/ogg;codecs=opus','audio/mp4'];
     recMime=mimes.find(m=>MediaRecorder.isTypeSupported(m))||'';
     mediaRec=new MediaRecorder(stream,recMime?{mimeType:recMime}:{});
     recMime=mediaRec.mimeType||'audio/webm';
     mediaRec.ondataavailable=ev=>{if(ev.data&&ev.data.size>0)audioCh.push(ev.data);};
     mediaRec.onstop=()=>{
+      stream.getTracks().forEach(t=>t.stop());
+      if(!audioCh.length){showToast('Recording too short','err');return;}
       const blob=new Blob(audioCh,{type:recMime});
       const fr=new FileReader();
       fr.onload=e2=>sock?.emit('send_voice',{dataUrl:e2.target.result,mimeType:recMime,roomId:room});
       fr.readAsDataURL(blob);
-      stream.getTracks().forEach(t=>t.stop());
     };
-    mediaRec.start(100); // collect chunks every 100ms
+    mediaRec.start(100);
     $('btnVc').classList.add('rec');$('btnVc').textContent='🔴';
-  }catch(err){console.error(err);alert('Microphone access denied. Check browser settings.');}
+  }catch(err){
+    console.error(err);
+    showToast('Microphone access denied','err');
+  }
 }
 function stopRec(){
-  if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();
+  if(!mediaRec||mediaRec.state==='inactive')return;
+  // Require at least 300ms of recording to avoid empty blobs
+  const elapsed=Date.now()-recStartTime;
+  if(elapsed<300){
+    setTimeout(()=>{if(mediaRec&&mediaRec.state!=='inactive')mediaRec.stop();},300-elapsed);
+  }else{
+    mediaRec.stop();
+  }
   $('btnVc').classList.remove('rec');$('btnVc').textContent='🎤';
 }
 
@@ -478,6 +584,9 @@ function setState(s){
   $('btnSk').style.display=s==='chatting'?'block':'none';
   $('btnC').style.display =s==='searching'?'block':'none';
   $('btnR').style.display =(s==='chatting'&&!rpSent)?'block':'none';
+  $('btnSL').style.display=(s==='chatting'&&isIn&&partnerUserId)?'block':'none';
+  $('btnCp').style.display=(s==='chatting'&&isIn&&partnerUserId)?'block':'none';
+  if(s==='chatting') { $('btnSL').disabled=false; $('btnCp').disabled=false; }
   $('rp').style.display   =(s==='chatting'&&rpSent)?'block':'none';
   if(s!=='chatting')$('rm').classList.remove('on');
   const ok=s==='chatting';
@@ -495,6 +604,7 @@ function setState(s){
 /* ══ BUBBLES ══ */
 // Global helpers so onclick inside bubbles works
 window.previewImg=src=>{$('ipmsrc').src=src;$('ipm').classList.add('on');};
+function closeImgPreview(e){if(e.target===document.getElementById('ipm'))document.getElementById('ipm').classList.remove('on');}
 window.playVoice=(src,mime,btnEl)=>{
   try{
     const audio=new Audio();
@@ -544,7 +654,8 @@ function addBub(content,isMe,ts,type){
     </div><div class="btime">${t}</div>`;
   }
 
-  row.innerHTML=`<div class="bub ${side}">${inner}</div>`;
+  const themeClass = isMe ? (ourTheme !== 'default' ? ourTheme : '') : (partnerTheme !== 'default' ? partnerTheme : '');
+  row.innerHTML=`<div class="bub ${side} ${themeClass}">${inner}</div>`;
   $('msgs').appendChild(row);
   scrollB();
 }

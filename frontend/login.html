@@ -11,7 +11,8 @@ body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-h
 h1{font-family:'Syne',sans-serif;font-weight:800}
 button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .25s}
 a{text-decoration:none}
-.card{width:100%;max-width:420px;background:var(--sr);border:1px solid var(--bd);border-radius:22px;padding:36px;animation:fi .5s ease}
+.card{width:100%;max-width:420px;background:var(--sr);border:1px solid var(--bd);border-radius:22px;padding:36px;animation:fadeUp 0.6s cubic-bezier(0.16,1,0.3,1) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 .top{text-align:center;margin-bottom:24px}
 .icon{font-size:30px;color:var(--pr);display:block;margin-bottom:10px}
 .top h1{font-size:22px;margin-bottom:4px}
@@ -36,12 +37,8 @@ label{font-size:12px;font-weight:600;color:var(--t2)}
 .ft{text-align:center;margin-top:16px;color:var(--t2);font-size:13px}
 .ft a{color:var(--pr2);font-weight:600}
 .bl{display:inline-block;margin-bottom:12px;color:var(--t2);font-size:13px}
-/* 2FA */
-.tfa-panel{display:none}
-.otp-box{background:rgba(124,92,252,.08);border:1px solid var(--bd);border-radius:9px;padding:12px;margin-bottom:12px;font-size:12px;color:var(--t2);line-height:1.6}
-.otp-code{font-family:'Courier New',monospace;font-size:20px;font-weight:700;color:var(--pr2);letter-spacing:6px;display:block;text-align:center;margin:8px 0 4px;padding:8px;background:var(--bg3);border-radius:8px;border:1px dashed var(--bd)}
-.step-tag{font-size:10px;color:var(--t3);text-align:center;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px}
-@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+
 </style>
 </head>
 <body>
@@ -74,33 +71,13 @@ label{font-size:12px;font-weight:600;color:var(--t2)}
     <button class="btns" onclick="guestChat()">Continue as Guest →</button>
   </div>
 
-  <!-- 2FA panel -->
-  <div class="tfa-panel" id="tfaPanel">
-    <div class="step-tag">Step 2 of 2 — Two-Factor Authentication</div>
-    <div class="otp-box">
-      🔐 Two-factor authentication is enabled on your account.<br/>
-      Your OTP code:
-      <span class="otp-code" id="otpDisplay">------</span>
-      <span style="font-size:10px;color:var(--t3)">👆 In production this goes to your email. For now it shows here.</span>
-    </div>
-    <div class="field">
-      <label>Enter the 6-digit code above</label>
-      <div class="iw">
-        <input type="text" id="otpInput" placeholder="Enter OTP" maxlength="6"
-               style="letter-spacing:6px;font-size:18px;text-align:center;padding:11px"
-               oninput="this.value=this.value.replace(/\D/g,'')"/>
-      </div>
-    </div>
-    <button class="btnp" id="otpBtn" onclick="verify2FA()">Verify & Sign In →</button>
-    <button class="btns" style="margin-top:8px" onclick="backToLogin()">← Back</button>
-  </div>
+
 
   <p class="ft">No account? <a href="register.html">Sign up free</a></p>
 </div>
 
 <script>
 const API = 'http://127.0.0.1:5000';
-let partialToken = null;
 
 const $ = id => document.getElementById(id);
 
@@ -142,15 +119,6 @@ async function doLogin() {
     const d = await r.json();
     if (!r.ok) return showErr(d.message || 'Login failed');
 
-    if (d.requires2FA) {
-      partialToken = d.partialToken;
-      // Show OTP (dev mode — in production this goes to email)
-      if (d.otp_dev) $('otpDisplay').textContent = d.otp_dev;
-      $('loginPanel').style.display = 'none';
-      $('tfaPanel').style.display   = 'block';
-      showOk('2FA required. Enter the code shown above.');
-      return;
-    }
     saveAndGo(d);
   } catch (e) {
     console.error(e);
@@ -161,37 +129,7 @@ async function doLogin() {
   }
 }
 
-async function verify2FA() {
-  const otp = $('otpInput').value.trim();
-  const btn = $('otpBtn');
-  hideMsg();
-  if (!otp || otp.length !== 6) return showErr('Enter the 6-digit code');
-  btn.disabled = true; btn.textContent = 'Verifying...';
-  try {
-    const r = await fetch(`${API}/api/auth/verify-2fa`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ partialToken, otp })
-    });
-    const d = await r.json();
-    if (!r.ok) return showErr(d.message || 'Invalid OTP');
-    saveAndGo(d);
-  } catch (e) {
-    console.error(e);
-    showErr('Server error. Try again.');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Verify & Sign In →';
-  }
-}
 
-function backToLogin() {
-  $('loginPanel').style.display = 'block';
-  $('tfaPanel').style.display   = 'none';
-  partialToken = null;
-  $('otpInput').value = '';
-  $('otpDisplay').textContent = '------';
-  hideMsg();
-}
 
 function saveAndGo(d) {
   localStorage.setItem('sc_token', d.token);
@@ -212,7 +150,7 @@ function guestChat() {
 
 document.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
-  $('tfaPanel').style.display !== 'none' ? verify2FA() : doLogin();
+  doLogin();
 });
 
 // Already logged in? Go to dashboard
