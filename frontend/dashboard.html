@@ -160,7 +160,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
 
   <div class="tabs">
     <button class="tab on" onclick="switchTab('profile',this)">👤 Profile</button>
-    <button class="tab"    onclick="switchTab('admirers',this)">🌟 Admirers</button>
     <button class="tab"    onclick="switchTab('friends',this)">👥 Friends <span id="frBadge" style="background:var(--rd);color:#fff;padding:1px 5px;border-radius:50px;font-size:9px;margin-left:2px;display:none">0</span></button>
     <button class="tab"    onclick="switchTab('security',this)">🔐 Security</button>
   </div>
@@ -222,22 +221,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.9);b
     </div>
   </div>
 
-  <!-- ADMIRERS TAB -->
-  <div class="tpanel" id="tab-admirers">
-    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,rgba(124,92,252,.05),var(--sr));border-color:var(--b2)">
-      <h2 class="ct" style="margin-bottom:10px">🌟 See Who Liked You</h2>
-      <p style="color:var(--t2);font-size:12px;line-height:1.6;margin-bottom:14px">
-        Find out who sent you a Super Like or an Anonymous Compliment! 
-        Without the "Reveal Likes" premium feature, usernames remain hidden.
-      </p>
-      <a href="premium.html"><button style="padding:8px 16px;border-radius:50px;background:var(--sr);border:1px solid var(--pr);color:var(--pr2);font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Get "Reveal Likes" in the Coin Shop →</button></a>
-    </div>
-    
-    <div class="card">
-      <h2 class="ct" style="margin-bottom:14px">Recent Admirers</h2>
-      <div id="admirersList"><p class="empty-msg">No admirers yet. Keep chatting to get Super Likes and Compliments!</p></div>
-    </div>
-  </div>
 
   <!-- FRIENDS TAB -->
   <div class="tpanel" id="tab-friends">
@@ -349,7 +332,6 @@ function switchTab(name, el) {
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
   $('tab-'+name).classList.add('on'); el.classList.add('on');
   if (name === 'friends') loadFriends();
-  if (name === 'admirers') loadAdmirers();
 }
 
 /* ── location ── */
@@ -373,11 +355,17 @@ function onES() { popCity($('eCi'),$('eC').value,$('eS').value,''); }
 /* ── badges ── */
 function buildBadges(u) {
   let h = '';
-  if (DEV.includes(u.username)) { h += '<span class="bm bkoc">🩸 King of Curses</span><span class="bm bdev">⚡ Dev</span>'; }
+  if (DEV.includes(u.username)) { h += '<span class="bm bdev" style="background:linear-gradient(135deg,rgba(124,92,252,.3),rgba(0,229,255,.2));color:#b4a0ff;border:1px solid rgba(124,92,252,.5)">⚡ Dev</span>'; }
   if (u.isAdmin)     h += '<span class="bm badm">🛡️ Admin</span>';
   if (u.adminTitle)  h += `<span class="bm bani">✦ ${u.adminTitle}</span>`;
-  if (u.isPremium)   h += '<span class="bm bvip">👑 VIP</span>';
-  else if (u.isVerified) h += '<span class="bm bv">✦ Verified</span>';
+  
+  if (u.isPremiumAnnual) {
+    h += '<span class="bm bvipa" style="background:linear-gradient(135deg,rgba(255,215,0,.35),rgba(255,140,0,.25));color:#ffe066;border:1px solid rgba(255,215,0,.65)">👑 VIP Annual</span>';
+  } else if (u.isPremium) {
+    h += '<span class="bm bvip">👑 VIP</span>';
+  } else if (u.isVerified) {
+    h += '<span class="bm bv">✦ Verified</span>';
+  }
   return h;
 }
 
@@ -413,7 +401,7 @@ function loadUI() {
   $('dSince').textContent = fmtDate(user.memberSince);
   $('bArea').innerHTML    = buildBadges(user);
   if (user.isVerified) $('vSec').style.display = 'none';
-  if (user.isPremium)  $('pBanner').style.display = 'none';
+  if (user.isPremium || user.isPremiumAnnual)  $('pBanner').style.display = 'none';
 
   // Chat button block
   const navChat = $('navChatBtn');
@@ -440,8 +428,8 @@ function loadUI() {
 
   // Security tab
   $('secSince').textContent = fmtDate(user.memberSince);
-  $('secPlan').textContent  = user.isPremium ? '👑 VIP' : 'Free';
-  $('secPlan').style.color  = user.isPremium ? 'var(--gd)' : 'var(--t2)';
+  $('secPlan').textContent  = user.isPremiumAnnual ? '👑 VIP Annual' : user.isPremium ? '👑 VIP' : 'Free';
+  $('secPlan').style.color  = (user.isPremiumAnnual || user.isPremium) ? 'var(--gd)' : 'var(--t2)';
   const vb = $('verBadge');
   if (vb) {
     vb.textContent  = user.isVerified ? '✦ Verified' : 'Not Verified';
@@ -687,40 +675,6 @@ async function respondFriend(id, action) {
   } catch { showToast('Error', 'err'); }
 }
 
-/* ── Admirers ── */
-async function loadAdmirers() {
-  try {
-    const r = await fetch(`${API}/api/user/interactions`, { headers: { 'Authorization':`Bearer ${token}` } });
-    const d = await r.json();
-    const rows = d.admirers || [];
-    const aEl = $('admirersList');
-    
-    if (rows.length === 0) {
-      aEl.innerHTML = '<p class="empty-msg">No admirers yet. Keep chatting!</p>';
-      return;
-    }
-    
-    aEl.innerHTML = '';
-    rows.forEach(a => {
-      const div = document.createElement('div');
-      div.className = 'friend-card';
-      const icon = a.type === 'superlike' ? '🌟' : (a.type === 'compliment' ? '💌' : '👍');
-      const actionTxt = a.type === 'superlike' ? 'sent you a Super Like' : 'sent you a Compliment';
-      const isBlurred = !a.isRevealed;
-      const blurStyle = isBlurred ? 'filter: blur(4px); user-select: none; opacity: 0.7' : '';
-      
-      div.innerHTML = `
-        <div class="fav" style="background:${a.type==='superlike'?'linear-gradient(135deg,#ffd166,#ff9f43)':'linear-gradient(135deg,#ff6496,#ff3278)'}">${icon}</div>
-        <div>
-          <div class="fname" style="${blurStyle}">${a.senderName}</div>
-          <div style="font-size:10px;color:var(--t3)">${actionTxt} • ${new Date(a.date).toLocaleDateString()}</div>
-        </div>
-        ${isBlurred ? `<a href="premium.html" class="fml" style="text-decoration:none"><button class="faccept" style="background:transparent;border-color:var(--pr);color:var(--pr2)">Reveal 👀</button></a>` : ''}
-      `;
-      aEl.appendChild(div);
-    });
-  } catch (e) { console.error('Admirers error:', e); }
-}
 
 function doLogout() { localStorage.removeItem('sc_token'); localStorage.removeItem('sc_user'); location.href = 'index.html'; }
 function showToast(msg, type) {

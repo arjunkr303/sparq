@@ -3,9 +3,11 @@ const supabase = require('../supabase');
 const Filter   = require('bad-words');
 const filter   = new Filter();
 
-const queue  = new Map();
-const chats  = new Map();
-const reports= new Map();
+const queue          = new Map();
+const chats          = new Map();
+const reports        = new Map();
+// pendingUndoQueue: targetUserId → { requesterSid, requesterUserId, timer }
+const pendingUndoQueue = new Map();
 
 const DEV_NAMES   = ['KING','king'];
 const ADMIN_NAMES = []; // populated from DB at runtime
@@ -55,7 +57,7 @@ module.exports = io => {
     try {
       const { id } = jwt.verify(token, process.env.JWT_SECRET);
       const { data: u } = await supabase.from('users')
-        .select('id,username,gender,is_verified,is_premium,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,spotlight_interest,spotlight_expiry,chat_theme,profile_lock_expiry')
+        .select('id,username,gender,is_verified,is_premium,premium_expiry,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,spotlight_interest,spotlight_expiry,chat_theme,theme_expiry,profile_lock_expiry,aura_expiry')
         .eq('id', id).maybeSingle();
       if (!u)          return next(new Error('User not found'));
       if (u.is_banned) return next(new Error('Banned'));
@@ -65,11 +67,14 @@ module.exports = io => {
       const isSpotlight = u.spotlight_expiry && new Date(u.spotlight_expiry) > now;
       const isLocked = u.profile_lock_expiry && new Date(u.profile_lock_expiry) > now;
       const hasTheme = u.theme_expiry && new Date(u.theme_expiry) > now;
+      const isPremiumAnnual = u.is_premium && u.premium_expiry && (new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000);
+      const hasAura = u.aura_expiry && new Date(u.aura_expiry) > now;
 
       socket.u = {
         id: u.id, guest: false, name: u.username,
         gender: u.gender||'other',
         verified: u.is_verified, premium: u.is_premium,
+        premiumAnnual: !!isPremiumAnnual,
         dev: DEV_NAMES.includes(u.username),
         admin: u.is_admin || false,
         adminTitle: u.admin_title || null,
@@ -79,6 +84,7 @@ module.exports = io => {
         spotlight: isSpotlight ? u.spotlight_interest : null,
         locked: isLocked,
         theme: hasTheme ? u.chat_theme : 'default',
+        aura: hasAura,
       };
       next();
     } catch { next(new Error('Auth failed')); }
@@ -93,11 +99,10 @@ module.exports = io => {
       queue.delete(socket.id);
       const me = {
         sid: socket.id, id: u.id||null, name: u.name, gender: u.gender,
-        verified: u.verified, premium: u.premium, dev: u.dev,
+        verified: u.verified, premium: u.premium, premiumAnnual: u.premiumAnnual, dev: u.dev,
         admin: u.admin, adminTitle: u.adminTitle,
-        country: u.country, state: u.state, city: u.city,
-        int: u.int, gf: genderFilter||'any', guest: u.guest,
-        boosted: u.boosted, spotlight: u.spotlight, locked: u.locked, theme: u.theme,
+        country: u.country, state: u.state, city: u.city, int: u.int, gf: genderFilter||'any',
+        boosted: u.boosted, spotlight: u.spotlight, locked: u.locked, theme: u.theme, aura: u.aura
       };
       console.log(`🔍 ${me.name} | city="${me.city}" state="${me.state}" gf="${me.gf}" queue=${queue.size}`);
       const partner = findMatch(me);
@@ -127,11 +132,12 @@ module.exports = io => {
         const partnerSocket = io.sockets.sockets.get(partner.sid);
         const pu = partnerSocket?.u || {};
 
-        const mkPayload = (name, gender, id, verified, premium, dev, admin, adminTitle, myStatus, locked, theme, country, state, city) => ({
+        const mkPayload = (name, gender, id, verified, premium, premiumAnnual, dev, admin, adminTitle, myStatus, locked, theme, country, state, city, interests, aura) => ({
           partnerUsername:   name,
           partnerGender:     gender,
           partnerVerified:   verified,
           partnerVip:        premium,
+          partnerVipAnnual:  premiumAnnual,
           partnerDev:        dev,
           partnerAdmin:      admin,
           partnerAdminTitle: adminTitle,
@@ -143,6 +149,8 @@ module.exports = io => {
           country:           country,
           state:             state,
           city:              city,
+          partnerInterests:  interests || [],
+          partnerAura:       aura || false
         });
 
         // Current user → gets partner's info (from live partner socket.u)
@@ -152,6 +160,7 @@ module.exports = io => {
           pu.id      || partner.id,
           pu.verified !== undefined ? pu.verified : partner.verified,
           pu.premium  !== undefined ? pu.premium  : partner.premium,
+          pu.premiumAnnual !== undefined ? pu.premiumAnnual : partner.premiumAnnual,
           pu.dev      !== undefined ? pu.dev      : partner.dev,
           pu.admin    !== undefined ? pu.admin    : partner.admin,
           pu.adminTitle !== undefined ? pu.adminTitle : partner.adminTitle,
@@ -160,15 +169,19 @@ module.exports = io => {
           pu.theme || partner.theme || 'default',
           pu.country || partner.country,
           pu.state || partner.state,
-          pu.city || partner.city
+          pu.city || partner.city,
+          pu.int || partner.int || [],
+          pu.aura !== undefined ? pu.aura : partner.aura
         ));
 
         // Partner → gets current user's info (from live socket.u — always fresh)
         io.to(partner.sid).emit('matched', mkPayload(
           u.name, u.gender, u.id,
-          u.verified, u.premium, u.dev, u.admin, u.adminTitle,
+          u.verified, u.premium, u.premiumAnnual, u.dev, u.admin, u.adminTitle,
           partnerStatus,
-          u.locked, u.theme, u.country, u.state, u.city
+          u.locked, u.theme, u.country, u.state, u.city,
+          u.int || [],
+          u.aura
         ));
 
         console.log(`🎉 ${me.name} <-> ${partner.name} room=${room} | verified: me=${u.verified} partner=${pu.verified !== undefined ? pu.verified : partner.verified}`);
@@ -183,6 +196,17 @@ module.exports = io => {
       queue.delete(socket.id);
       console.log(`❌ ${u.name} cancelled. Queue=${queue.size}`);
       socket.emit('search_cancelled');
+    });
+
+    socket.on('cancel_undo_wait', () => {
+      // Remove this socket from any pending undo wait entry it created
+      for (const [tuid, entry] of pendingUndoQueue.entries()) {
+        if (entry.requesterSid === socket.id) {
+          clearTimeout(entry.timer);
+          pendingUndoQueue.delete(tuid);
+          console.log(`❌ ${u.name} cancelled undo-wait for userId=${tuid}`);
+        }
+      }
     });
 
     socket.on('send_message', ({ message, roomId }) => {
@@ -220,7 +244,113 @@ module.exports = io => {
       socket.to(roomId).emit('partner_typing', { isTyping });
     });
 
-    socket.on('skip', () => { endChat(socket); socket.emit('skipped'); });
+    socket.on('skip', async () => {
+      endChat(socket);
+      // After ending chat, check if someone is waiting to reconnect with this user
+      const reconnected = await matchWithPendingUndo(socket);
+      if (!reconnected) {
+        socket.emit('skipped');
+      }
+    });
+
+    socket.on('undo_skip', async ({ targetUserId }) => {
+      if (!targetUserId) return;
+      const partnerSocket = [...io.sockets.sockets.values()].find(s => s.u?.id === targetUserId);
+
+      if (!partnerSocket) {
+        socket.emit('media_error', { msg: 'Stranger is no longer online.' });
+        return;
+      }
+
+      const inChat = chats.has(partnerSocket.id);
+
+      if (!inChat) {
+        // ── Target is free — connect immediately ──
+        queue.delete(socket.id);
+        queue.delete(partnerSocket.id);
+
+        const room = 'r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+        socket.join(room);
+        partnerSocket.join(room);
+
+        chats.set(socket.id,        { partnerId: partnerSocket.id, roomId: room, partnerUserId: targetUserId });
+        chats.set(partnerSocket.id, { partnerId: socket.id,        roomId: room, partnerUserId: u.id || null });
+
+        const ci = common(u.int, partnerSocket.u?.int);
+
+        let meStatus = 'none', partnerStatus = 'none';
+        if (u.id && targetUserId) {
+          const { data: fs } = await supabase.from('friendships').select('user_id,friend_id,status')
+            .or(`and(user_id.eq.${u.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${u.id})`);
+          if (fs && fs.length > 0) {
+            const row = fs[0];
+            const accepted = row.status === 'accepted';
+            meStatus      = accepted ? 'friends' : (row.user_id === u.id        ? 'pending' : 'incoming');
+            partnerStatus = accepted ? 'friends' : (row.user_id === targetUserId ? 'pending' : 'incoming');
+          }
+        }
+
+        const mkPayload = (name, gender, id, verified, premium, premiumAnnual, dev, admin, adminTitle, myStatus, locked, theme, country, state, city) => ({
+          partnerUsername: name, partnerGender: gender, partnerVerified: verified,
+          partnerVip: premium, partnerVipAnnual: premiumAnnual, partnerDev: dev,
+          partnerAdmin: admin, partnerAdminTitle: adminTitle, partnerUserId: id || null,
+          commonInterests: ci, roomId: room, friendshipStatus: myStatus,
+          profileLocked: locked, chatTheme: theme,
+          country, state, city,
+        });
+
+        const pu = partnerSocket.u || {};
+        io.to(socket.id).emit('matched', mkPayload(
+          pu.name, pu.gender, pu.id || targetUserId,
+          pu.verified, pu.premium, pu.premiumAnnual, pu.dev, pu.admin, pu.adminTitle,
+          meStatus, pu.locked, pu.theme || 'default', pu.country, pu.state, pu.city
+        ));
+        io.to(partnerSocket.id).emit('matched', mkPayload(
+          u.name, u.gender, u.id,
+          u.verified, u.premium, u.premiumAnnual, u.dev, u.admin, u.adminTitle,
+          partnerStatus, u.locked, u.theme, u.country, u.state, u.city
+        ));
+        io.to(room).emit('receive_message', { from: 'system', message: '✨ Match restored via Undo Skip!', timestamp: new Date().toISOString() });
+        console.log(`↩️ Undo skip immediate: ${u.name} <-> ${pu.name}`);
+
+      } else {
+        // ── Target is currently in another chat — enter 30-min wait queue ──
+        // Cancel any previous pending undo from this requester for the same target
+        const existingEntry = pendingUndoQueue.get(targetUserId);
+        if (existingEntry) {
+          clearTimeout(existingEntry.timer);
+        }
+
+        const WAIT_MS = 30 * 60 * 1000; // 30 minutes
+
+        const timer = setTimeout(() => {
+          // Time expired — remove from waiting queue and send to normal search
+          const entry = pendingUndoQueue.get(targetUserId);
+          if (entry && entry.requesterSid === socket.id) {
+            pendingUndoQueue.delete(targetUserId);
+            socket.emit('undo_skip_expired');
+            console.log(`⏰ Undo skip expired for ${u.name} waiting for userId=${targetUserId}`);
+          }
+        }, WAIT_MS);
+
+        pendingUndoQueue.set(targetUserId, {
+          requesterSid:    socket.id,
+          requesterUserId: u.id || null,
+          timer,
+        });
+
+        // Put requester in a special waiting state (not in normal queue)
+        queue.delete(socket.id);
+
+        // Notify requester they are now waiting
+        socket.emit('undo_skip_waiting', { waitMinutes: 30 });
+
+        // Notify the target (partner) that someone wants to reconnect
+        partnerSocket.emit('undo_skip_incoming', { fromUsername: u.name });
+
+        console.log(`⏳ Undo skip WAIT: ${u.name} waiting for userId=${targetUserId} (30 min)`);
+      }
+    });
 
     // ── Friend request ──
     socket.on('send_friend_request', async ({ targetUserId }) => {
@@ -270,11 +400,204 @@ module.exports = io => {
       io.to(c.partnerId).emit('receive_compliment');
     });
 
+    socket.on('update_theme', ({ themeColor }) => {
+      socket.u.theme = themeColor;
+      const c = chats.get(socket.id);
+      if (c && c.partnerId) {
+        io.to(c.partnerId).emit('partner_theme_updated', { themeColor });
+      }
+    });
+
+    // ── Rematch Actions ──
+    socket.on('send_rematch', ({ targetUserId, roomId }) => {
+      if (u.guest || !targetUserId) return;
+      const partnerSocket = [...io.sockets.sockets.values()].find(s => s.u?.id === targetUserId);
+      if (partnerSocket) {
+        partnerSocket.emit('receive_rematch', {
+          fromUsername: u.name,
+          fromUserId: u.id,
+          roomId: roomId
+        });
+      }
+    });
+
+    socket.on('decline_rematch', async ({ targetUserId }) => {
+      if (!targetUserId) return;
+      const senderSocket = [...io.sockets.sockets.values()].find(s => s.u?.id === targetUserId);
+      if (senderSocket) {
+        senderSocket.emit('rematch_declined', { message: `${u.name} declined the re-match.` });
+      }
+      await supabase.from('rematch_requests')
+        .update({ status: 'rejected' })
+        .eq('sender_id', targetUserId)
+        .eq('receiver_id', u.id);
+    });
+
+    socket.on('accept_rematch', async ({ targetUserId }) => {
+      if (u.guest || !targetUserId || !u.id) return;
+      const senderSocket = [...io.sockets.sockets.values()].find(s => s.u?.id === targetUserId);
+      if (senderSocket) {
+        const newRoom = 'r_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        socket.join(newRoom);
+        senderSocket.join(newRoom);
+        
+        chats.set(socket.id, { partnerId: senderSocket.id, roomId: newRoom, partnerUserId: senderSocket.u.id });
+        chats.set(senderSocket.id, { partnerId: socket.id, roomId: newRoom, partnerUserId: u.id });
+        
+        await supabase.from('rematch_requests')
+          .update({ status: 'accepted' })
+          .eq('sender_id', targetUserId)
+          .eq('receiver_id', u.id);
+          
+        const ci = common(u.int, senderSocket.u.int);
+        
+        let meStatus = 'none', partnerStatus = 'none';
+        const { data: fs } = await supabase.from('friendships').select('user_id,friend_id,status')
+          .or(`and(user_id.eq.${u.id},friend_id.eq.${senderSocket.u.id}),and(user_id.eq.${senderSocket.u.id},friend_id.eq.${u.id})`);
+        if (fs && fs.length > 0) {
+          const row = fs[0];
+          const accepted = row.status === 'accepted';
+          meStatus      = accepted ? 'friends' : (row.user_id === u.id              ? 'pending' : 'incoming');
+          partnerStatus = accepted ? 'friends' : (row.user_id === senderSocket.u.id ? 'pending' : 'incoming');
+        }
+
+        const mkPayload = (name, gender, id, verified, premium, premiumAnnual, dev, admin, adminTitle, myStatus, locked, theme, country, state, city, interests) => ({
+          partnerUsername:   name,
+          partnerGender:     gender,
+          partnerVerified:   verified,
+          partnerVip:        premium,
+          partnerVipAnnual:  premiumAnnual,
+          partnerDev:        dev,
+          partnerAdmin:      admin,
+          partnerAdminTitle: adminTitle,
+          partnerUserId:     id || null,
+          commonInterests:   ci, roomId: newRoom,
+          friendshipStatus:  myStatus,
+          profileLocked:     locked,
+          chatTheme:         theme,
+          country:           country,
+          state:             state,
+          city:              city,
+          partnerInterests:  interests || []
+        });
+
+        socket.emit('matched', mkPayload(
+          senderSocket.u.name, senderSocket.u.gender, senderSocket.u.id,
+          senderSocket.u.verified, senderSocket.u.premium, senderSocket.u.premiumAnnual, senderSocket.u.dev,
+          senderSocket.u.admin, senderSocket.u.adminTitle, meStatus,
+          senderSocket.u.locked, senderSocket.u.theme || 'default',
+          senderSocket.u.country, senderSocket.u.state, senderSocket.u.city,
+          senderSocket.u.int || []
+        ));
+
+        senderSocket.emit('matched', mkPayload(
+          u.name, u.gender, u.id,
+          u.verified, u.premium, u.premiumAnnual, u.dev, u.admin, u.adminTitle, partnerStatus,
+          u.locked, u.theme || 'default', u.country, u.state, u.city,
+          u.int || []
+        ));
+
+        socket.emit('rematch_success');
+        senderSocket.emit('rematch_success');
+      } else {
+        socket.emit('media_error', { msg: 'Partner is offline or unavailable.' });
+      }
+    });
+
     socket.on('disconnect', () => {
       queue.delete(socket.id);
+      // Clean up pending undo entries where this user was the REQUESTER (they left while waiting)
+      for (const [tuid, entry] of pendingUndoQueue.entries()) {
+        if (entry.requesterSid === socket.id) {
+          clearTimeout(entry.timer);
+          pendingUndoQueue.delete(tuid);
+        }
+      }
+      // If this user was the TARGET someone was waiting for, notify the requester they're gone
+      if (u.id && pendingUndoQueue.has(u.id)) {
+        const entry = pendingUndoQueue.get(u.id);
+        clearTimeout(entry.timer);
+        pendingUndoQueue.delete(u.id);
+        const requesterSocket = io.sockets.sockets.get(entry.requesterSid);
+        if (requesterSocket) {
+          requesterSocket.emit('media_error', { msg: 'Stranger went offline while you were waiting.' });
+          requesterSocket.emit('undo_skip_expired'); // reset to idle
+        }
+      }
       endChat(socket);
       console.log(`🔌 Left: ${u.name} queue=${queue.size}`);
     });
+
+    async function matchWithPendingUndo(s) {
+      // Check if someone is waiting in the undo-skip queue for this user
+      if (!s.u?.id) return false;
+      const entry = pendingUndoQueue.get(s.u.id);
+      if (!entry) return false;
+
+      const requesterSocket = io.sockets.sockets.get(entry.requesterSid);
+      if (!requesterSocket || !requesterSocket.connected) {
+        // Requester has gone offline — clean up
+        clearTimeout(entry.timer);
+        pendingUndoQueue.delete(s.u.id);
+        return false;
+      }
+
+      // Clear the waiting timer
+      clearTimeout(entry.timer);
+      pendingUndoQueue.delete(s.u.id);
+
+      // Remove both from normal queue (safety)
+      queue.delete(s.id);
+      queue.delete(requesterSocket.id);
+
+      const room = 'r_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+      s.join(room);
+      requesterSocket.join(room);
+
+      chats.set(s.id,               { partnerId: requesterSocket.id, roomId: room, partnerUserId: entry.requesterUserId });
+      chats.set(requesterSocket.id, { partnerId: s.id,               roomId: room, partnerUserId: s.u.id });
+
+      const ci = common(s.u.int, requesterSocket.u?.int);
+      const ru = requesterSocket.u || {};
+
+      let meStatus = 'none', partnerStatus = 'none';
+      if (s.u.id && ru.id) {
+        const { data: fs } = await supabase.from('friendships').select('user_id,friend_id,status')
+          .or(`and(user_id.eq.${s.u.id},friend_id.eq.${ru.id}),and(user_id.eq.${ru.id},friend_id.eq.${s.u.id})`);
+        if (fs && fs.length > 0) {
+          const row = fs[0];
+          const accepted = row.status === 'accepted';
+          meStatus      = accepted ? 'friends' : (row.user_id === s.u.id ? 'pending' : 'incoming');
+          partnerStatus = accepted ? 'friends' : (row.user_id === ru.id  ? 'pending' : 'incoming');
+        }
+      }
+
+      const mkPayload = (name, gender, id, verified, premium, premiumAnnual, dev, admin, adminTitle, myStatus, locked, theme, country, state, city) => ({
+        partnerUsername: name, partnerGender: gender, partnerVerified: verified,
+        partnerVip: premium, partnerVipAnnual: premiumAnnual, partnerDev: dev,
+        partnerAdmin: admin, partnerAdminTitle: adminTitle, partnerUserId: id || null,
+        commonInterests: ci, roomId: room, friendshipStatus: myStatus,
+        profileLocked: locked, chatTheme: theme,
+        country, state, city,
+      });
+
+      // Target (s) receives requester's info
+      io.to(s.id).emit('matched', mkPayload(
+        ru.name, ru.gender, ru.id,
+        ru.verified, ru.premium, ru.premiumAnnual, ru.dev, ru.admin, ru.adminTitle,
+        meStatus, ru.locked, ru.theme || 'default', ru.country, ru.state, ru.city
+      ));
+      // Requester receives target's info
+      io.to(requesterSocket.id).emit('matched', mkPayload(
+        s.u.name, s.u.gender, s.u.id,
+        s.u.verified, s.u.premium, s.u.premiumAnnual, s.u.dev, s.u.admin, s.u.adminTitle,
+        partnerStatus, s.u.locked, s.u.theme || 'default', s.u.country, s.u.state, s.u.city
+      ));
+      io.to(room).emit('receive_message', { from: 'system', message: '✨ Reconnected via Undo Skip!', timestamp: new Date().toISOString() });
+
+      console.log(`↩️ Undo skip MATCH: ${ru.name} <-> ${s.u.name} (waited in queue)`);
+      return true;
+    }
 
     function endChat(s) {
       const c = chats.get(s.id);

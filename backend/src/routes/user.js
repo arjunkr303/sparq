@@ -4,27 +4,33 @@ const authMw   = require('../middleware/auth');
 const bcrypt   = require('bcryptjs');
 const router   = express.Router();
 
-const clean = u => ({
-  id:           u.id,
-  username:     u.username,
-  email:        u.email,
-  gender:       u.gender,
-  age:          u.age,
-  country:      u.country      || '',
-  state:        u.state        || '',
-  city:         u.city         || '',
-  interests:    u.interests    || [],
-  isVerified:   u.is_verified  || false,
-  isPremium:    u.is_premium   || false,
-  isAdmin:      u.is_admin     || false,
-  adminTitle:   u.admin_title  || null,
-  coins:        u.coins        || 0,
-  twoFAEnabled: u.two_fa_enabled || false,
-  memberSince:  u.created_at   || null,
-  profilePhoto: u.profile_photo || null,
-  trustScore:   u.trust_score  || 100,
-  reportCount:  u.report_count || 0,
-});
+const clean = u => {
+  const now = new Date();
+  const isPremiumAnnual = u.is_premium && u.premium_expiry && (new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000);
+  return {
+    id:           u.id,
+    username:     u.username,
+    email:        u.email,
+    gender:       u.gender,
+    age:          u.age,
+    country:      u.country      || '',
+    state:        u.state        || '',
+    city:         u.city         || '',
+    interests:    u.interests    || [],
+    isVerified:   u.is_verified  || false,
+    isPremium:    u.is_premium   || false,
+    isPremiumAnnual: !!isPremiumAnnual,
+    isAdmin:      u.is_admin     || false,
+    adminTitle:   u.admin_title  || null,
+    coins:        u.coins        || 0,
+    twoFAEnabled: u.two_fa_enabled || false,
+    memberSince:  u.created_at   || null,
+    profilePhoto: u.profile_photo || null,
+    trustScore:   u.trust_score  || 100,
+    reportCount:  u.report_count || 0,
+    premiumExpiry: u.premium_expiry || null
+  };
+};
 
 // ── get me ──
 router.get('/me', authMw, async (req, res) => {
@@ -88,6 +94,10 @@ router.post('/spend-coins', authMw, async (req, res) => {
     if (!amount || amount < 1 || !itemId) return res.status(400).json({ message: 'Invalid request' });
     if ((req.user.coins || 0) < amount)
       return res.status(400).json({ message: 'Not enough coins' });
+
+    if (['superlike', 'compliment', 'rematch'].includes(itemId) && !extra?.targetUserId) {
+      return res.status(400).json({ message: `Target user is required for ${itemId}` });
+    }
     
     const upd = { coins: req.user.coins - amount };
     const now = new Date();
@@ -104,6 +114,10 @@ router.post('/spend-coins', authMw, async (req, res) => {
     } else if (itemId === 'spotlight') {
       upd.spotlight_interest = extra?.interest || (req.user.interests && req.user.interests[0]) || '';
       upd.spotlight_expiry = new Date(now.getTime() + 24*60*60*1000).toISOString();
+    } else if (itemId === 'aura') {
+      upd.aura_expiry = new Date(now.getTime() + 7*24*60*60*1000).toISOString(); // 1 week
+    } else if (itemId === 'citylock') {
+      upd.city_lock_expiry = new Date(now.getTime() + 24*60*60*1000).toISOString(); // 24 hours
     }
 
     const { data: u } = await supabase.from('users')
@@ -132,6 +146,8 @@ router.post('/spend-coins', authMw, async (req, res) => {
     cleaned.revealLikesExpiry = u.reveal_likes_expiry;
     cleaned.spotlightExpiry = u.spotlight_expiry;
     cleaned.spotlightInterest = u.spotlight_interest;
+    cleaned.auraExpiry = u.aura_expiry;
+    cleaned.cityLockExpiry = u.city_lock_expiry;
 
     res.json({ user: cleaned });
   } catch (err) {
