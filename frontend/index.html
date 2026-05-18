@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>StrangerNear — Meet people near you</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080f;--bg2:#0f0f1a;--surface:#1a1a2e;--border:rgba(120,100,255,.15);--border2:rgba(120,100,255,.28);--primary:#7c5cfc;--primary2:#9b7ffe;--pglow:rgba(124,92,252,.35);--accent:#00e5ff;--gold:#ffd166;--text:#f0eeff;--text2:#a89fd8;--text3:#6b638f}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800;line-height:1.15}
+a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .25s}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+.bp{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:12px 28px;border-radius:50px;font-weight:600;font-size:14px;box-shadow:0 4px 20px var(--pglow)}
+.bp:hover{transform:translateY(-2px)}
+.bs{background:transparent;color:var(--text2);padding:12px 28px;border-radius:50px;font-weight:500;font-size:14px;border:1px solid var(--border2)}
+.bs:hover{border-color:var(--primary);color:var(--primary2)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.ni{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
+.logo span:first-child{color:var(--primary)}
+.nl{display:flex;align-items:center;gap:20px}
+.nl a{color:var(--text2);font-size:14px;font-weight:500}
+section{position:relative;z-index:1}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 24px 60px}
+.hi{max-width:680px;margin:0 auto;text-align:center;animation:fi .6s ease}
+.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);border-radius:50px;padding:6px 16px;font-size:13px;margin-bottom:32px}
+.hero h1{font-size:clamp(46px,8vw,78px);margin-bottom:18px}
+.gr{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text2);font-size:16px;line-height:1.7;margin-bottom:36px}
+.hb{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:50px}
+.stats{display:flex;gap:44px;justify-content:center;flex-wrap:wrap}
+.sn{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--primary2)}
+.sl{color:var(--text3);font-size:12px;margin-top:3px}
+.sec{padding:80px 24px}.si{max-width:1080px;margin:0 auto}
+.ey{text-align:center;color:var(--primary);font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:14px}
+.st{text-align:center;font-size:clamp(26px,4vw,38px);margin-bottom:48px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px}
+.cn{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:var(--primary);opacity:.22;margin-bottom:12px}
+.card h3{font-size:17px;margin-bottom:9px}.card p{color:var(--text2);font-size:13px;line-height:1.7}
+.tags{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.tag{background:var(--surface);border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-size:13px;color:var(--text2)}
+.feat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;transition:border-color .2s,transform .2s}
+.feat:hover{border-color:var(--primary);transform:translateY(-3px)}
+.fi2{font-size:24px;margin-bottom:12px}.feat h3{font-size:16px;margin-bottom:8px}.feat p{color:var(--text2);font-size:13px;line-height:1.6}
+.cta{padding:80px 24px;text-align:center;background:linear-gradient(180deg,transparent,rgba(124,92,252,.05),transparent)}
+.cta h2{font-size:clamp(26px,5vw,42px);margin-bottom:12px}
+.cta p{color:var(--text2);margin-bottom:28px;font-size:15px}
+footer{border-top:1px solid var(--border);padding:24px}
+.fi3{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.fl{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--primary)}
+footer p{color:var(--text3);font-size:12px}
+@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<nav>
+  <div class="ni">
+    <div class="logo"><span>◈</span><span>StrangerNear</span></div>
+    <div class="nl" id="navLinks">
+      <a href="login.html">Login</a>
+      <a href="chat.html"><button class="bs" style="padding:8px 16px;font-size:13px">Guest Chat</button></a>
+      <a href="register.html"><button class="bp" style="padding:8px 20px;font-size:13px">Sign Up Free</button></a>
+    </div>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hi">
+    <div class="pill">◉ Live now — people chatting worldwide</div>
+    <h1>Meet strangers<br><span class="gr">near you</span></h1>
+    <p>Chat with real people from your city, state, or anywhere in the world.<br>Safe, verified, and always interesting.</p>
+    <div class="hb">
+      <a href="register.html"><button class="bp" style="padding:13px 34px;font-size:15px">Start Free →</button></a>
+      <a href="chat.html"><button class="bs" style="padding:13px 28px">Chat as Guest</button></a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="sn">10K+</div><div class="sl">Active Users</div></div>
+      <div class="stat"><div class="sn">180+</div><div class="sl">Countries</div></div>
+      <div class="stat"><div class="sn">99%</div><div class="sl">Safe Chats</div></div>
+    </div>
+  </div>
+</section>
+<section class="sec">
+  <div class="si">
+    <p class="ey">HOW IT WORKS</p><h2 class="st">Three steps to connect</h2>
+    <div class="grid3">
+      <div class="card"><div class="cn">01</div><h3>Start Instantly</h3><p>No signup needed as a guest. Or create a free account for more features.</p></div>
+      <div class="card"><div class="cn">02</div><h3>Get Verified</h3><p>Optional face verification earns you a trusted badge and better matches.</p></div>
+      <div class="card"><div class="cn">03</div><h3>Match Nearby</h3><p>City first, then state, then country, then global — you're never left waiting.</p></div>
+    </div>
+  </div>
+</section>
+<section class="sec" style="padding-top:0">
+  <div class="si"><p class="ey">INTERESTS</p><h2 class="st">Match by what you love</h2>
+    <div class="tags"><div class="tag">Gaming</div><div class="tag">Music</div><div class="tag">Movies</div><div class="tag">Travel</div><div class="tag">Food</div><div class="tag">Sports</div><div class="tag">Tech</div><div class="tag">Art</div><div class="tag">Books</div><div class="tag">Fitness</div><div class="tag">Cooking</div><div class="tag">Photography</div></div>
+  </div>
+</section>
+<section class="sec" style="padding-top:0">
+  <div class="si"><p class="ey">FEATURES</p><h2 class="st">Built different</h2>
+    <div class="grid3">
+      <div class="feat"><div class="fi2">📍</div><h3>Location Matching</h3><p>City → State → Country → Global. Always nearby first.</p></div>
+      <div class="feat"><div class="fi2">👤</div><h3>No Signup Needed</h3><p>Jump in as a guest instantly. Sign up only when you want more.</p></div>
+      <div class="feat"><div class="fi2">✅</div><h3>Verified Badges</h3><p>Face check confirms real users. No fakes, no bots.</p></div>
+      <div class="feat"><div class="fi2">🎤</div><h3>Voice & Images</h3><p>Send photos and voice messages (signed-in users).</p></div>
+      <div class="feat"><div class="fi2">🛡️</div><h3>Smart Moderation</h3><p>Keyword filter, report system, trust scores.</p></div>
+      <div class="feat"><div class="fi2">🔒</div><h3>Private by Default</h3><p>No chat history stored. Conversations vanish when you leave.</p></div>
+    </div>
+  </div>
+</section>
+<section class="cta">
+  <h2>Ready to meet someone?</h2>
+  <p>Chat as a guest or create a free account for more features</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+    <a href="chat.html"><button class="bs" style="padding:12px 26px;font-size:14px">Chat as Guest</button></a>
+    <a href="register.html"><button class="bp" style="padding:12px 26px;font-size:14px">Sign Up Free →</button></a>
+  </div>
+</section>
+<footer>
+  <div class="fi3"><div class="fl">◈ StrangerNear</div><p>© 2025 StrangerNear. 18+ only.</p></div>
+</footer>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');let W,H,P=[];
+function init(){W=c.width=innerWidth;H=c.height=innerHeight;P=Array.from({length:60},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.5,dx:(Math.random()-.5)*.4,dy:(Math.random()-.5)*.4,o:Math.random()*.5+.1}));}
+function draw(){x.clearRect(0,0,W,H);P.forEach(p=>{p.x+=p.dx;p.y+=p.dy;if(p.x<0||p.x>W)p.dx*=-1;if(p.y<0||p.y>H)p.dy*=-1;x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fillStyle=`rgba(124,92,252,${p.o})`;x.fill();});for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const d=Math.hypot(P[i].x-P[j].x,P[i].y-P[j].y);if(d<120){x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.strokeStyle=`rgba(124,92,252,${.06*(1-d/120)})`;x.lineWidth=.5;x.stroke();}}requestAnimationFrame(draw);}
+window.addEventListener('resize',init);init();draw();
+if(localStorage.getItem('sc_token')){document.getElementById('navLinks').innerHTML='<a href="dashboard.html">Dashboard</a><a href="chat.html"><button class="bp" style="padding:8px 20px;font-size:13px">Start Chat</button></a>';}
+</script>
+</body>
+</html>
