@@ -1,138 +1,212 @@
-const express  = require('express');
-const supabase = require('../supabase');
-const authMw   = require('../middleware/auth');
-const bcrypt   = require('bcryptjs');
-const router   = express.Router();
+const express = require("express");
+const supabase = require("../supabase");
+const { tryClaim } = require("../openerRooms");
+const authMw = require("../middleware/auth");
+const bcrypt = require("bcryptjs");
+const router = express.Router();
 
-const clean = u => {
+const clean = (u) => {
   const now = new Date();
-  const isPremiumAnnual = u.is_premium && u.premium_expiry && (new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000);
+  const isPremiumAnnual =
+    u.is_premium &&
+    u.premium_expiry &&
+    new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000;
   return {
-    id:           u.id,
-    username:     u.username,
-    email:        u.email,
-    gender:       u.gender,
-    age:          u.age,
-    country:      u.country      || '',
-    state:        u.state        || '',
-    city:         u.city         || '',
-    interests:    u.interests    || [],
-    isVerified:   u.is_verified  || false,
-    isPremium:    u.is_premium   || false,
+    id: u.id,
+    username: u.username,
+    email: u.email,
+    gender: u.gender,
+    age: u.age,
+    country: u.country || "",
+    state: u.state || "",
+    city: u.city || "",
+    interests: u.interests || [],
+    isVerified: u.is_verified || false,
+    isPremium: !!(
+      u.is_premium &&
+      u.premium_expiry &&
+      new Date(u.premium_expiry) > now
+    ),
     isPremiumAnnual: !!isPremiumAnnual,
-    isAdmin:      u.is_admin     || false,
-    adminTitle:   u.admin_title  || null,
-    coins:        u.coins        || 0,
+    isAdmin: u.is_admin || false,
+    adminTitle: u.admin_title || null,
+    coins: u.coins || 0,
     twoFAEnabled: u.two_fa_enabled || false,
-    memberSince:  u.created_at   || null,
+    memberSince: u.created_at || null,
     profilePhoto: u.profile_photo || null,
-    trustScore:   u.trust_score  || 100,
-    reportCount:  u.report_count || 0,
-    premiumExpiry: u.premium_expiry || null
+    trustScore: u.trust_score || 100,
+    reportCount: u.report_count || 0,
+    premiumExpiry: u.premium_expiry || null,
   };
 };
 
 // ── get me ──
-router.get('/me', authMw, async (req, res) => {
+router.get("/me", authMw, async (req, res) => {
   res.json({ user: clean(req.user) });
 });
 
 // ── update profile ──
-router.put('/update', authMw, async (req, res) => {
+router.put("/update", authMw, async (req, res) => {
   try {
     const { username, country, state, city, interests } = req.body;
     const upd = {};
-    if (country   !== undefined) upd.country   = country;
-    if (state     !== undefined) upd.state     = state;
-    if (city      !== undefined) upd.city      = city;
+    if (country !== undefined) upd.country = country;
+    if (state !== undefined) upd.state = state;
+    if (city !== undefined) upd.city = city;
     if (interests !== undefined) upd.interests = interests;
     if (username) {
-      const { data: ex } = await supabase.from('users').select('id')
-        .eq('username', username).neq('id', req.user.id).maybeSingle();
-      if (ex) return res.status(400).json({ message: 'Username taken' });
+      const { data: ex } = await supabase
+        .from("users")
+        .select("id")
+        .eq("username", username)
+        .neq("id", req.user.id)
+        .maybeSingle();
+      if (ex) return res.status(400).json({ message: "Username taken" });
       upd.username = username;
     }
-    const { data: u, error } = await supabase.from('users')
-      .update(upd).eq('id', req.user.id).select().single();
-    if (error) return res.status(500).json({ message: 'Update failed' });
+    const { data: u, error } = await supabase
+      .from("users")
+      .update(upd)
+      .eq("id", req.user.id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ message: "Update failed" });
     res.json({ user: clean(u) });
-  } catch { res.status(500).json({ message: 'Server error' }); }
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ── upload profile photo (base64) ──
-router.post('/photo', authMw, async (req, res) => {
+router.post("/photo", authMw, async (req, res) => {
   try {
     const { photoBase64 } = req.body;
-    if (!photoBase64) return res.status(400).json({ message: 'No photo provided' });
+    if (!photoBase64)
+      return res.status(400).json({ message: "No photo provided" });
     // Limit size to ~800KB base64
     if (photoBase64.length > 1100000)
-      return res.status(400).json({ message: 'Photo too large. Max 800KB.' });
-    if (!photoBase64.startsWith('data:image/'))
-      return res.status(400).json({ message: 'Invalid image format' });
+      return res.status(400).json({ message: "Photo too large. Max 800KB." });
+    if (!photoBase64.startsWith("data:image/"))
+      return res.status(400).json({ message: "Invalid image format" });
 
-    const { data: u, error } = await supabase.from('users')
+    const { data: u, error } = await supabase
+      .from("users")
       .update({ profile_photo: photoBase64 })
-      .eq('id', req.user.id).select().single();
-    if (error) return res.status(500).json({ message: 'Photo upload failed' });
-    res.json({ user: clean(u), message: 'Photo updated!' });
-  } catch { res.status(500).json({ message: 'Server error' }); }
+      .eq("id", req.user.id)
+      .select()
+      .single();
+    if (error) return res.status(500).json({ message: "Photo upload failed" });
+    res.json({ user: clean(u), message: "Photo updated!" });
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ── verify face ──
-router.post('/verify', authMw, async (req, res) => {
+router.post("/verify", authMw, async (req, res) => {
   try {
-    const { data: u } = await supabase.from('users')
-      .update({ is_verified: true }).eq('id', req.user.id).select().single();
-    res.json({ user: clean(u), message: 'Verified!' });
-  } catch { res.status(500).json({ message: 'Server error' }); }
+    const { data: u } = await supabase
+      .from("users")
+      .update({ is_verified: true })
+      .eq("id", req.user.id)
+      .select()
+      .single();
+    res.json({ user: clean(u), message: "Verified!" });
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ── spend coins ──
-router.post('/spend-coins', authMw, async (req, res) => {
+router.post("/spend-coins", authMw, async (req, res) => {
   try {
     const { amount, itemId, extra } = req.body;
-    if (!amount || amount < 1 || !itemId) return res.status(400).json({ message: 'Invalid request' });
+    if (!amount || amount < 1 || !itemId)
+      return res.status(400).json({ message: "Invalid request" });
     if ((req.user.coins || 0) < amount)
-      return res.status(400).json({ message: 'Not enough coins' });
+      return res.status(400).json({ message: "Not enough coins" });
 
-    if (['superlike', 'compliment', 'rematch'].includes(itemId) && !extra?.targetUserId) {
-      return res.status(400).json({ message: `Target user is required for ${itemId}` });
+    if (
+      ["superlike", "compliment", "rematch"].includes(itemId) &&
+      !extra?.targetUserId
+    ) {
+      return res
+        .status(400)
+        .json({ message: `Target user is required for ${itemId}` });
     }
-    
+
+    if (itemId === "opener") {
+      if (!extra?.roomId) {
+        return res
+          .status(400)
+          .json({ message: "Active chat room is required for opener" });
+      }
+      if (!tryClaim(extra.roomId)) {
+        return res
+          .status(409)
+          .json({ message: "AI opener already used in this chat" });
+      }
+    }
+
     const upd = { coins: req.user.coins - amount };
     const now = new Date();
 
-    if (itemId === 'boost') {
-      upd.queue_boost_expiry = new Date(now.getTime() + 60*60*1000).toISOString();
-    } else if (itemId === 'theme') {
-      upd.chat_theme = extra?.themeColor || 'premium';
-      upd.theme_expiry = new Date(now.getTime() + 7*24*60*60*1000).toISOString();
-    } else if (itemId === 'lock') {
-      upd.profile_lock_expiry = new Date(now.getTime() + 30*24*60*60*1000).toISOString();
-    } else if (itemId === 'likes') {
-      upd.reveal_likes_expiry = new Date(now.getTime() + 7*24*60*60*1000).toISOString();
-    } else if (itemId === 'spotlight') {
-      upd.spotlight_interest = extra?.interest || (req.user.interests && req.user.interests[0]) || '';
-      upd.spotlight_expiry = new Date(now.getTime() + 24*60*60*1000).toISOString();
-    } else if (itemId === 'aura') {
-      upd.aura_expiry = new Date(now.getTime() + 7*24*60*60*1000).toISOString(); // 1 week
-    } else if (itemId === 'citylock') {
-      upd.city_lock_expiry = new Date(now.getTime() + 24*60*60*1000).toISOString(); // 24 hours
+    if (itemId === "boost") {
+      upd.queue_boost_expiry = new Date(
+        now.getTime() + 60 * 60 * 1000,
+      ).toISOString();
+    } else if (itemId === "theme") {
+      upd.chat_theme = extra?.themeColor || "premium";
+      upd.theme_expiry = new Date(
+        now.getTime() + 7 * 24 * 60 * 60 * 1000,
+      ).toISOString();
+    } else if (itemId === "lock") {
+      upd.profile_lock_expiry = new Date(
+        now.getTime() + 30 * 24 * 60 * 60 * 1000,
+      ).toISOString();
+    } else if (itemId === "likes") {
+      upd.reveal_likes_expiry = new Date(
+        now.getTime() + 7 * 24 * 60 * 60 * 1000,
+      ).toISOString();
+    } else if (itemId === "spotlight") {
+      upd.spotlight_interest =
+        extra?.interest || (req.user.interests && req.user.interests[0]) || "";
+      upd.spotlight_expiry = new Date(
+        now.getTime() + 24 * 60 * 60 * 1000,
+      ).toISOString();
+    } else if (itemId === "aura") {
+      upd.aura_expiry = new Date(
+        now.getTime() + 7 * 24 * 60 * 60 * 1000,
+      ).toISOString(); // 1 week
+    } else if (itemId === "citylock") {
+      upd.city_lock_expiry = new Date(
+        now.getTime() + 24 * 60 * 60 * 1000,
+      ).toISOString(); // 24 hours
     }
 
-    const { data: u } = await supabase.from('users')
-      .update(upd).eq('id', req.user.id).select().single();
+    const { data: u } = await supabase
+      .from("users")
+      .update(upd)
+      .eq("id", req.user.id)
+      .select()
+      .single();
 
     // Log interactions for superlike, compliment, or rematch if target is provided
-    if (['superlike', 'compliment', 'rematch'].includes(itemId) && extra?.targetUserId) {
-      if (itemId === 'rematch') {
-        await supabase.from('rematch_requests').insert({
-          sender_id: req.user.id, receiver_id: extra.targetUserId
+    if (
+      ["superlike", "compliment", "rematch"].includes(itemId) &&
+      extra?.targetUserId
+    ) {
+      if (itemId === "rematch") {
+        await supabase.from("rematch_requests").insert({
+          sender_id: req.user.id,
+          receiver_id: extra.targetUserId,
         });
       } else {
-        await supabase.from('user_interactions').insert({
-          sender_id: req.user.id, receiver_id: extra.targetUserId,
-          interaction_type: itemId, is_anonymous: (itemId === 'compliment')
+        await supabase.from("user_interactions").insert({
+          sender_id: req.user.id,
+          receiver_id: extra.targetUserId,
+          interaction_type: itemId,
+          is_anonymous: itemId === "compliment",
         });
       }
     }
@@ -151,114 +225,144 @@ router.post('/spend-coins', authMw, async (req, res) => {
 
     res.json({ user: cleaned });
   } catch (err) {
-    console.error('Spend coins error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Spend coins error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
-
-
 // ── friends: send request ──
-router.post('/friends/request', authMw, async (req, res) => {
+router.post("/friends/request", authMw, async (req, res) => {
   try {
     const { targetUserId } = req.body;
     if (!targetUserId || targetUserId === req.user.id)
-      return res.status(400).json({ message: 'Invalid target' });
+      return res.status(400).json({ message: "Invalid target" });
 
-    const { data: ex } = await supabase.from('friendships').select('id')
-      .or(`and(user_id.eq.${req.user.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${req.user.id})`)
+    const { data: ex } = await supabase
+      .from("friendships")
+      .select("id")
+      .or(
+        `and(user_id.eq.${req.user.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${req.user.id})`,
+      )
       .maybeSingle();
-    if (ex) return res.status(400).json({ message: 'Already sent or already friends' });
+    if (ex)
+      return res
+        .status(400)
+        .json({ message: "Already sent or already friends" });
 
-    await supabase.from('friendships').insert({
-      user_id: req.user.id, friend_id: targetUserId, status: 'pending'
+    await supabase.from("friendships").insert({
+      user_id: req.user.id,
+      friend_id: targetUserId,
+      status: "pending",
     });
-    res.json({ message: 'Friend request sent!' });
+    res.json({ message: "Friend request sent!" });
   } catch (err) {
-    console.error('Friend request error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Friend request error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
 // ── friends: respond ──
-router.post('/friends/respond', authMw, async (req, res) => {
+router.post("/friends/respond", authMw, async (req, res) => {
   try {
     const { requestId, action } = req.body;
-    const { data: fr } = await supabase.from('friendships').select('*')
-      .eq('id', requestId).eq('friend_id', req.user.id).maybeSingle();
-    if (!fr) return res.status(404).json({ message: 'Request not found' });
+    const { data: fr } = await supabase
+      .from("friendships")
+      .select("*")
+      .eq("id", requestId)
+      .eq("friend_id", req.user.id)
+      .maybeSingle();
+    if (!fr) return res.status(404).json({ message: "Request not found" });
 
-    if (action === 'accept') {
-      await supabase.from('friendships').update({ status: 'accepted' }).eq('id', requestId);
-      res.json({ message: 'Friend added!' });
+    if (action === "accept") {
+      await supabase
+        .from("friendships")
+        .update({ status: "accepted" })
+        .eq("id", requestId);
+      res.json({ message: "Friend added!" });
     } else {
-      await supabase.from('friendships').delete().eq('id', requestId);
-      res.json({ message: 'Request rejected.' });
+      await supabase.from("friendships").delete().eq("id", requestId);
+      res.json({ message: "Request rejected." });
     }
-  } catch { res.status(500).json({ message: 'Server error' }); }
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ── friends: list ──
-router.get('/friends', authMw, async (req, res) => {
+router.get("/friends", authMw, async (req, res) => {
   try {
-    const { data: rows } = await supabase.from('friendships')
-      .select('id, status, user_id, friend_id, sender:users!friendships_user_id_fkey(id,username,is_verified,is_premium,profile_photo), receiver:users!friendships_friend_id_fkey(id,username,is_verified,is_premium,profile_photo)')
+    const { data: rows } = await supabase
+      .from("friendships")
+      .select(
+        "id, status, user_id, friend_id, sender:users!friendships_user_id_fkey(id,username,is_verified,is_premium,profile_photo), receiver:users!friendships_friend_id_fkey(id,username,is_verified,is_premium,profile_photo)",
+      )
       .or(`user_id.eq.${req.user.id},friend_id.eq.${req.user.id}`);
     res.json({ friends: rows || [] });
   } catch (err) {
-    console.error('Friends list error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Friends list error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
 // ── admin: give badge ──
-router.post('/admin/badge', authMw, async (req, res) => {
+router.post("/admin/badge", authMw, async (req, res) => {
   try {
-    if (!req.user.is_admin) return res.status(403).json({ message: 'Not authorized' });
+    if (!req.user.is_admin)
+      return res.status(403).json({ message: "Not authorized" });
     const { targetUsername, badge } = req.body;
-    const { data: target } = await supabase.from('users').select('id')
-      .eq('username', targetUsername).maybeSingle();
-    if (!target) return res.status(404).json({ message: 'User not found' });
+    const { data: target } = await supabase
+      .from("users")
+      .select("id")
+      .eq("username", targetUsername)
+      .maybeSingle();
+    if (!target) return res.status(404).json({ message: "User not found" });
     const upd = {};
-    if (badge === 'admin')         upd.is_admin    = true;
-    if (badge === 'verified')      upd.is_verified = true;
-    if (badge === 'premium')       upd.is_premium  = true;
-    if (badge === 'remove_admin')  upd.is_admin    = false;
-    await supabase.from('users').update(upd).eq('id', target.id);
+    if (badge === "admin") upd.is_admin = true;
+    if (badge === "verified") upd.is_verified = true;
+    if (badge === "premium") upd.is_premium = true;
+    if (badge === "remove_admin") upd.is_admin = false;
+    await supabase.from("users").update(upd).eq("id", target.id);
     res.json({ message: `Done` });
-  } catch { res.status(500).json({ message: 'Server error' }); }
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ── interactions: get admirers ──
-router.get('/interactions', authMw, async (req, res) => {
+router.get("/interactions", authMw, async (req, res) => {
   try {
-    const { data: rows } = await supabase.from('user_interactions')
-      .select('id, interaction_type, is_anonymous, created_at, sender:users!user_interactions_sender_id_fkey(username, gender)')
-      .eq('receiver_id', req.user.id)
-      .order('created_at', { ascending: false })
+    const { data: rows } = await supabase
+      .from("user_interactions")
+      .select(
+        "id, interaction_type, is_anonymous, created_at, sender:users!user_interactions_sender_id_fkey(username, gender)",
+      )
+      .eq("receiver_id", req.user.id)
+      .order("created_at", { ascending: false })
       .limit(50);
-      
+
     const now = new Date();
-    const canSee = req.user.reveal_likes_expiry && new Date(req.user.reveal_likes_expiry) > now;
-    
-    const admirers = (rows || []).map(r => {
-      let name = r.sender?.username || 'Unknown';
+    const canSee =
+      req.user.reveal_likes_expiry &&
+      new Date(req.user.reveal_likes_expiry) > now;
+
+    const admirers = (rows || []).map((r) => {
+      let name = r.sender?.username || "Unknown";
       if (r.is_anonymous || !canSee) {
-        name = 'Someone (' + (r.sender?.gender || 'unknown') + ')';
+        name = "Someone (" + (r.sender?.gender || "unknown") + ")";
       }
       return {
         id: r.id,
         type: r.interaction_type,
         senderName: name,
         date: r.created_at,
-        isRevealed: canSee && !r.is_anonymous
+        isRevealed: canSee && !r.is_anonymous,
       };
     });
-    
+
     res.json({ admirers, canSee });
   } catch (err) {
-    console.error('Interactions error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Interactions error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
