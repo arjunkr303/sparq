@@ -642,6 +642,35 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 .si-reveal { --item-clr:#00e5ff; --item-glow:rgba(0,229,255,.15); --item-border:rgba(0,229,255,.13); --item-border-h:rgba(0,229,255,.38); }
 .si-city   { --item-clr:#ff9f43; --item-glow:rgba(255,159,67,.16); --item-border:rgba(255,159,67,.14); --item-border-h:rgba(255,159,67,.40); }
 
+/* Premium Verified Aura Glowing Ring Styles */
+.aura-glow {
+  border: 2px solid #ffd166 !important;
+  position: relative;
+  box-shadow: 0 0 16px rgba(255, 209, 102, 0.6), inset 0 0 8px rgba(255, 209, 102, 0.4);
+}
+.aura-glow::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(from 0deg, #ffd166, #ffb347, #fff5d1, #ffd166, #ffb347);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
+  animation: auraSpin 3s linear infinite, auraShimmer 1.5s ease-in-out infinite alternate;
+}
+@keyframes auraSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes auraShimmer {
+  0% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(255, 209, 102, 0.6)) blur(0.5px); }
+  100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(255, 209, 102, 0.9)) blur(1px); }
+}
+
 .shop-item-head {
   display: flex;
   align-items: flex-start;
@@ -720,6 +749,59 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 @keyframes dot-pulse {
   0%,100% { opacity:1; transform:scale(1); }
   50%      { opacity:.5; transform:scale(.75); }
+}
+
+/* Buy button that appears on actionable shop cards */
+.shop-buy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  border: 1.5px solid var(--item-clr);
+  background: rgba(255,255,255,.04);
+  color: var(--item-clr);
+  cursor: pointer;
+  transition: all .25s ease;
+  position: relative;
+  z-index: 1;
+  letter-spacing: .2px;
+}
+.shop-buy-btn:hover {
+  background: var(--item-clr);
+  color: #0a0914;
+  box-shadow: 0 6px 22px var(--item-glow);
+  transform: translateY(-2px);
+}
+.shop-buy-btn:active { transform: translateY(0); }
+.shop-buy-btn .btn-icon { font-size: 16px; }
+
+/* Active theme status badge on the theme card */
+.theme-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+.theme-status-badge.active {
+  background: rgba(196,175,255,.12);
+  border: 1px solid rgba(196,175,255,.35);
+  color: #c4afff;
+}
+.theme-status-badge.inactive {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  color: var(--t3);
 }
 
 /* ═══════════════════════════════ TOAST ═══════════════════════════════ */
@@ -836,67 +918,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 .th-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
 .th-preview { padding: 7px 10px; border-radius: 9px; font-size: 10px; }
 
-/* Slot modal */
-.lucky-modal .modal-box {
-  max-width: 400px;
-  background: var(--bg2);
-  border: 1px solid var(--bd);
-  border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(0,0,0,.6);
-  text-align: center;
-}
-.reels-row {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 24px auto;
-  background: var(--bg);
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid var(--bd);
-  width: fit-content;
-}
-.slot-reel {
-  width: 66px;
-  height: 66px;
-  background: var(--bg3);
-  border: 1px solid var(--bd);
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.4);
-}
-.slot-reel::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 100%);
-  pointer-events: none;
-  z-index: 2;
-}
-.slot-strip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.slot-item {
-  height: 66px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  user-select: none;
-  transition: filter 0.1s ease;
-}
-@keyframes spin-blur {
-  0%   { transform: translateY(0);    filter: blur(0px); }
-  50%  { filter: blur(1.5px); }
-  100% { transform: translateY(-396px); filter: blur(0px); }
-}
-.spinning { animation: spin-blur .15s linear infinite; }
+
 
 .nav-coins-pill {
   display: flex;
@@ -919,15 +941,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
   border-color: rgba(255, 209, 102, 0.4);
   box-shadow: 0 0 15px rgba(255, 209, 102, 0.12);
 }
-.si-slot {
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.si-slot:hover {
-  transform: translateY(-5px);
-  border-color: var(--pr);
-  box-shadow: 0 10px 20px rgba(124,92,252,0.15);
-}
+
 
 /* ═══════════════════════════════ RESPONSIVE ═══════════════════════════════ */
 @media (max-width: 700px) {
@@ -1172,7 +1186,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
       </div>
 
       <!-- Lucky Draw -->
-      <div class="shop-item si-slot reveal reveal-d2" onclick="playLuckyDraw()">
+      <div class="shop-item si-slot reveal reveal-d2">
         <div class="shop-item-head">
           <div class="shop-icon">💎</div>
           <div>
@@ -1180,8 +1194,8 @@ nav.scrolled { background: rgba(7,7,15,.95); }
             <div class="shop-cost">🪙 10 coins</div>
           </div>
         </div>
-        <div class="shop-desc">Draw a card for a chance to win up to <strong style="color:var(--gd)">100 coins</strong>, a free VIP day, or exclusive chat themes. Endlessly replayable! Click to draw now.</div>
-        <div class="shop-where"><div class="shop-where-dot" style="background:#06d6a0"></div>Play Right Here!</div>
+        <div class="shop-desc">Draw a card for a chance to win up to <strong style="color:var(--gd)">100 coins</strong>, a free VIP day, or exclusive chat themes. Play your daily free draw on the dashboard!</div>
+        <div class="shop-where"><div class="shop-where-dot"></div>Available on Dashboard</div>
       </div>
 
       <!-- Compliment -->
@@ -1250,7 +1264,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
       </div>
 
       <!-- Aura -->
-      <div class="shop-item si-aura reveal reveal-d2">
+      <div class="shop-item si-aura reveal reveal-d2" onclick="location.href='dashboard.html'" style="cursor: pointer;">
         <div class="shop-item-head">
           <div class="shop-icon">✨</div>
           <div>
@@ -1259,11 +1273,11 @@ nav.scrolled { background: rgba(7,7,15,.95); }
           </div>
         </div>
         <div class="shop-desc">A shimmering animated golden ring glows around your avatar in every active chat. Pure premium flex — everyone notices.</div>
-        <div class="shop-where"><div class="shop-where-dot"></div>Visible inside Chat</div>
+        <div class="shop-where"><div class="shop-where-dot"></div>Available on Profile Page</div>
       </div>
 
       <!-- Chat Theme -->
-      <div class="shop-item si-theme reveal reveal-d3">
+      <div class="shop-item si-theme reveal reveal-d3" id="themeShopCard">
         <div class="shop-item-head">
           <div class="shop-icon">🎭</div>
           <div>
@@ -1272,7 +1286,14 @@ nav.scrolled { background: rgba(7,7,15,.95); }
           </div>
         </div>
         <div class="shop-desc">Style your entire chat with Gold, Purple, Crimson, Emerald, Rose or a custom image background. Active for 7 days.</div>
-        <div class="shop-where"><div class="shop-where-dot"></div>Accessible from Dashboard</div>
+        <!-- Live theme status (populated by JS on load) -->
+        <div id="themeCardStatus" class="theme-status-badge inactive" style="display:none">
+          <span id="themeCardStatusDot" style="width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0"></span>
+          <span id="themeCardStatusText">No active theme</span>
+        </div>
+        <button class="shop-buy-btn" onclick="openThemeModal(25)" id="themeBuyBtn">
+          <span class="btn-icon">🎭</span> Buy Theme — 25 🪙
+        </button>
       </div>
 
       <!-- Reveal Interests -->
@@ -1387,46 +1408,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
   </div>
 </div>
 
-<!-- ═══ LUCKY DRAW MODAL ═══ -->
-<div class="modal-overlay lucky-modal" id="luckyMod">
-  <div class="modal-box">
-    <button onclick="closeLuckyDrawModal()" id="luckyCloseBtn" style="position:absolute;top:18px;right:18px;background:rgba(255,255,255,.06);border:1px solid var(--bd);color:var(--t2);width:34px;height:34px;border-radius:50%;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s">✕</button>
-    <h2 style="font-size:24px;font-weight:800;margin-bottom:6px">✨ Reward Draw</h2>
-    <p style="color:var(--t2);font-size:13px;margin-bottom:4px">Draw cards and win premium rewards!</p>
 
-    <div class="reels-row">
-      <div class="slot-reel" id="reel1"><div class="slot-strip" id="strip1">
-        <div class="slot-item">🪙</div>
-        <div class="slot-item">👑</div>
-        <div class="slot-item">✨</div>
-        <div class="slot-item">🎁</div>
-        <div class="slot-item">⚪</div>
-        <div class="slot-item">💎</div>
-      </div></div>
-      <div class="slot-reel" id="reel2"><div class="slot-strip" id="strip2">
-        <div class="slot-item">👑</div>
-        <div class="slot-item">🎁</div>
-        <div class="slot-item">🪙</div>
-        <div class="slot-item">⚪</div>
-        <div class="slot-item">💎</div>
-        <div class="slot-item">✨</div>
-      </div></div>
-      <div class="slot-reel" id="reel3"><div class="slot-strip" id="strip3">
-        <div class="slot-item">✨</div>
-        <div class="slot-item">⚪</div>
-        <div class="slot-item">👑</div>
-        <div class="slot-item">💎</div>
-        <div class="slot-item">🎁</div>
-        <div class="slot-item">🪙</div>
-      </div></div>
-    </div>
-
-    <div id="luckyStatus" style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--t2);margin-bottom:20px;min-height:22px;transition:all .3s ease">Ready to draw...</div>
-    <div style="display:flex;gap:12px;justify-content:center">
-      <button id="luckySpinBtn" onclick="triggerLuckySpin()" class="btn-primary" style="padding:12px 36px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 4px 12px rgba(124,92,252,.2)">DRAW (10 🪙)</button>
-    </div>
-  </div>
-</div>
 
 <!-- ═══════════════════════════════ SCRIPTS ═══════════════════════════════ -->
 <script>
@@ -1461,6 +1443,7 @@ async function refreshUser() {
     user = d.user;
     localStorage.setItem('sc_user', JSON.stringify(user));
     updateNavCoins();
+    updateThemeCardStatus(); // update badge with server-fresh data
   } catch (e) { console.error('Refresh error:', e); }
 }
 
@@ -1468,6 +1451,40 @@ async function refreshUser() {
 if (token) {
   updateNavCoins();
   refreshUser();
+  updateThemeCardStatus();
+}
+
+/* ══ THEME CARD STATUS ══ */
+function updateThemeCardStatus() {
+  const badge = document.getElementById('themeCardStatus');
+  const text  = document.getElementById('themeCardStatusText');
+  const btn   = document.getElementById('themeBuyBtn');
+  if (!badge || !text) return;
+
+  const currentUser = JSON.parse(localStorage.getItem('sc_user') || 'null');
+  const theme  = currentUser?.chatTheme || 'default';
+  const expiry = currentUser?.themeExpiry || currentUser?.theme_expiry || null;
+  const now    = new Date();
+
+  const isActive = theme && theme !== 'default' && expiry && new Date(expiry) > now;
+
+  badge.style.display = 'inline-flex';
+
+  if (isActive) {
+    const diffDays = Math.ceil((new Date(expiry) - now) / (1000 * 60 * 60 * 24));
+    const themeName = {
+      premium: 'Gold Premium', purple: 'Royal Purple', red: 'Crimson Flame',
+      green: 'Mint Serene', rose: 'Rose Romance', sunset: 'Sunset Love',
+      passion: 'Neon Passion', serenade: 'Emerald Serenade'
+    }[theme] || (theme.startsWith('data:') ? 'Custom Image' : theme);
+    badge.className = 'theme-status-badge active';
+    text.textContent = `✨ ${themeName} — ${diffDays}d left`;
+    if (btn) btn.textContent = '🎭 Change Theme — 25 🪙';
+  } else {
+    badge.className = 'theme-status-badge inactive';
+    text.textContent = 'No active theme';
+    if (btn) btn.innerHTML = '<span class="btn-icon">🎭</span> Buy Theme — 25 🪙';
+  }
 }
 
 /* ══ PARTICLES ══ */
@@ -1600,123 +1617,7 @@ function buyCoinItem(itemId, cost) {
   }).catch(() => showToast('Server error', 'err'));
 }
 
-/* ══ LUCKY DRAW ══ */
-let isLuckySpinning = false;
 
-function playLuckyDraw() {
-  const cost = 10, coins = user?.coins || 0;
-  if (coins < cost) { showToast(`Not enough coins! You have 🪙${coins}, need 🪙${cost}`, 'err'); return; }
-  if (!confirm(`Spend 🪙${cost} coins to run the Reward Draw?`)) return;
-  openLuckyDrawModal();
-}
-
-function openLuckyDrawModal() {
-  document.getElementById('luckyMod').classList.add('open');
-  document.getElementById('luckyStatus').textContent = 'Ready to draw...';
-  document.getElementById('luckyStatus').style.color = 'var(--t2)';
-  document.getElementById('luckySpinBtn').disabled = false;
-  document.getElementById('luckySpinBtn').style.opacity = '1';
-  document.getElementById('luckyCloseBtn').style.opacity = '1';
-  ['strip1','strip2','strip3'].forEach(id => {
-    document.getElementById(id).style.transform = 'translateY(0)';
-    document.getElementById(id).style.transition = 'none';
-  });
-}
-function closeLuckyDrawModal() {
-  if (isLuckySpinning) return;
-  document.getElementById('luckyMod').classList.remove('open');
-}
-
-function triggerLuckySpin() {
-  if (isLuckySpinning) return;
-  const cost = 10, coins = user?.coins || 0;
-  if (coins < cost) { showToast(`Not enough coins! You have 🪙${coins}, need 🪙${cost}`, 'err'); return; }
-
-  isLuckySpinning = true;
-  const btn  = document.getElementById('luckySpinBtn');
-  const cBtn = document.getElementById('luckyCloseBtn');
-  btn.disabled = true; btn.style.opacity = '.4';
-  cBtn.style.opacity = '.3';
-  document.getElementById('luckyStatus').textContent = 'Drawing... ✨';
-  document.getElementById('luckyStatus').style.color = 'var(--gd)';
-
-  // Visual deduction from navbar pill
-  const navCoins = document.getElementById('navCoins');
-  if (navCoins) navCoins.textContent = coins - cost;
-
-  const s1 = document.getElementById('strip1');
-  const s2 = document.getElementById('strip2');
-  const s3 = document.getElementById('strip3');
-  s1.classList.add('spinning');
-  s2.classList.add('spinning');
-  s3.classList.add('spinning');
-
-  fetch(`${API}/api/user/spend-coins`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify({ amount: cost, itemId: 'luckydraw' })
-  })
-  .then(r => { if (!r.ok) throw new Error('API error'); return r.json(); })
-  .then(d => {
-    if (d.user) {
-      const upd = { ...user, coins: d.user.coins, chatTheme: d.user.chatTheme, isPremium: d.user.isPremium };
-      localStorage.setItem('sc_user', JSON.stringify(upd));
-      Object.assign(user, upd);
-    }
-    const reward = d.reward;
-    let targets = [4, 1, 5];
-    if (reward) {
-      if (reward.type === 'coins') {
-        if (reward.amount === 5)              targets = [0, 2, 1];
-        else if (reward.amount === 15 || reward.amount === 25) targets = [0, 2, 5];
-        else if (reward.amount === 100)       targets = [5, 4, 3];
-      } else if (reward.type === 'theme')     targets = [2, 5, 0];
-      else if (reward.type === 'vip')         targets = [1, 0, 2];
-    }
-    setTimeout(() => {
-      stopReel(s1, targets[0]);
-      setTimeout(() => {
-        stopReel(s2, targets[1]);
-        setTimeout(() => {
-          stopReel(s3, targets[2]);
-          isLuckySpinning = false;
-          btn.disabled = false; btn.style.opacity = '1';
-          cBtn.style.opacity = '1';
-          const isWin = reward && reward.type !== 'nothing';
-          document.getElementById('luckyStatus').textContent = reward ? reward.label : 'Better luck next time! ⚪';
-          document.getElementById('luckyStatus').style.color = isWin ? 'var(--gn)' : 'var(--t2)';
-          
-          updateNavCoins();
-
-          if (isWin) {
-            showToast(`🎉 ${reward.label}`, 'ok');
-            const mb = document.querySelector('#luckyMod .modal-box');
-            mb.style.transform = 'scale(1.05)';
-            setTimeout(() => mb.style.transform = 'scale(1)', 150);
-          } else { showToast('Try again!', 'err'); }
-        }, 400);
-      }, 400);
-    }, 800);
-  })
-  .catch(err => {
-    console.error(err);
-    [s1,s2,s3].forEach(s => s.classList.remove('spinning'));
-    isLuckySpinning = false;
-    btn.disabled = false; btn.style.opacity = '1';
-    cBtn.style.opacity = '1';
-    document.getElementById('luckyStatus').textContent = 'Server error. Try again.';
-    document.getElementById('luckyStatus').style.color = 'var(--rd)';
-    showToast('Server error', 'err');
-    updateNavCoins();
-  });
-}
-
-function stopReel(stripEl, targetIndex) {
-  stripEl.classList.remove('spinning');
-  stripEl.style.transition = 'transform .5s cubic-bezier(.25,1,.5,1)';
-  stripEl.style.transform  = `translateY(-${targetIndex * 66}px)`;
-  setTimeout(() => { stripEl.style.transition = 'none'; }, 500);
-}
 
 /* ══ THEME MODAL ══ */
 let selectedThemeColor = null, themePurchaseCost = 25, customThemeImageBase64 = null;
@@ -1775,25 +1676,42 @@ function confirmThemePurchase() {
   const coins = user?.coins || 0;
   if (coins < themePurchaseCost) { showToast(`Not enough coins! You have 🪙${coins}, need 🪙${themePurchaseCost}`,'err'); return; }
   if (!confirm(`Spend 🪙${themePurchaseCost} coins on this theme?`)) return;
+
+  // Disable button during purchase
+  const confirmBtn = document.getElementById('themeConfirmBtn');
+  if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Activating...'; }
+
   fetch(`${API}/api/user/spend-coins`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
     body: JSON.stringify({ amount: themePurchaseCost, itemId: 'theme', extra: { themeColor: finalThemeValue } })
   }).then(r => r.json()).then(d => {
     if (d.user) {
-      localStorage.setItem('sc_user', JSON.stringify({ ...user, coins: d.user.coins, chatTheme: d.user.chatTheme }));
-      user.coins = d.user.coins;
-      user.chatTheme = d.user.chatTheme;
+      const updatedUser = {
+        ...user,
+        coins: d.user.coins,
+        chatTheme: d.user.chatTheme,
+        themeExpiry: d.user.themeExpiry
+      };
+      localStorage.setItem('sc_user', JSON.stringify(updatedUser));
+      user = updatedUser;
       updateNavCoins();
+      updateThemeCardStatus(); // refresh theme card badge
     }
     showToast(`✅ Theme activated! 🪙${d.user?.coins || 0} coins remaining`, 'ok');
     closeThemeModal();
-  }).catch(() => showToast('Server error', 'err'));
+  }).catch(() => showToast('Server error', 'err'))
+  .finally(() => {
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = `Spend ${themePurchaseCost} 🪙`;
+    }
+  });
 }
 
 /* ══ CLOSE MODALS ON BACKDROP ══ */
 document.querySelectorAll('.modal-overlay').forEach(ov => {
-  ov.addEventListener('click', e => { if (e.target === ov) { if (ov.id === 'luckyMod') closeLuckyDrawModal(); else closeThemeModal(); } });
+  ov.addEventListener('click', e => { if (e.target === ov) { closeThemeModal(); } });
 });
 </script>
 </body>

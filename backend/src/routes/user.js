@@ -37,6 +37,9 @@ const clean = (u) => {
     trustScore: u.trust_score || 100,
     reportCount: u.report_count || 0,
     premiumExpiry: u.premium_expiry || null,
+    auraExpiry: u.aura_expiry || null,
+    chatTheme: u.chat_theme || 'default',
+    themeExpiry: u.theme_expiry || null,
   };
 };
 

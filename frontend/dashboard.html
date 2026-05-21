@@ -369,6 +369,7 @@ nav {
   color: #fff;
   transition: all 0.2s;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 15;
 }
 
 .photo-wrap:hover .photo-edit {
@@ -447,6 +448,35 @@ nav {
   background: rgba(168, 85, 247, 0.08);
   color: #d8b4fe;
   border: 1px solid rgba(168, 85, 247, 0.16);
+}
+
+/* Premium Verified Aura Glowing Ring Styles */
+.aura-glow {
+  border: 2px solid #ffd166 !important;
+  position: relative;
+  box-shadow: 0 0 16px rgba(255, 209, 102, 0.6), inset 0 0 8px rgba(255, 209, 102, 0.4);
+}
+.aura-glow::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  padding: 2px;
+  background: conic-gradient(from 0deg, #ffd166, #ffb347, #fff5d1, #ffd166, #ffb347);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 10;
+  animation: auraSpin 3s linear infinite, auraShimmer 1.5s ease-in-out infinite alternate;
+}
+@keyframes auraSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes auraShimmer {
+  0% { opacity: 0.5; filter: drop-shadow(0 0 4px rgba(255, 209, 102, 0.6)) blur(0.5px); }
+  100% { opacity: 1; filter: drop-shadow(0 0 12px rgba(255, 209, 102, 0.9)) blur(1px); }
 }
 
 /* ═══════════════════════════════ DETAILED ROWS ═══════════════════════════════ */
@@ -1508,6 +1538,12 @@ nav {
           </div>
           <button class="vbtn" onclick="openVM()">🪪 Start Verification</button>
         </div>
+        <div class="vs" id="auraSec" style="margin-top: 16px; background: rgba(251, 209, 102, 0.02); border: 1px solid rgba(251, 209, 102, 0.1);">
+          <h3 style="color: #ffd166; display: flex; align-items: center; gap: 6px;">✨ Verified Aura</h3>
+          <p id="auraDesc" style="font-size:12px; color:var(--t2); margin-bottom:8px; line-height:1.5;">Activate a shimmering animated golden ring around your profile avatar in chat and profile views.</p>
+          <div id="auraStatus" style="font-size: 12px; margin-bottom: 12px; font-weight: 600; color: var(--tx);">Status: Inactive</div>
+          <button class="vbtn" id="auraBuyBtn" onclick="buyAura()" style="background: rgba(251, 209, 102, 0.08); border: 1px solid rgba(251, 209, 102, 0.2); color: #ffd166; width: 100%;">🪙 Spend 25 Coins</button>
+        </div>
         <button class="lbtn" onclick="doLogout()">Sign Out</button>
       </div>
 
@@ -1871,6 +1907,90 @@ function loadUI() {
       pill.style.display = 'flex';
       navCoins.textContent = user.coins || 0;
     }
+  }
+
+  // Verified Aura status update
+  const auraSec = $('auraSec');
+  const auraStatus = $('auraStatus');
+  const auraBuyBtn = $('auraBuyBtn');
+  const photoWrap = document.querySelector('.photo-wrap');
+  
+  if (user.auraExpiry) {
+    const expiry = new Date(user.auraExpiry);
+    const now = new Date();
+    if (expiry > now) {
+      const diffMs = expiry - now;
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+      
+      // Toggle glow on avatar
+      if (photoWrap) photoWrap.classList.add('aura-glow');
+      
+      if (auraStatus) {
+        auraStatus.innerHTML = `Status: <span style="color: var(--gd); font-weight: bold;">✨ Active</span> (Expires in ${diffDays} day${diffDays > 1 ? 's' : ''})`;
+      }
+      if (auraBuyBtn) {
+        auraBuyBtn.textContent = 'Renew for 25 Coins';
+      }
+    } else {
+      if (photoWrap) photoWrap.classList.remove('aura-glow');
+      
+      if (auraStatus) {
+        auraStatus.innerHTML = `Status: <span style="color: var(--t3);">Expired</span>`;
+      }
+      if (auraBuyBtn) {
+        auraBuyBtn.textContent = '🪙 Spend 25 Coins';
+      }
+    }
+  } else {
+    if (photoWrap) photoWrap.classList.remove('aura-glow');
+    
+    if (auraStatus) {
+      auraStatus.innerHTML = `Status: <span style="color: var(--t3);">Inactive</span>`;
+    }
+    if (auraBuyBtn) {
+      auraBuyBtn.textContent = '🪙 Spend 25 Coins';
+    }
+  }
+}
+
+/* ── buy verified aura ── */
+async function buyAura() {
+  const cost = 25;
+  const coins = user?.coins || 0;
+  if (coins < cost) {
+    showToast(`Not enough coins! You have 🪙${coins}, need 🪙${cost}`, 'err');
+    return;
+  }
+  if (!confirm(`Spend 🪙${cost} coins to activate Verified Aura for 7 days?`)) return;
+
+  const btn = $('auraBuyBtn');
+  btn.disabled = true;
+  btn.textContent = 'Activating...';
+  
+  try {
+    const r = await fetch(`${API}/api/user/spend-coins`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ amount: cost, itemId: 'aura' })
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      showToast(d.message || 'Purchase failed', 'err');
+      return;
+    }
+    
+    // Update local storage user object
+    user = { ...user, coins: d.user.coins, auraExpiry: d.user.auraExpiry };
+    localStorage.setItem('sc_user', JSON.stringify(user));
+    
+    showToast('✨ Verified Aura activated! 🪙' + (d.user?.coins || 0) + ' coins remaining', 'ok');
+    loadUI();
+  } catch (e) {
+    console.error(e);
+    showToast('Server error', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🪙 Spend 25 Coins';
   }
 }
 

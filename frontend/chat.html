@@ -2,1490 +2,625 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>Chat — StrangerNear</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
     <style>
       :root {
-        --bg: #08080f;
-        --bg2: #0f0f1a;
-        --bg3: #141426;
-        --sr: #1a1a2e;
-        --s2: #1f1f35;
-        --bd: rgba(120, 100, 255, 0.15);
-        --b2: rgba(120, 100, 255, 0.28);
+        --bg: #05050a;
+        --bg2: #0a0a14;
+        --bg3: #111122;
+        --glass: rgba(255, 255, 255, 0.025);
+        --glass2: rgba(255, 255, 255, 0.05);
+        --bd: rgba(120, 100, 255, 0.1);
+        --b2: rgba(120, 100, 255, 0.25);
         --pr: #7c5cfc;
         --pr2: #9b7ffe;
-        --pg: rgba(124, 92, 252, 0.35);
+        --pg: rgba(124, 92, 252, 0.4);
         --ac: #00e5ff;
         --gn: #06d6a0;
         --rd: #ef4565;
         --gd: #ffd166;
-        --tx: #f0eeff;
+        --tx: #ffffff;
         --t2: #a89fd8;
         --t3: #6b638f;
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
       }
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
       body {
         background: var(--bg);
         color: var(--tx);
         font-family: "DM Sans", sans-serif;
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
         display: flex;
         flex-direction: column;
       }
-      button {
-        font-family: "DM Sans", sans-serif;
-        cursor: pointer;
-        border: none;
-        outline: none;
-        transition: all 0.2s;
-      }
-      .top {
-        height: 50px;
-        background: var(--bg2);
-        border-bottom: 1px solid var(--bd);
-        display: flex;
-        align-items: center;
-        padding: 0 12px;
-        gap: 9px;
-        flex-shrink: 0;
-      }
-      .bk {
-        background: none;
-        color: var(--t3);
-        font-size: 12px;
-        padding: 4px 9px;
-        border-radius: 7px;
-        border: 1px solid var(--bd);
-      }
-      .bk:hover {
-        color: var(--tx);
-        border-color: var(--b2);
-      }
-      .lm {
-        font-family: "Syne", sans-serif;
-        font-weight: 800;
-        font-size: 14px;
-        color: var(--pr);
-      }
-      .tr {
-        margin-left: auto;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .gtag {
-        background: rgba(255, 209, 102, 0.1);
-        border: 1px solid rgba(255, 209, 102, 0.25);
-        color: var(--gd);
-        padding: 3px 8px;
-        border-radius: 50px;
-        font-size: 10px;
-        font-weight: 600;
-      }
-      .sul {
-        background: linear-gradient(135deg, var(--pr), var(--pr2));
-        color: #fff;
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-size: 10px;
-        font-weight: 600;
-        text-decoration: none;
-      }
-      .layout {
-        flex: 1;
-        display: flex;
-        overflow: hidden;
-      }
-      .sb {
-        width: 240px;
-        flex-shrink: 0;
-        background: var(--bg2);
-        border-right: 1px solid var(--bd);
-        display: flex;
-        flex-direction: column;
-        padding: 11px;
-        gap: 9px;
-        overflow-y: auto;
-      }
-      .mc {
-        background: var(--sr);
-        border: 1px solid var(--bd);
-        border-radius: 10px;
-        padding: 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .mav {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--pr), var(--ac));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 800;
-        font-size: 12px;
-        flex-shrink: 0;
-        overflow: hidden;
-      }
-      .mav img,
-      .cav img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-      }
-      .mn {
-        font-family: "Syne", sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-      }
-      .br {
-        display: flex;
-        gap: 2px;
-        flex-wrap: wrap;
-        margin-top: 2px;
-      }
+      button { font-family: "DM Sans", sans-serif; cursor: pointer; border: none; outline: none; transition: all 0.25s cubic-bezier(0.2,0.8,0.2,1); }
+      
+      /* Typography Helpers */
+      .syne { font-family: "Syne", sans-serif; }
+      
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 5px; height: 5px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--b2); border-radius: 10px; }
+      ::-webkit-scrollbar-thumb:hover { background: var(--pr); }
 
-      /* ── BADGES ── */
-      .bm {
-        display: inline-flex;
-        align-items: center;
-        padding: 2px 5px;
-        border-radius: 50px;
-        font-size: 9px;
-        font-weight: 700;
-        gap: 2px;
-      }
-      .bv {
-        background: linear-gradient(
-          135deg,
-          rgba(6, 214, 160, 0.2),
-          rgba(0, 229, 255, 0.1)
-        );
-        color: #00ffcc;
-        border: 1px solid rgba(6, 214, 160, 0.4);
-      }
-      .bvip {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 209, 102, 0.2),
-          rgba(255, 150, 50, 0.1)
-        );
-        color: #ffd166;
-        border: 1px solid rgba(255, 209, 102, 0.4);
-      }
-      .bdev {
-        background: linear-gradient(
-          135deg,
-          rgba(124, 92, 252, 0.3),
-          rgba(0, 229, 255, 0.2)
-        );
-        color: #b4a0ff;
-        border: 1px solid rgba(124, 92, 252, 0.5);
-      }
-      .badm {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 50, 50, 0.25),
-          rgba(255, 150, 0, 0.15)
-        );
-        color: #ff8844;
-        border: 1px solid rgba(255, 100, 50, 0.5);
-        text-shadow: 0 0 6px rgba(255, 100, 50, 0.4);
-      }
-      /* King of Curses — purple/black curse aura */
-      .bkoc {
-        background: linear-gradient(
-          135deg,
-          rgba(80, 0, 120, 0.5),
-          rgba(20, 0, 40, 0.8)
-        );
-        color: #df80ff;
-        border: 1px solid rgba(180, 0, 255, 0.5);
-        text-shadow: 0 0 8px rgba(180, 0, 255, 0.6);
-        box-shadow: 0 0 8px rgba(120, 0, 200, 0.3);
-      }
-      .bani {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 140, 0, 0.2),
-          rgba(200, 0, 100, 0.2)
-        );
-        color: #ff9f43;
-        border: 1px solid rgba(255, 140, 0, 0.45);
-        text-shadow: 0 0 6px rgba(255, 140, 0, 0.4);
-      }
-
-      .fc {
-        background: var(--sr);
-        border: 1px solid var(--bd);
-        border-radius: 10px;
-        padding: 10px;
-      }
-      .ft {
-        font-size: 9px;
-        font-weight: 700;
-        color: var(--t3);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
-      }
-      .gfr {
-        display: flex;
-        gap: 4px;
-      }
-      .gfb {
-        flex: 1;
-        padding: 5px 2px;
-        border-radius: 6px;
-        background: var(--bg3);
-        border: 1px solid var(--bd);
-        color: var(--t2);
-        font-size: 9px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: "DM Sans", sans-serif;
-      }
-      .gfb.on {
-        background: rgba(124, 92, 252, 0.15);
-        border-color: var(--pr);
-        color: var(--pr2);
-      }
-      .fu {
-        font-size: 10px;
-        color: var(--gd);
-        margin-top: 4px;
-        font-weight: 600;
-      }
-      .fh {
-        font-size: 9px;
-        color: var(--t3);
-        margin-top: 1px;
-        line-height: 1.3;
-      }
-      .pc {
-        background: rgba(124, 92, 252, 0.06);
-        border: 1px solid var(--b2);
-        border-radius: 10px;
-        padding: 10px;
-        display: none;
-      }
-      .ph {
-        font-size: 9px;
-        color: var(--t3);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 2px;
-      }
-      .pname {
-        font-family: "Syne", sans-serif;
-        font-size: 14px;
-        font-weight: 700;
-        margin-bottom: 5px;
-      }
-      .pm {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 3px;
-      }
-      .gtg {
-        font-size: 9px;
-        padding: 2px 6px;
-        border-radius: 50px;
-        font-weight: 600;
-        display: inline-block;
-      }
-      .pci {
-        font-size: 10px;
-        color: var(--t2);
-        margin-top: 4px;
-      }
-      /* Add friend button */
-      .afbtn {
-        width: 100%;
-        margin-top: 8px;
-        padding: 7px;
-        border-radius: 8px;
-        background: rgba(6, 214, 160, 0.1);
-        border: 1px solid rgba(6, 214, 160, 0.3);
-        color: var(--gn);
-        font-size: 11px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: "DM Sans", sans-serif;
-        transition: all 0.2s;
-      }
-      .afbtn:hover {
-        background: rgba(6, 214, 160, 0.2);
-      }
-      .afbtn:disabled {
-        opacity: 0.5;
-        cursor: default;
-      }
-      .ctl {
-        margin-top: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      }
-      .cb {
-        width: 100%;
-        padding: 8px;
-        border-radius: 8px;
-        font-size: 11px;
-        font-weight: 600;
-        font-family: "DM Sans", sans-serif;
-      }
-      .cs {
-        background: linear-gradient(135deg, var(--pr), var(--pr2));
-        color: #fff;
-        box-shadow: 0 3px 12px var(--pg);
-      }
-      .cs:hover {
-        transform: translateY(-1px);
-      }
-      .csk {
-        background: var(--sr);
-        border: 1px solid var(--b2);
-        color: var(--t2);
-      }
-      .csk:hover {
-        border-color: var(--pr);
-        color: var(--pr2);
-      }
-      .ccl {
-        background: rgba(239, 69, 101, 0.08);
-        border: 1px solid rgba(239, 69, 101, 0.25);
-        color: var(--rd);
-      }
-      .crp {
-        background: transparent;
-        border: 1px solid rgba(239, 69, 101, 0.15);
-        color: var(--rd);
-        font-size: 10px;
-        padding: 6px;
-      }
-      .rm {
-        background: var(--s2);
-        border: 1px solid var(--b2);
-        border-radius: 8px;
-        overflow: hidden;
-        display: none;
-      }
-      .rm.on {
-        display: block;
-      }
-      .ri {
-        display: block;
-        width: 100%;
-        text-align: left;
-        padding: 6px 9px;
-        background: none;
-        color: var(--t2);
-        font-size: 11px;
-        cursor: pointer;
+      /* Top Bar */
+      .top-nav {
+        height: 56px;
+        background: rgba(10, 10, 20, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--bd);
-        font-family: "DM Sans", sans-serif;
-      }
-      .ri:last-child {
-        border-bottom: none;
-      }
-      .ri:hover {
-        background: rgba(124, 92, 252, 0.08);
-        color: var(--tx);
-      }
-      .rp {
-        text-align: center;
-        color: var(--gn);
-        font-size: 10px;
-        padding: 4px;
-      }
-      .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        min-width: 0;
-      }
-      .chdr {
-        height: 50px;
-        border-bottom: 1px solid var(--bd);
-        background: var(--bg2);
         display: flex;
         align-items: center;
-        padding: 0 13px;
-        gap: 8px;
+        padding: 0 20px;
         flex-shrink: 0;
-      }
-      .hd-idle {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        width: 100%;
-      }
-      .hdot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--t3);
-        flex-shrink: 0;
-      }
-      .hdot.srch {
-        background: var(--gd);
-        animation: blink 1s infinite;
-      }
-      .hdot.chat {
-        background: var(--gn);
-      }
-      .htxt {
-        color: var(--t2);
-        font-size: 12px;
-      }
-      .hd-chat {
-        display: none;
-        align-items: center;
-        gap: 7px;
-        width: 100%;
-      }
-      .cav {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, var(--pr), var(--ac));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 11px;
-        flex-shrink: 0;
-        overflow: hidden;
-      }
-      @keyframes auraPulse {
-        0% {
-          box-shadow:
-            0 0 0 0 rgba(255, 209, 102, 0.7),
-            0 0 10px rgba(255, 209, 102, 0.8);
-        }
-        70% {
-          box-shadow:
-            0 0 0 8px rgba(255, 209, 102, 0),
-            0 0 15px rgba(255, 209, 102, 0.5);
-        }
-        100% {
-          box-shadow:
-            0 0 0 0 rgba(255, 209, 102, 0),
-            0 0 10px rgba(255, 209, 102, 0.8);
-        }
-      }
-      .aura-glow {
-        border: 2px solid #ffd166;
-        animation: auraPulse 2s infinite;
+        z-index: 100;
         position: relative;
       }
-      .cn {
-        font-family: "Syne", sans-serif;
-        font-size: 12px;
-        font-weight: 700;
-      }
-      .cs2 {
-        font-size: 10px;
-        color: var(--gn);
-      }
-      .msgs {
-        flex: 1;
-        overflow-y: auto;
-        padding: 11px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-      ::-webkit-scrollbar {
-        width: 3px;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--pr);
-        border-radius: 2px;
-      }
-      .sbox {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        gap: 8px;
-        padding: 16px;
-      }
-      .sic {
-        font-size: 38px;
-        animation: fl 3s ease infinite;
-      }
-      .sbox h2 {
-        font-family: "Syne", sans-serif;
-        font-size: 17px;
-        font-weight: 800;
-      }
-      .sbox p {
+      .back-btn {
+        background: var(--glass);
         color: var(--t2);
-        font-size: 12px;
-        line-height: 1.5;
-      }
-      .spn {
-        width: 38px;
-        height: 38px;
-        border: 3px solid var(--b2);
-        border-top: 3px solid var(--pr);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      .slbl {
-        color: var(--tx);
-        font-size: 12px;
-        font-weight: 500;
-      }
-      .sysmsg {
-        display: flex;
-        justify-content: center;
-        margin: 2px 0;
-      }
-      .sysmsg span {
-        background: var(--sr);
-        color: var(--t3);
-        font-size: 10px;
-        padding: 2px 10px;
-        border-radius: 50px;
-      }
-      .mr {
-        display: flex;
-        margin-bottom: 1px;
-      }
-      .mr.me {
-        justify-content: flex-end;
-      }
-      .mr.them {
-        justify-content: flex-start;
-      }
-      .bub {
-        max-width: 70%;
-        border-radius: 13px;
-        padding: 7px 10px;
-        word-break: break-word;
-        animation: fi 0.25s ease;
-      }
-      .bub.me {
-        background: linear-gradient(135deg, var(--pr), var(--pr2));
-        border-bottom-right-radius: 3px;
-      }
-      .bub.me.premium {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 209, 102, 0.25),
-          rgba(255, 150, 50, 0.2)
-        );
-        border: 1px solid rgba(255, 209, 102, 0.5);
-        color: #ffd166;
-      }
-      .bub.them {
-        background: var(--s2);
-        border: 1px solid var(--bd);
-        border-bottom-left-radius: 3px;
-      }
-      .bub.them.premium {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 209, 102, 0.15),
-          rgba(255, 150, 50, 0.1)
-        );
-        border-color: rgba(255, 209, 102, 0.4);
-      }
-
-      /* Standard Collection Bubble Styling */
-      .bub.me.purple {
-        background: linear-gradient(
-          135deg,
-          rgba(180, 160, 255, 0.3),
-          rgba(124, 92, 252, 0.25)
-        );
-        border: 1px solid rgba(180, 160, 255, 0.6);
-        color: #e2d9ff;
-        box-shadow: 0 0 8px rgba(124, 92, 252, 0.25);
-      }
-      .bub.them.purple {
-        background: linear-gradient(
-          135deg,
-          rgba(180, 160, 255, 0.15),
-          rgba(124, 92, 252, 0.12)
-        );
-        border: 1px solid rgba(180, 160, 255, 0.4);
-        color: #b4a0ff;
-      }
-
-      .bub.me.red {
-        background: linear-gradient(
-          135deg,
-          rgba(239, 69, 101, 0.3),
-          rgba(255, 50, 50, 0.25)
-        );
-        border: 1px solid rgba(239, 69, 101, 0.6);
-        color: #ffd3db;
-        box-shadow: 0 0 8px rgba(239, 69, 101, 0.25);
-      }
-      .bub.them.red {
-        background: linear-gradient(
-          135deg,
-          rgba(239, 69, 101, 0.15),
-          rgba(255, 50, 50, 0.12)
-        );
-        border: 1px solid rgba(239, 69, 101, 0.4);
-        color: #ef4565;
-      }
-
-      .bub.me.green {
-        background: linear-gradient(
-          135deg,
-          rgba(6, 214, 160, 0.3),
-          rgba(0, 229, 255, 0.25)
-        );
-        border: 1px solid rgba(6, 214, 160, 0.6);
-        color: #cfffe5;
-        box-shadow: 0 0 8px rgba(6, 214, 160, 0.25);
-      }
-      .bub.them.green {
-        background: linear-gradient(
-          135deg,
-          rgba(6, 214, 160, 0.15),
-          rgba(0, 229, 255, 0.12)
-        );
-        border: 1px solid rgba(6, 214, 160, 0.4);
-        color: #06d6a0;
-      }
-
-      /* Premium Romantic Collection Bubble Styling */
-      .bub.me.rose {
-        background: linear-gradient(135deg, #ff758c, #ff7eb3);
-        border: 1px solid rgba(255, 255, 255, 0.45);
-        color: #fff;
-        box-shadow: 0 0 15px rgba(255, 117, 140, 0.4);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-      }
-      .bub.them.rose {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 117, 140, 0.18),
-          rgba(255, 126, 179, 0.12)
-        );
-        border: 1px solid rgba(255, 117, 140, 0.5);
-        color: #ff758c;
-        box-shadow: 0 0 8px rgba(255, 117, 140, 0.15);
-      }
-
-      .bub.me.sunset {
-        background: linear-gradient(135deg, #f857a6, #ff5858);
-        border: 1px solid rgba(255, 255, 255, 0.45);
-        color: #fff;
-        box-shadow: 0 0 15px rgba(248, 87, 166, 0.4);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-      }
-      .bub.them.sunset {
-        background: linear-gradient(
-          135deg,
-          rgba(248, 87, 166, 0.18),
-          rgba(255, 88, 88, 0.12)
-        );
-        border: 1px solid rgba(248, 87, 166, 0.5);
-        color: #f857a6;
-        box-shadow: 0 0 8px rgba(248, 87, 166, 0.15);
-      }
-
-      .bub.me.passion {
-        background: linear-gradient(135deg, #8a2be2, #ff007f);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        color: #fff;
-        box-shadow: 0 0 20px rgba(255, 0, 127, 0.5);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-      }
-      .bub.them.passion {
-        background: linear-gradient(
-          135deg,
-          rgba(138, 43, 226, 0.18),
-          rgba(255, 0, 127, 0.12)
-        );
-        border: 1px solid rgba(255, 0, 127, 0.5);
-        color: #ff007f;
-        box-shadow: 0 0 8px rgba(255, 0, 127, 0.15);
-      }
-
-      .bub.me.serenade {
-        background: linear-gradient(135deg, #11998e, #38ef7d);
-        border: 1px solid rgba(255, 255, 255, 0.45);
-        color: #fff;
-        box-shadow: 0 0 15px rgba(56, 239, 125, 0.4);
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
-      }
-      .bub.them.serenade {
-        background: linear-gradient(
-          135deg,
-          rgba(17, 153, 142, 0.18),
-          rgba(56, 239, 125, 0.12)
-        );
-        border: 1px solid rgba(17, 153, 142, 0.5);
-        color: #38ef7d;
-        box-shadow: 0 0 8px rgba(17, 153, 142, 0.15);
-      }
-      .bt {
         font-size: 13px;
-        line-height: 1.5;
-      }
-      .btime {
-        font-size: 9px;
-        color: rgba(255, 255, 255, 0.3);
-        margin-top: 2px;
-        text-align: right;
-      }
-      .bub.them .btime {
-        color: var(--t3);
-      }
-      .bub img {
-        max-width: 160px;
-        max-height: 160px;
-        border-radius: 7px;
-        display: block;
-        cursor: pointer;
-      }
-      /* voice bubble */
-      .vrow {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        padding: 2px 0;
-      }
-      .vpb {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-size: 11px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        border: none;
-        cursor: pointer;
-        transition: background 0.2s;
-      }
-      .vpb:hover {
-        background: rgba(255, 255, 255, 0.35);
-      }
-      .bub.them .vpb {
-        background: rgba(124, 92, 252, 0.2);
-        color: var(--pr2);
-      }
-      .bub.them .vpb:hover {
-        background: rgba(124, 92, 252, 0.35);
-      }
-      .wv {
-        flex: 1;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        gap: 1px;
-      }
-      .wb {
-        width: 2px;
-        border-radius: 1px;
-        background: rgba(255, 255, 255, 0.45);
-        animation: wave 1.2s ease infinite;
-      }
-      .bub.them .wb {
-        background: var(--pr);
-      }
-      .vdur {
-        font-size: 10px;
-        color: rgba(255, 255, 255, 0.5);
-        margin-left: 2px;
-        white-space: nowrap;
-      }
-      .bub.them .vdur {
-        color: var(--t3);
-      }
-      .td {
-        display: flex;
-        gap: 4px;
-        align-items: center;
-        padding: 1px 0;
-      }
-      .td span {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--t2);
-        animation: typingDot 1.4s ease-in-out infinite;
-      }
-      .td span:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      .td span:nth-child(3) {
-        animation-delay: 0.4s;
-      }
-      .bub.typing-bub {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
-        min-height: 34px;
-      }
-      .typing-lbl {
-        font-size: 11px;
-        color: var(--t3);
-        letter-spacing: 0.02em;
-      }
-      @keyframes typingDot {
-        0%,
-        60%,
-        100% {
-          transform: translateY(0);
-          opacity: 0.45;
-        }
-        30% {
-          transform: translateY(-4px);
-          opacity: 1;
-        }
-      }
-      .ia {
-        padding: 9px 11px;
-        border-top: 1px solid var(--bd);
-        background: var(--bg2);
-        display: flex;
-        gap: 6px;
-        align-items: center;
-        flex-shrink: 0;
-      }
-      .iab {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: var(--sr);
-        border: 1px solid var(--bd);
-        color: var(--t3);
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-      .iab:hover:not(:disabled) {
-        border-color: var(--pr);
-        color: var(--pr2);
-      }
-      .iab:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-      .iab.rec {
-        background: rgba(239, 69, 101, 0.12);
-        border-color: var(--rd);
-        color: var(--rd);
-        animation: blink 1s infinite;
-      }
-      #mi {
-        flex: 1;
-        background: var(--sr);
-        border: 1px solid var(--bd);
-        border-radius: 50px;
-        padding: 7px 13px;
-        color: var(--tx);
-        font-size: 13px;
-        font-family: "DM Sans", sans-serif;
-        min-width: 0;
-      }
-      #mi:focus {
-        outline: none;
-        border-color: var(--pr);
-      }
-      #mi::placeholder {
-        color: var(--t3);
-      }
-      #mi:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-      #sb {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: var(--sr);
-        border: 1px solid var(--bd);
-        color: var(--t3);
-        font-size: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-      #sb.on {
-        background: linear-gradient(135deg, var(--pr), var(--pr2));
-        border-color: transparent;
-        color: #fff;
-        box-shadow: 0 3px 12px var(--pg);
-      }
-      .mov {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.78);
-        backdrop-filter: blur(8px);
-        z-index: 1000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-      }
-      .mov.on {
-        display: flex;
-      }
-      .mb {
-        background: var(--s2);
-        border: 1px solid var(--b2);
-        border-radius: 16px;
-        padding: 22px;
-        max-width: 320px;
-        width: 90%;
-        text-align: center;
-      }
-      .mb h2 {
-        font-family: "Syne", sans-serif;
-        font-size: 15px;
-        margin-bottom: 7px;
-      }
-      .mb p {
-        color: var(--t2);
-        font-size: 12px;
-        line-height: 1.6;
-        margin-bottom: 14px;
-      }
-      .mbtns {
-        display: flex;
-        gap: 7px;
-        justify-content: center;
-        flex-wrap: wrap;
-      }
-      .mbp {
-        background: linear-gradient(135deg, var(--pr), var(--pr2));
-        color: #fff;
-        padding: 8px 16px;
-        border-radius: 50px;
         font-weight: 600;
-        font-size: 12px;
+        padding: 6px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--bd);
+        display: flex;
+        align-items: center;
+        gap: 6px;
       }
-      .mbs {
-        background: transparent;
-        border: 1px solid var(--b2);
-        color: var(--t2);
-        padding: 8px 12px;
-        border-radius: 50px;
-        font-size: 12px;
-      }
-      /* toast */
-      .toast {
-        position: fixed;
-        bottom: 20px;
+      .back-btn:hover { background: var(--glass2); color: var(--tx); border-color: var(--b2); transform: translateX(-2px); }
+      
+      .logo {
+        position: absolute;
         left: 50%;
         transform: translateX(-50%);
-        background: var(--s2);
-        border: 1px solid var(--b2);
-        color: var(--tx);
-        padding: 9px 20px;
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 16px;
+        background: linear-gradient(135deg, var(--ac), var(--pr));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+      }
+      
+      .top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+      .coin-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 209, 102, 0.08);
+        border: 1px solid rgba(255, 209, 102, 0.2);
+        padding: 4px 10px 4px 6px;
         border-radius: 50px;
         font-size: 12px;
-        z-index: 3000;
-        display: none;
-        white-space: nowrap;
+        font-weight: 700;
+        color: var(--gd);
+        text-decoration: none;
+        transition: transform 0.2s;
       }
-      .toast.ok {
-        border-color: rgba(6, 214, 160, 0.4);
-        color: var(--gn);
+      .coin-pill:hover { transform: scale(1.05); background: rgba(255, 209, 102, 0.15); }
+      .coin-pill-icon { background: linear-gradient(135deg, #ffd166, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+      
+      /* Layout Grid */
+      .layout-grid {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 280px 1fr 260px;
+        overflow: hidden;
+        position: relative;
       }
-      .toast.err {
-        border-color: rgba(239, 69, 101, 0.4);
-        color: var(--rd);
-      }
-      #ipm {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.92);
-        z-index: 2000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-      }
-      #ipm.on {
+
+      /* Panels */
+      .panel {
         display: flex;
-      }
-      #ipm img {
-        max-width: 92vw;
-        max-height: 92vh;
-        border-radius: 9px;
-        cursor: default;
-      }
-      #ipm-close {
-        position: fixed;
-        top: 14px;
-        right: 16px;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 2001;
-        transition: background 0.2s;
-      }
-      #ipm-close:hover {
-        background: rgba(239, 69, 101, 0.5);
-      }
-      #fi {
-        display: none;
-      }
-      @keyframes fadeUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-      @keyframes fl {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-6px);
-        }
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      @keyframes blink {
-        0%,
-        100% {
-          opacity: 1;
-        }
-        50% {
-          opacity: 0.3;
-        }
-      }
-      @keyframes wave {
-        0%,
-        100% {
-          height: 3px;
-        }
-        50% {
-          height: 14px;
-        }
-      }
-      .sl-anim {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 100px;
-        animation: zoomFade 2.5s ease forwards;
-        text-shadow: 0 0 40px rgba(255, 209, 102, 0.8);
-      }
-      .cp-anim {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         flex-direction: column;
-        animation: floatUpFade 3s ease forwards;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: var(--bg2);
       }
-      .cp-anim .msg {
-        background: linear-gradient(135deg, #ff6496, #ff3278);
-        color: #fff;
-        padding: 12px 24px;
-        border-radius: 50px;
-        font-family: "Syne", sans-serif;
-        font-size: 24px;
-        font-weight: 800;
-        box-shadow: 0 10px 30px rgba(255, 100, 150, 0.5);
-        margin-top: 10px;
+      .left-panel { border-right: 1px solid var(--bd); padding: 16px; gap: 12px; z-index: 10; }
+      .right-panel { border-left: 1px solid var(--bd); padding: 16px; gap: 12px; z-index: 10; }
+      .main-panel { background: var(--bg); position: relative; display: flex; flex-direction: column; }
+
+      /* Cards inside panels */
+      .p-card {
+        background: var(--bg3);
+        border: 1px solid var(--bd);
+        border-radius: 16px;
+        padding: 16px;
+        position: relative;
+        overflow: hidden;
       }
-      @keyframes zoomFade {
-        0% {
-          transform: scale(0);
-          opacity: 0;
-        }
-        20% {
-          transform: scale(1.2);
-          opacity: 1;
-        }
-        80% {
-          transform: scale(1);
-          opacity: 1;
-        }
-        100% {
-          transform: scale(1.5);
-          opacity: 0;
-        }
+      .p-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
       }
-      @keyframes floatUpFade {
-        0% {
-          transform: translateY(50px);
-          opacity: 0;
-        }
-        20% {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        80% {
-          transform: translateY(-20px);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(-50px);
-          opacity: 0;
-        }
+      
+      /* User Profile Card */
+      .user-card { display: flex; align-items: center; gap: 12px; }
+      .avatar-box {
+        width: 46px; height: 46px; border-radius: 14px;
+        background: linear-gradient(135deg, var(--pr), var(--ac));
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 16px; flex-shrink: 0;
+        overflow: hidden; border: 2px solid var(--bg3);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2); position: relative;
       }
-      .rose-anim-main {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) scale(0);
-        font-size: 120px;
-        animation: roseCentralZoom 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        filter: drop-shadow(0 0 30px rgba(255, 100, 120, 0.9));
-        text-shadow: 0 0 40px rgba(255, 100, 120, 0.6);
+      .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+      .user-info { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; }
+      .user-name { font-family: "Syne", sans-serif; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .badge-row { display: flex; flex-wrap: wrap; gap: 4px; }
+
+      /* Badges */
+      .bm { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 6px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; }
+      .bv { background: rgba(6,214,160,.15); color: #00ffcc; border: 1px solid rgba(6,214,160,.3); }
+      .bvip { background: rgba(255,209,102,.15); color: #ffd166; border: 1px solid rgba(255,209,102,.3); }
+      .bvipa { background: linear-gradient(135deg, rgba(255,215,0,.2), rgba(255,140,0,.15)); color: #ffe066; border: 1px solid rgba(255,215,0,.4); }
+      .bdev { background: rgba(124,92,252,.2); color: #b4a0ff; border: 1px solid rgba(124,92,252,.4); }
+      .badm { background: rgba(255,80,80,.15); color: #ff8844; border: 1px solid rgba(255,100,50,.3); }
+      .bani { background: rgba(255,140,0,.15); color: #ff9f43; border: 1px solid rgba(255,140,0,.3); }
+      
+      .gtg { font-size: 10px; padding: 3px 8px; border-radius: 8px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; text-transform: uppercase; }
+
+      /* Filters Card */
+      .card-title { font-size: 10px; font-weight: 700; color: var(--t3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+      .filter-group { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; border: 1px solid var(--bd); }
+      .filter-btn { flex: 1; padding: 8px 4px; border-radius: 8px; background: transparent; color: var(--t2); font-size: 11px; font-weight: 600; text-align: center; }
+      .filter-btn.on { background: var(--bg3); color: var(--tx); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+      .filter-status { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 10px; }
+      .filter-uses { color: var(--gd); font-weight: 700; }
+      .filter-hint { color: var(--t3); }
+
+      /* Action Buttons */
+      .actions-grid { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+      .action-btn { 
+        width: 100%; padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; 
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        position: relative; overflow: hidden;
       }
-      .rose-petal-drift {
-        position: absolute;
-        pointer-events: none;
-        opacity: 0;
+      .action-btn::after {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 40%;
+        background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent); pointer-events: none;
       }
-      @keyframes roseCentralZoom {
-        0% {
-          transform: translate(-50%, -50%) scale(0) rotate(-45deg);
-          opacity: 0;
-        }
-        15% {
-          transform: translate(-50%, -50%) scale(1.2) rotate(10deg);
-          opacity: 1;
-        }
-        30% {
-          transform: translate(-50%, -50%) scale(1) rotate(0deg);
-          opacity: 1;
-        }
-        80% {
-          transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
-          opacity: 1;
-          filter: drop-shadow(0 0 50px rgba(255, 100, 120, 1));
-        }
-        100% {
-          transform: translate(-50%, -50%) scale(0) rotate(45deg);
-          opacity: 0;
-        }
+      .btn-primary { background: linear-gradient(135deg, var(--pr), #6040d0); color: #fff; box-shadow: 0 6px 16px rgba(124,92,252,0.3); border: 1px solid rgba(255,255,255,0.1); }
+      .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,92,252,0.4); }
+      .btn-primary:active { transform: translateY(0); }
+      
+      .btn-secondary { background: var(--bg3); color: var(--tx); border: 1px solid var(--bd); }
+      .btn-secondary:hover { background: var(--glass2); border-color: var(--b2); transform: translateY(-1px); }
+      
+      .btn-danger { background: rgba(239, 69, 101, 0.1); color: var(--rd); border: 1px solid rgba(239, 69, 101, 0.2); }
+      .btn-danger:hover { background: rgba(239, 69, 101, 0.2); }
+      
+      /* Premium Buttons */
+      .btn-prem-gold { background: rgba(255, 209, 102, 0.1); border: 1px solid rgba(255, 209, 102, 0.3); color: var(--gd); }
+      .btn-prem-gold:hover { background: rgba(255, 209, 102, 0.15); box-shadow: 0 0 15px rgba(255,209,102,0.1); }
+      
+      .btn-prem-pink { background: rgba(255, 100, 150, 0.1); border: 1px solid rgba(255, 100, 150, 0.3); color: #ff6496; }
+      .btn-prem-pink:hover { background: rgba(255, 100, 150, 0.15); box-shadow: 0 0 15px rgba(255,100,150,0.1); }
+      
+      .btn-prem-rose { background: rgba(255, 100, 120, 0.1); border: 1px solid rgba(255, 100, 120, 0.3); color: #ff6478; }
+      .btn-prem-rose:hover { background: rgba(255, 100, 120, 0.15); box-shadow: 0 0 15px rgba(255,100,120,0.1); }
+      
+      .btn-prem-cyan { background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--ac); }
+      .btn-prem-cyan:hover { background: rgba(0, 229, 255, 0.15); box-shadow: 0 0 15px rgba(0,229,255,0.1); }
+
+      /* Report Menu */
+      .report-menu {
+        background: var(--bg); border: 1px solid var(--b2); border-radius: 12px; overflow: hidden;
+        margin-top: -4px; margin-bottom: 4px; display: none;
+        animation: fadeSlideDown 0.2s ease forwards;
       }
-      @keyframes petalFall {
-        0% {
-          transform: translateY(0) rotate(0deg) translateX(0);
-          opacity: 0;
+      .report-menu.on { display: block; }
+      .report-item { display: block; width: 100%; text-align: left; padding: 10px 14px; background: none; color: var(--t2); font-size: 12px; border-bottom: 1px solid var(--bd); transition: background 0.2s; }
+      .report-item:last-child { border-bottom: none; }
+      .report-item:hover { background: rgba(239, 69, 101, 0.1); color: var(--rd); }
+      .report-success { text-align: center; color: var(--gn); font-size: 11px; padding: 8px; font-weight: 600; display: none; background: rgba(6,214,160,.1); border-radius: 8px; }
+
+      /* Chat Main Area */
+      .chat-header {
+        height: 64px; background: rgba(10, 10, 20, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--bd); display: flex; align-items: center; padding: 0 24px; z-index: 10;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      
+      .hd-idle { display: flex; align-items: center; gap: 10px; width: 100%; }
+      .hdot { width: 8px; height: 8px; border-radius: 50%; background: var(--t3); box-shadow: 0 0 8px currentColor; }
+      .hdot.srch { background: var(--gd); animation: pulseDot 1.5s infinite; }
+      .hdot.chat { background: var(--gn); }
+      .htxt { color: var(--t2); font-size: 14px; font-weight: 500; }
+      
+      .hd-chat { display: none; align-items: center; gap: 12px; width: 100%; }
+      .chat-partner-avatar { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--pr), var(--ac)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; overflow: hidden; border: 2px solid transparent; }
+      .chat-partner-avatar img { width: 100%; height: 100%; object-fit: cover; }
+      .chat-partner-info { display: flex; flex-direction: column; }
+      .chat-partner-name { font-family: "Syne", sans-serif; font-size: 15px; font-weight: 700; }
+      .chat-partner-status { font-size: 11px; color: var(--gn); font-weight: 600; display: flex; align-items: center; gap: 4px; }
+
+      /* Messages Area */
+      .msgs-area { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 24px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
+      
+      .sysmsg { display: flex; justify-content: center; margin: 8px 0; }
+      .sysmsg span { background: rgba(255,255,255,0.05); border: 1px solid var(--glass2); color: var(--t3); font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 50px; backdrop-filter: blur(4px); }
+      
+      .mr { display: flex; margin-bottom: 2px; }
+      .mr.me { justify-content: flex-end; }
+      .mr.them { justify-content: flex-start; }
+      
+      .bub {
+        max-width: 75%; border-radius: 20px; padding: 10px 16px; font-size: 14px; line-height: 1.45; word-break: break-word;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: relative; animation: bubblePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+      .bub.me { background: linear-gradient(135deg, var(--pr), #6040d0); border-bottom-right-radius: 4px; color: #fff; }
+      .bub.them { background: var(--bg3); border: 1px solid var(--bd); border-bottom-left-radius: 4px; color: var(--tx); }
+      
+      .btime { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 4px; text-align: right; font-weight: 500; display: block; }
+      .bub.them .btime { color: var(--t3); }
+      
+      .bub img { max-width: 220px; max-height: 280px; border-radius: 12px; display: block; cursor: zoom-in; margin-top: 4px; transition: transform 0.2s; }
+      .bub img:hover { transform: scale(1.02); }
+
+      /* Themed Bubbles (Preserved logic, updated aesthetic) */
+      .bub.me.premium { background: linear-gradient(135deg, rgba(255,209,102,.3), rgba(255,140,0,.25)); border: 1px solid rgba(255,209,102,.6); color: #fff0b3; box-shadow: 0 4px 20px rgba(255,209,102,.15); }
+      .bub.them.premium { background: linear-gradient(135deg, rgba(255,209,102,.1), rgba(255,140,0,.05)); border: 1px solid rgba(255,209,102,.3); color: #ffd166; }
+      
+      .bub.me.purple { background: linear-gradient(135deg, rgba(160,120,255,.4), rgba(100,50,255,.3)); border: 1px solid rgba(160,120,255,.6); color: #e6dfff; box-shadow: 0 4px 20px rgba(160,120,255,.15); }
+      .bub.them.purple { background: linear-gradient(135deg, rgba(160,120,255,.1), rgba(100,50,255,.05)); border: 1px solid rgba(160,120,255,.3); color: #c4afff; }
+      
+      .bub.me.red { background: linear-gradient(135deg, rgba(239,69,101,.4), rgba(200,20,50,.3)); border: 1px solid rgba(239,69,101,.6); color: #ffebef; box-shadow: 0 4px 20px rgba(239,69,101,.15); }
+      .bub.them.red { background: linear-gradient(135deg, rgba(239,69,101,.1), rgba(200,20,50,.05)); border: 1px solid rgba(239,69,101,.3); color: #ef4565; }
+      
+      .bub.me.green { background: linear-gradient(135deg, rgba(6,214,160,.4), rgba(0,180,120,.3)); border: 1px solid rgba(6,214,160,.6); color: #e0fff4; box-shadow: 0 4px 20px rgba(6,214,160,.15); }
+      .bub.them.green { background: linear-gradient(135deg, rgba(6,214,160,.1), rgba(0,180,120,.05)); border: 1px solid rgba(6,214,160,.3); color: #06d6a0; }
+      
+      .bub.me.rose { background: linear-gradient(135deg, #ff758c, #ff7eb3); border: 1px solid rgba(255,255,255,.3); color: #fff; box-shadow: 0 4px 20px rgba(255,117,140,.2); }
+      .bub.them.rose { background: linear-gradient(135deg, rgba(255,117,140,.15), rgba(255,126,179,.05)); border: 1px solid rgba(255,117,140,.4); color: #ff758c; }
+      
+      .bub.me.sunset { background: linear-gradient(135deg, #f857a6, #ff5858); border: 1px solid rgba(255,255,255,.3); color: #fff; box-shadow: 0 4px 20px rgba(248,87,166,.2); }
+      .bub.them.sunset { background: linear-gradient(135deg, rgba(248,87,166,.15), rgba(255,88,88,.05)); border: 1px solid rgba(248,87,166,.4); color: #f857a6; }
+      
+      .bub.me.passion { background: linear-gradient(135deg, #8a2be2, #ff007f); border: 1px solid rgba(255,255,255,.3); color: #fff; box-shadow: 0 4px 20px rgba(255,0,127,.2); }
+      .bub.them.passion { background: linear-gradient(135deg, rgba(138,43,226,.15), rgba(255,0,127,.05)); border: 1px solid rgba(255,0,127,.4); color: #ff007f; }
+      
+      .bub.me.serenade { background: linear-gradient(135deg, #11998e, #38ef7d); border: 1px solid rgba(255,255,255,.3); color: #fff; box-shadow: 0 4px 20px rgba(56,239,125,.2); }
+      .bub.them.serenade { background: linear-gradient(135deg, rgba(17,153,142,.15), rgba(56,239,125,.05)); border: 1px solid rgba(17,153,142,.4); color: #38ef7d; }
+
+      /* Voice Bubbles */
+      .vrow { display: flex; align-items: center; gap: 10px; min-width: 140px; }
+      .vpb { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.2); color: #fff; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.2s; backdrop-filter: blur(4px); }
+      .vpb:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
+      .bub.them .vpb { background: var(--pr); color: #fff; }
+      .bub.them .vpb:hover { background: var(--pr2); }
+      
+      .wv { flex: 1; height: 24px; display: flex; align-items: center; gap: 2px; justify-content: center; }
+      .wb { width: 3px; border-radius: 2px; background: rgba(255,255,255,0.6); animation: wave 1.2s ease infinite; }
+      .bub.them .wb { background: var(--pr); }
+      .vdur { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8); margin-left: 4px; }
+      .bub.them .vdur { color: var(--t2); }
+
+      /* Typing Indicator */
+      .typing-bub { display: flex; align-items: center; gap: 10px; padding: 12px 18px; min-height: 42px; }
+      .td { display: flex; gap: 4px; align-items: center; }
+      .td span { width: 6px; height: 6px; border-radius: 50%; background: var(--t2); animation: typingDot 1.4s infinite ease-in-out both; }
+      .td span:nth-child(1) { animation-delay: -0.32s; }
+      .td span:nth-child(2) { animation-delay: -0.16s; }
+      .typing-lbl { font-size: 12px; font-weight: 600; color: var(--t3); letter-spacing: 0.5px; }
+
+      /* Input Area */
+      .input-area {
+        padding: 16px 24px; padding-bottom: calc(16px + var(--safe-bottom));
+        background: rgba(10, 10, 20, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid var(--bd); display: flex; gap: 10px; align-items: center; flex-shrink: 0; z-index: 10;
+      }
+      .iab {
+        width: 42px; height: 42px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--bd);
+        color: var(--t2); font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+      .iab:hover:not(:disabled) { background: var(--glass2); border-color: var(--pr); color: var(--pr2); transform: translateY(-2px); }
+      .iab:disabled { opacity: 0.4; cursor: not-allowed; }
+      .iab.rec { background: rgba(239, 69, 101, 0.15); border-color: var(--rd); color: var(--rd); animation: pulseRed 1.5s infinite; }
+      
+      .input-wrapper { flex: 1; position: relative; display: flex; align-items: center; }
+      #mi {
+        width: 100%; background: var(--bg3); border: 1px solid var(--bd); border-radius: 24px;
+        padding: 12px 20px; color: var(--tx); font-size: 15px; font-family: "DM Sans", sans-serif;
+        box-shadow: inset 0 2px 6px rgba(0,0,0,0.2); transition: all 0.2s;
+      }
+      #mi:focus { outline: none; border-color: var(--pr); background: rgba(26,26,46,0.8); box-shadow: inset 0 2px 6px rgba(0,0,0,0.2), 0 0 0 3px rgba(124,92,252,0.15); }
+      #mi::placeholder { color: var(--t3); }
+      #mi:disabled { opacity: 0.5; cursor: not-allowed; }
+      
+      #sb {
+        width: 42px; height: 42px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--bd);
+        color: var(--t3); font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      #sb.on { background: linear-gradient(135deg, var(--pr), #6040d0); border-color: transparent; color: #fff; box-shadow: 0 4px 15px rgba(124,92,252,0.4); transform: scale(1.05); }
+      #sb.on:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(124,92,252,0.6); }
+      
+      #fi { display: none; }
+
+      /* Idle / Search Boxes */
+      .sbox { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 16px; padding: 24px; animation: fadeIn 0.4s ease; }
+      .sic { font-size: 64px; background: linear-gradient(135deg, var(--pr), var(--ac)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 10px 20px rgba(124,92,252,0.3)); animation: float 4s ease-in-out infinite; }
+      .sbox h2 { font-family: "Syne", sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+      .sbox p { color: var(--t2); font-size: 14px; max-width: 280px; line-height: 1.6; }
+      
+      .spn { width: 56px; height: 56px; border: 4px solid var(--b2); border-top: 4px solid var(--ac); border-right: 4px solid var(--pr); border-radius: 50%; animation: spin 1s linear infinite; box-shadow: 0 0 20px rgba(0,229,255,0.2); }
+      .slbl { color: var(--tx); font-size: 16px; font-weight: 600; font-family: "Syne", sans-serif; }
+
+      /* Modals */
+      .mov { position: fixed; inset: 0; background: rgba(5, 5, 10, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+      .mov.on { display: flex; animation: fadeIn 0.2s ease; }
+      .mb { background: var(--bg3); border: 1px solid var(--b2); border-radius: 24px; padding: 32px 24px; max-width: 360px; width: 100%; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,0.5); position: relative; overflow: hidden; animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      .mb::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(90deg, var(--pr), var(--ac)); }
+      .mb h2 { font-family: "Syne", sans-serif; font-size: 20px; margin-bottom: 12px; font-weight: 800; }
+      .mb p { color: var(--t2); font-size: 14px; line-height: 1.6; margin-bottom: 24px; }
+      .mbtns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .mbp { background: linear-gradient(135deg, var(--pr), #6040d0); color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 14px; box-shadow: 0 6px 16px rgba(124,92,252,0.3); }
+      .mbp:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,92,252,0.4); }
+      .mbs { background: var(--bg2); border: 1px solid var(--bd); color: var(--tx); padding: 12px 24px; border-radius: 50px; font-size: 14px; font-weight: 600; }
+      .mbs:hover { background: var(--glass2); border-color: var(--b2); }
+
+      /* Toast */
+      .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: rgba(20, 20, 35, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--b2); box-shadow: 0 10px 30px rgba(0,0,0,0.4); color: var(--tx); padding: 14px 24px; border-radius: 16px; font-size: 13px; font-weight: 600; z-index: 3000; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); display: flex; align-items: center; gap: 10px; }
+      .toast.on { transform: translateX(-50%) translateY(0); opacity: 1; }
+      .toast::before { content:''; position:absolute; left:0; top:0; bottom:0; width:4px; border-radius: 16px 0 0 16px; background: var(--pr); }
+      .toast.ok::before { background: var(--gn); }
+      .toast.err::before { background: var(--rd); }
+
+      /* Image Preview Modal */
+      #ipm { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+      #ipm.on { display: flex; animation: fadeIn 0.3s ease; }
+      #ipm img { max-width: 90vw; max-height: 90vh; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); object-fit: contain; animation: scaleUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+      #ipm-close { position: fixed; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2001; transition: all 0.2s; }
+      #ipm-close:hover { background: rgba(239, 69, 101, 0.6); transform: rotate(90deg); }
+
+      /* Animations */
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes fadeSlideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+      @keyframes spin { to { transform: rotate(360deg); } }
+      @keyframes pulseDot { 0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px currentColor; } 50% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 2px currentColor; } }
+      @keyframes pulseRed { 0%, 100% { box-shadow: 0 0 0 0 rgba(239, 69, 101, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 69, 101, 0); } }
+      @keyframes wave { 0%, 100% { height: 4px; } 50% { height: 18px; } }
+      @keyframes typingDot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1.2); opacity: 1; } }
+      @keyframes bubblePop { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+      @keyframes scaleUp { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+      
+      /* Existing Premium Animations Preserved */
+      .sl-anim { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: flex; align-items: center; justify-content: center; font-size: 120px; animation: zoomFade 2.5s ease forwards; text-shadow: 0 0 60px rgba(255, 209, 102, 0.8); }
+      .cp-anim { position: fixed; inset: 0; pointer-events: none; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column; animation: floatUpFade 3s ease forwards; }
+      .cp-anim .msg { background: linear-gradient(135deg, #ff6496, #ff3278); color: #fff; padding: 16px 32px; border-radius: 50px; font-family: "Syne", sans-serif; font-size: 28px; font-weight: 800; box-shadow: 0 15px 40px rgba(255, 100, 150, 0.6); margin-top: 16px; border: 2px solid rgba(255,255,255,0.3); }
+      @keyframes zoomFade { 0% { transform: scale(0); opacity: 0; } 20% { transform: scale(1.2); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+      @keyframes floatUpFade { 0% { transform: translateY(60px); opacity: 0; } 20% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(-30px); opacity: 1; } 100% { transform: translateY(-80px); opacity: 0; } }
+      
+      .rose-anim-main { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0); font-size: 140px; animation: roseCentralZoom 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; filter: drop-shadow(0 0 40px rgba(255, 100, 120, 0.9)); text-shadow: 0 0 50px rgba(255, 100, 120, 0.6); }
+      .rose-petal-drift { position: absolute; pointer-events: none; opacity: 0; }
+      @keyframes roseCentralZoom { 0% { transform: translate(-50%, -50%) scale(0) rotate(-45deg); opacity: 0; } 15% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); opacity: 1; } 30% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1.1) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 60px rgba(255, 100, 120, 1)); } 100% { transform: translate(-50%, -50%) scale(0) rotate(45deg); opacity: 0; } }
+      @keyframes petalFall { 0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; } 10% { opacity: 0.9; } 90% { opacity: 0.9; } 100% { transform: translateY(120vh) rotate(720deg) translateX(150px); opacity: 0; } }
+
+      .aura-glow {
+        border: 2px solid #ffd166 !important;
+        position: relative;
+        box-shadow: 0 0 20px rgba(255, 209, 102, 0.8), inset 0 0 10px rgba(255, 209, 102, 0.5);
+      }
+      .aura-glow::after {
+        content: ''; position: absolute; inset: -8px; border-radius: inherit; padding: 3px;
+        background: conic-gradient(from 0deg, #ffd166, #ff9f43, #fff5d1, #ffd166, #ff9f43);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 10;
+        animation: auraSpin 3s linear infinite, auraShimmer 1.5s ease-in-out infinite alternate;
+      }
+      @keyframes auraSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      @keyframes auraShimmer { 0% { opacity: 0.6; filter: drop-shadow(0 0 6px rgba(255, 209, 102, 0.7)) blur(0.5px); } 100% { opacity: 1; filter: drop-shadow(0 0 16px rgba(255, 209, 102, 1)) blur(1px); } }
+
+      /* Mobile Nav */
+      .mobile-nav { display: none; height: 60px; background: rgba(10, 10, 20, 0.9); backdrop-filter: blur(12px); border-top: 1px solid var(--bd); padding-bottom: var(--safe-bottom); position: relative; z-index: 100; }
+      .mnav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--t3); background: transparent; font-size: 20px; transition: color 0.2s; }
+      .mnav-btn span { font-size: 10px; font-weight: 700; }
+      .mnav-btn.active { color: var(--pr); }
+      .mnav-btn.active span { color: var(--tx); }
+
+      /* Responsiveness */
+      @media (max-width: 1023px) {
+        .layout-grid { grid-template-columns: 260px 1fr; }
+        .right-panel {
+          position: absolute; top: 0; right: 0; bottom: 0; width: 280px; background: rgba(15,15,26,0.95); backdrop-filter: blur(20px);
+          transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1); box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 50; border-left: 1px solid var(--b2);
         }
-        10% {
-          opacity: 0.8;
+        .right-panel.open { transform: translateX(0); }
+        .chat-header { padding-right: 16px; }
+        #btnInfoToggle { display: flex !important; }
+      }
+      @media (max-width: 767px) {
+        .layout-grid { display: flex; }
+        .mobile-nav { display: flex; }
+        .left-panel, .main-panel, .right-panel {
+          position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: var(--bg); transition: opacity 0.3s, visibility 0.3s; z-index: 1;
         }
-        90% {
-          opacity: 0.8;
-        }
-        100% {
-          transform: translateY(110vh) rotate(720deg) translateX(100px);
-          opacity: 0;
-        }
+        .right-panel { transform: none; box-shadow: none; background: var(--bg); border: none; }
+        
+        /* Tab switching logic for mobile */
+        .left-panel { opacity: 0; visibility: hidden; }
+        .main-panel { opacity: 1; visibility: visible; z-index: 2; }
+        .right-panel { opacity: 0; visibility: hidden; }
+        
+        body[data-tab="menu"] .left-panel { opacity: 1; visibility: visible; z-index: 3; }
+        body[data-tab="menu"] .main-panel { opacity: 0; visibility: hidden; }
+        
+        body[data-tab="info"] .right-panel { opacity: 1; visibility: visible; z-index: 3; }
+        body[data-tab="info"] .main-panel { opacity: 0; visibility: hidden; }
+        
+        .user-card, .p-card { border-radius: 0; border-left: none; border-right: none; }
+        .msgs-area { padding: 16px; }
+        .bub { max-width: 85%; }
+        #btnInfoToggle { display: none !important; } /* Hidden on mobile as we use bottom nav */
       }
     </style>
   </head>
-  <body>
-    <div class="top">
-      <button class="bk" onclick="goBack()">← Back</button>
-      <span class="lm">◈ StrangerNear</span>
-      <div class="tr" id="tr"></div>
+  <body data-tab="chat">
+    <!-- Top Nav -->
+    <div class="top"> <!-- Keeping .top to satisfy JS, but styling it via top-nav -->
+      <div class="top-nav" style="width:100%; height:100%; padding:0;">
+        <button class="back-btn bk" onclick="goBack()">← Back</button>
+        <span class="logo lm">◈ StrangerNear</span>
+        <div class="top-right tr" id="tr"></div>
+      </div>
     </div>
 
-    <div class="layout">
-      <div class="sb">
-        <div class="mc">
-          <div class="mav" id="mav">?</div>
-          <div>
-            <div class="mn" id="mname">Guest</div>
-            <div class="br" id="mbr"></div>
+    <!-- Layout Grid -->
+    <div class="layout layout-grid">
+      
+      <!-- LEFT PANEL (Me & Filters) -->
+      <div class="panel left-panel sb" id="mobileMenuPanel">
+        <!-- My Card -->
+        <div class="p-card mc">
+          <div class="avatar-box mav" id="mav">?</div>
+          <div class="user-info">
+            <div class="user-name mn" id="mname">Guest</div>
+            <div class="badge-row br" id="mbr"></div>
           </div>
         </div>
-        <div class="fc">
-          <div class="ft">Gender Filter</div>
-          <div class="gfr">
-            <button class="gfb on" id="gf-any" onclick="setGF('any', this)">
-              Any
-            </button>
-            <button class="gfb" id="gf-female" onclick="setGF('female', this)">
-              ♀ Girls
-            </button>
-            <button class="gfb" id="gf-male" onclick="setGF('male', this)">
-              ♂ Guys
-            </button>
+
+        <!-- Gender Filter -->
+        <div class="p-card fc">
+          <div class="card-title ft">Gender Filter</div>
+          <div class="filter-group gfr">
+            <button class="filter-btn gfb on" id="gf-any" onclick="setGF('any', this)">Any</button>
+            <button class="filter-btn gfb" id="gf-female" onclick="setGF('female', this)">♀ Girls</button>
+            <button class="filter-btn gfb" id="gf-male" onclick="setGF('male', this)">♂ Guys</button>
           </div>
-          <div class="fu" id="fuL"></div>
-          <div class="fh" id="fh"></div>
-        </div>
-        <div class="pc" id="pc">
-          <div class="ph">Chatting with</div>
-          <div class="pname" id="pname">—</div>
-          <div class="pm" id="pm"></div>
-          <div class="pci" id="pci"></div>
-          <button
-            class="afbtn"
-            id="afBtn"
-            style="display: none"
-            onclick="sendFriendReq()"
-          >
-            ➕ Add Friend
-          </button>
-        </div>
-        <div class="ctl">
-          <button class="cb cs" id="btnS" onclick="startSearch()">
-            Start Chat
-          </button>
-          <button
-            class="cb csk"
-            id="btnSk"
-            onclick="doSkip()"
-            style="display: none"
-          >
-            Next Stranger →
-          </button>
-          <button
-            class="cb ccl"
-            id="btnC"
-            onclick="doCancel()"
-            style="display: none"
-          >
-            ✕ Cancel
-          </button>
-          <button
-            class="cb crp"
-            id="btnR"
-            onclick="togRep()"
-            style="display: none"
-          >
-            ⚑ Report
-          </button>
-          <button
-            class="cb"
-            id="btnSL"
-            onclick="sendPremiumAction('superlike', 8)"
-            style="
-              display: none;
-              background: rgba(255, 209, 102, 0.1);
-              border: 1px solid rgba(255, 209, 102, 0.3);
-              color: var(--gd);
-            "
-          >
-            🌟 Super Like (8 🪙)
-          </button>
-          <button
-            class="cb"
-            id="btnCp"
-            onclick="sendPremiumAction('compliment', 5)"
-            style="
-              display: none;
-              background: rgba(255, 100, 150, 0.1);
-              border: 1px solid rgba(255, 100, 150, 0.3);
-              color: #ff6496;
-            "
-          >
-            💌 Compliment (5 🪙)
-          </button>
-          <button
-            class="cb"
-            id="btnRose"
-            onclick="sendPremiumAction('rose', 3)"
-            style="
-              display: none;
-              background: rgba(255, 100, 120, 0.1);
-              border: 1px solid rgba(255, 100, 120, 0.3);
-              color: #ff6478;
-            "
-          >
-            🌹 Send Rose (3 🪙)
-          </button>
-          <button
-            class="cb"
-            id="btnOpener"
-            onclick="buyFirstMessageOpener()"
-            style="
-              display: none;
-              background: rgba(0, 229, 255, 0.1);
-              border: 1px solid rgba(0, 229, 255, 0.3);
-              color: var(--ac);
-            "
-          >
-            💬 AI Opener (3 🪙)
-          </button>
-          <button
-            class="cb"
-            id="btnRevealInt"
-            onclick="buyRevealInterests()"
-            style="
-              display: none;
-              background: rgba(0, 229, 255, 0.1);
-              border: 1px solid rgba(0, 229, 255, 0.3);
-              color: var(--ac);
-            "
-          >
-            🎯 Reveal Interests (8 🪙)
-          </button>
-          <button
-            class="cb"
-            id="btnRM"
-            onclick="sendRematchRequest()"
-            style="
-              display: none;
-              background: rgba(0, 229, 255, 0.1);
-              border: 1px solid rgba(0, 229, 255, 0.3);
-              color: var(--ac);
-            "
-          >
-            🔁 Request Re-match (10 🪙)
-          </button>
-          <div class="rm" id="rm">
-            <button class="ri" onclick="doReport('Fake profile')">
-              Fake profile
-            </button>
-            <button class="ri" onclick="doReport('Harassment')">
-              Harassment
-            </button>
-            <button class="ri" onclick="doReport('Inappropriate')">
-              Inappropriate
-            </button>
-            <button class="ri" onclick="doReport('Spam')">Spam</button>
+          <div class="filter-status">
+            <span class="filter-uses fu" id="fuL"></span>
+            <span class="filter-hint fh" id="fh"></span>
           </div>
-          <div class="rp" id="rp" style="display: none">✓ Reported</div>
+        </div>
+
+        <!-- Left Actions -->
+        <div class="actions-grid ctl">
+          <button class="action-btn btn-primary cb cs" id="btnS" onclick="startSearch()">Start Chat</button>
+          <button class="action-btn btn-secondary cb csk" id="btnSk" onclick="doSkip()" style="display: none">Next Stranger →</button>
+          <button class="action-btn btn-danger cb ccl" id="btnC" onclick="doCancel()" style="display: none">✕ Cancel Search</button>
         </div>
       </div>
 
-      <div class="main">
-        <div class="chdr">
+      <!-- MAIN PANEL (Chat) -->
+      <div class="panel main-panel main" id="mobileChatPanel">
+        <!-- Chat Header -->
+        <div class="chat-header chdr">
+          <!-- Idle Header -->
           <div class="hd-idle" id="hdIdle">
             <div class="hdot" id="hdot"></div>
             <span class="htxt" id="htxt">Ready to chat</span>
           </div>
+          
+          <!-- Active Chat Header -->
           <div class="hd-chat" id="hdChat">
-            <div class="cav" id="hav">?</div>
-            <div>
-              <div class="cn" id="hname">—</div>
-              <div class="cs2" id="hstat">● online</div>
+            <div class="chat-partner-avatar cav" id="hav">?</div>
+            <div class="chat-partner-info">
+              <div class="chat-partner-name cn" id="hname">—</div>
+              <div class="chat-partner-status cs2" id="hstat">● online</div>
             </div>
+            <!-- Toggle Right Panel (Tablet only) -->
+            <button id="btnInfoToggle" onclick="document.getElementById('rightPanel').classList.toggle('open')" style="display:none; margin-left:auto; background:var(--glass2); border:1px solid var(--bd); color:var(--tx); width:36px; height:36px; border-radius:10px; font-size:16px;">ℹ️</button>
           </div>
         </div>
 
-        <div class="msgs" id="msgs">
+        <!-- Messages Area -->
+        <div class="msgs-area msgs" id="msgs">
           <div class="sbox" id="boxIdle">
             <div class="sic">◈</div>
             <h2>Ready to meet someone?</h2>
             <p id="idleSub">Click Start Chat to find a stranger</p>
-            <button
-              class="cb cs"
-              style="
-                width: auto;
-                padding: 8px 22px;
-                border-radius: 50px;
-                margin-top: 5px;
-              "
-              onclick="startSearch()"
-            >
-              Start Chat →
-            </button>
+            <button class="action-btn btn-primary cb cs" style="width: auto; padding: 12px 32px; border-radius: 50px; margin-top: 8px;" onclick="startSearch()">Start Chat →</button>
           </div>
+          
           <div class="sbox" id="boxSearch" style="display: none">
             <div class="spn"></div>
             <div class="slbl" id="srchLbl">Finding your match...</div>
-            <p style="font-size: 10px; color: var(--t3)">
-              Expanding if no one found nearby...
-            </p>
+            <p style="font-size: 12px; color: var(--t3); max-width: 200px;">Expanding if no one found nearby...</p>
           </div>
         </div>
 
-        <div class="ia">
-          <input
-            type="file"
-            id="fi"
-            accept="image/*"
-            onchange="sendImg(this)"
-          />
-          <button
-            class="iab"
-            id="btnImg"
-            onclick="document.getElementById('fi').click()"
-            disabled
-            title="Sign in to send images"
-          >
-            🖼
-          </button>
-          <button
-            class="iab"
-            id="btnVc"
-            disabled
-            title="Hold to record voice"
-            onmousedown="startRec(event)"
-            onmouseup="stopRec()"
-            ontouchstart="startRec(event)"
-            ontouchend="stopRec()"
-          >
-            🎤
-          </button>
-          <input
-            type="text"
-            id="mi"
-            placeholder="Start a chat first..."
-            disabled
-            maxlength="500"
-          />
+        <!-- Input Area -->
+        <div class="input-area ia">
+          <input type="file" id="fi" accept="image/*" onchange="sendImg(this)" />
+          <button class="iab" id="btnImg" onclick="document.getElementById('fi').click()" disabled title="Sign in to send images">🖼️</button>
+          <button class="iab" id="btnVc" disabled title="Hold to record voice" onmousedown="startRec(event)" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
+          <div class="input-wrapper">
+            <input type="text" id="mi" placeholder="Type a message..." disabled maxlength="500" />
+          </div>
           <button id="sb" onclick="sendMsg()">↑</button>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL (Partner Info & Premium) -->
+      <div class="panel right-panel" id="rightPanel">
+        <!-- Partner Card -->
+        <div class="p-card pc" id="pc" style="display:none; padding: 20px 16px;">
+          <div class="card-title ph" style="margin-bottom:8px">Chatting with</div>
+          <div class="user-name pname" id="pname" style="font-size:18px; margin-bottom:12px">—</div>
+          <div class="badge-row pm" id="pm"></div>
+          <div class="pci" id="pci" style="margin-top:12px; font-size:12px"></div>
+          
+          <button class="action-btn afbtn" id="afBtn" style="display: none; margin-top: 16px; background:rgba(6,214,160,0.1); color:var(--gn); border:1px solid rgba(6,214,160,0.3);" onclick="sendFriendReq()">➕ Add Friend</button>
+        </div>
+
+        <!-- Premium Actions -->
+        <div class="actions-grid ctl" style="margin-top: 0">
+          <button class="action-btn btn-prem-gold cb" id="btnSL" onclick="sendPremiumAction('superlike', 8)" style="display: none;">🌟 Super Like (8 🪙)</button>
+          <button class="action-btn btn-prem-pink cb" id="btnCp" onclick="sendPremiumAction('compliment', 5)" style="display: none;">💌 Compliment (5 🪙)</button>
+          <button class="action-btn btn-prem-rose cb" id="btnRose" onclick="sendPremiumAction('rose', 3)" style="display: none;">🌹 Send Rose (3 🪙)</button>
+          <button class="action-btn btn-prem-cyan cb" id="btnOpener" onclick="buyFirstMessageOpener()" style="display: none;">💬 AI Opener (3 🪙)</button>
+          <button class="action-btn btn-prem-cyan cb" id="btnRevealInt" onclick="buyRevealInterests()" style="display: none;">🎯 Reveal Interests (8 🪙)</button>
+          <button class="action-btn btn-prem-cyan cb" id="btnRM" onclick="sendRematchRequest()" style="display: none;">🔁 Request Re-match (10 🪙)</button>
+          
+          <div style="margin-top: auto"></div>
+          
+          <button class="action-btn btn-danger cb crp" id="btnR" onclick="togRep()" style="display: none; border-style: dashed;">⚑ Report User</button>
+          
+          <div class="report-menu rm" id="rm">
+            <button class="report-item ri" onclick="doReport('Fake profile')">Fake profile</button>
+            <button class="report-item ri" onclick="doReport('Harassment')">Harassment</button>
+            <button class="report-item ri" onclick="doReport('Inappropriate')">Inappropriate</button>
+            <button class="report-item ri" onclick="doReport('Spam')">Spam</button>
+          </div>
+          <div class="report-success rp" id="rp" style="display: none">✓ Report Submitted</div>
         </div>
       </div>
     </div>
 
-    <!-- GF modal -->
+    <!-- Mobile Bottom Nav -->
+    <div class="mobile-nav">
+      <button class="mnav-btn" onclick="setMobileTab('menu')" id="mtab-menu">
+        <div style="font-size:22px">☰</div>
+        <span>Menu</span>
+      </button>
+      <button class="mnav-btn active" onclick="setMobileTab('chat')" id="mtab-chat">
+        <div style="font-size:22px">💬</div>
+        <span>Chat</span>
+      </button>
+      <button class="mnav-btn" onclick="setMobileTab('info')" id="mtab-info">
+        <div style="font-size:22px">👤</div>
+        <span>Partner</span>
+      </button>
+    </div>
+
+    <!-- Modals -->
+    <!-- GF Modal -->
     <div class="mov" id="gfMod">
       <div class="mb">
-        <div style="font-size: 28px; margin-bottom: 8px" id="gfIco">🔒</div>
+        <div style="font-size: 42px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));" id="gfIco">🔒</div>
         <h2 id="gfTit">Limit reached</h2>
         <p id="gfTxt">Used all free filters.</p>
         <div class="mbtns">
@@ -1495,613 +630,117 @@
       </div>
     </div>
 
-    <!-- Rematch modal -->
+    <!-- Rematch Modal -->
     <div class="mov" id="rmMod">
       <div class="mb">
-        <div style="font-size: 32px; margin-bottom: 8px">🔁</div>
+        <div style="font-size: 42px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">🔁</div>
         <h2 id="rmTit">Re-match Request!</h2>
         <p id="rmTxt">Stranger wants to match with you again.</p>
         <div class="mbtns">
-          <button
-            class="mbp"
-            style="
-              background: linear-gradient(135deg, var(--gn), #00ffcc);
-              color: #000;
-            "
-            id="rmAcceptBtn"
-          >
-            Accept (Free)
-          </button>
+          <button class="mbp" style="background: linear-gradient(135deg, var(--gn), #00ffcc); color: #000; box-shadow: 0 6px 16px rgba(6,214,160,0.3);" id="rmAcceptBtn">Accept (Free)</button>
           <button class="mbs" id="rmDeclineBtn">Decline</button>
         </div>
       </div>
     </div>
 
     <!-- Theme Selector Modal -->
-    <div
-      class="mov"
-      id="themeMod"
-      style="
-        position: fixed;
-        inset: 0;
-        background: rgba(8, 8, 15, 0.9);
-        backdrop-filter: blur(15px);
-        z-index: 2000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        overflow-y: auto;
-        padding: 20px;
-      "
-    >
-      <div
-        class="mb"
-        style="
-          background: var(--bg2);
-          border: 1px solid var(--bd);
-          border-radius: 24px;
-          padding: 24px;
-          max-width: 540px;
-          width: 100%;
-          box-shadow: 0 20px 50px rgba(124, 92, 252, 0.15);
-          animation: fi 0.3s ease;
-        "
-      >
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-          "
-        >
-          <h2
-            style="
-              font-family: &quot;Syne&quot;, sans-serif;
-              font-size: 20px;
-              color: var(--tx);
-            "
-          >
-            🎭 Choose Chat Theme
-          </h2>
-          <button
-            onclick="closeThemeModal()"
-            style="
-              background: none;
-              color: var(--t3);
-              font-size: 16px;
-              border: none;
-              cursor: pointer;
-            "
-          >
-            ✕
-          </button>
+    <div class="mov" id="themeMod" style="position: fixed; inset: 0; background: rgba(5, 5, 10, 0.9); backdrop-filter: blur(15px); z-index: 2000; display: none; align-items: center; justify-content: center; overflow-y: auto; padding: 20px;">
+      <div class="mb" style="background: var(--bg2); border: 1px solid var(--b2); border-radius: 24px; padding: 24px; max-width: 540px; width: 100%; box-shadow: 0 20px 50px rgba(124, 92, 252, 0.15); animation: scaleUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <h2 style="font-family: 'Syne', sans-serif; font-size: 20px; color: var(--tx); margin:0;">🎭 Choose Chat Theme</h2>
+          <button onclick="closeThemeModal()" style="background: var(--glass2); border-radius:50%; width:32px; height:32px; color: var(--t3); font-size: 14px; border: none; cursor: pointer; display:flex; align-items:center; justify-content:center;">✕</button>
         </div>
-        <p style="color: var(--t2); font-size: 12px; margin-bottom: 16px">
-          Spent coins unlock the selected custom theme for 7 days on all your
-          conversations!
-        </p>
+        <p style="color: var(--t2); font-size: 13px; margin-bottom: 20px; text-align:left;">Spent coins unlock the selected custom theme for 7 days on all your conversations!</p>
 
-        <div
-          style="
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            max-height: 350px;
-            overflow-y: auto;
-            padding-right: 4px;
-            margin-bottom: 20px;
-          "
-        >
+        <div style="display: flex; flex-direction: column; gap: 20px; max-height: 400px; overflow-y: auto; padding-right: 8px; margin-bottom: 24px; text-align:left;">
           <!-- Standard Collection -->
           <div>
-            <h4
-              style="
-                font-size: 11px;
-                color: var(--t3);
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-bottom: 8px;
-              "
-            >
-              Standard Collection
-            </h4>
-            <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-              "
-            >
-              <div
-                class="th-card"
-                onclick="selectTheme('premium')"
-                id="tc-premium"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #ffd166;
-                    margin-bottom: 4px;
-                  "
-                >
-                  👑 Gold Premium
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(255, 209, 102, 0.15),
-                      rgba(255, 150, 50, 0.1)
-                    );
-                    border: 1px solid rgba(255, 209, 102, 0.3);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #ffd166;
-                  "
-                >
-                  Preview bubble
-                </div>
+            <h4 style="font-size: 11px; color: var(--t3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Standard Collection</h4>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+              <div class="th-card" onclick="selectTheme('premium')" id="tc-premium" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #ffd166; margin-bottom: 6px;">👑 Gold Premium</div>
+                <div style="background: linear-gradient(135deg, rgba(255, 209, 102, 0.15), rgba(255, 150, 50, 0.1)); border: 1px solid rgba(255, 209, 102, 0.3); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #ffd166;">Preview bubble</div>
               </div>
-              <div
-                class="th-card"
-                onclick="selectTheme('purple')"
-                id="tc-purple"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #b4a0ff;
-                    margin-bottom: 4px;
-                  "
-                >
-                  🔮 Royal Purple
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(124, 92, 252, 0.15),
-                      rgba(0, 229, 255, 0.1)
-                    );
-                    border: 1px solid rgba(124, 92, 252, 0.3);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #b4a0ff;
-                  "
-                >
-                  Preview bubble
-                </div>
+              <div class="th-card" onclick="selectTheme('purple')" id="tc-purple" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #b4a0ff; margin-bottom: 6px;">🔮 Royal Purple</div>
+                <div style="background: linear-gradient(135deg, rgba(124, 92, 252, 0.15), rgba(0, 229, 255, 0.1)); border: 1px solid rgba(124, 92, 252, 0.3); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #b4a0ff;">Preview bubble</div>
               </div>
-              <div
-                class="th-card"
-                onclick="selectTheme('red')"
-                id="tc-red"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #ef4565;
-                    margin-bottom: 4px;
-                  "
-                >
-                  🔥 Crimson Flame
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(239, 69, 101, 0.15),
-                      rgba(255, 50, 50, 0.1)
-                    );
-                    border: 1px solid rgba(239, 69, 101, 0.3);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #ef4565;
-                  "
-                >
-                  Preview bubble
-                </div>
+              <div class="th-card" onclick="selectTheme('red')" id="tc-red" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #ef4565; margin-bottom: 6px;">🔥 Crimson Flame</div>
+                <div style="background: linear-gradient(135deg, rgba(239, 69, 101, 0.15), rgba(255, 50, 50, 0.1)); border: 1px solid rgba(239, 69, 101, 0.3); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #ef4565;">Preview bubble</div>
               </div>
-              <div
-                class="th-card"
-                onclick="selectTheme('green')"
-                id="tc-green"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #06d6a0;
-                    margin-bottom: 4px;
-                  "
-                >
-                  🌲 Mint Serene
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(6, 214, 160, 0.15),
-                      rgba(0, 229, 255, 0.1)
-                    );
-                    border: 1px solid rgba(6, 214, 160, 0.3);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #06d6a0;
-                  "
-                >
-                  Preview bubble
-                </div>
+              <div class="th-card" onclick="selectTheme('green')" id="tc-green" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #06d6a0; margin-bottom: 6px;">🌿 Mint Serene</div>
+                <div style="background: linear-gradient(135deg, rgba(6, 214, 160, 0.15), rgba(0, 229, 255, 0.1)); border: 1px solid rgba(6, 214, 160, 0.3); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #06d6a0;">Preview bubble</div>
               </div>
             </div>
           </div>
-
+          
           <!-- Premium Romantic Collection -->
           <div>
-            <h4
-              style="
-                font-size: 11px;
-                color: #ff6496;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-bottom: 8px;
-                display: flex;
-                align-items: center;
-                gap: 4px;
-              "
-            >
-              💖 Premium Romantic Collection
-            </h4>
-            <div
-              style="
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-              "
-            >
-              <div
-                class="th-card"
-                onclick="selectTheme('rose')"
-                id="tc-rose"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #ff758c;
-                    margin-bottom: 4px;
-                  "
-                >
-                  🌹 Rose Romance
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(255, 117, 140, 0.2),
-                      rgba(255, 126, 179, 0.15)
-                    );
-                    border: 1px solid rgba(255, 117, 140, 0.4);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #ff758c;
-                    text-shadow: 0 0 4px rgba(255, 117, 140, 0.3);
-                  "
-                >
-                  Preview bubble
-                </div>
+            <h4 style="font-size: 11px; color: #ff758c; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Premium Romantic</h4>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+              <div class="th-card" onclick="selectTheme('rose')" id="tc-rose" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #ff758c; margin-bottom: 6px;">🌹 Rose Romance</div>
+                <div style="background: linear-gradient(135deg, rgba(255, 117, 140, 0.2), rgba(255, 126, 179, 0.15)); border: 1px solid rgba(255, 117, 140, 0.4); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #ff758c;">Preview bubble</div>
               </div>
-              <div
-                class="th-card"
-                onclick="selectTheme('sunset')"
-                id="tc-sunset"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #f857a6;
-                    margin-bottom: 4px;
-                  "
-                >
-                  🌇 Sunset Love
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(248, 87, 166, 0.2),
-                      rgba(255, 88, 88, 0.15)
-                    );
-                    border: 1px solid rgba(248, 87, 166, 0.4);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #f857a6;
-                    text-shadow: 0 0 4px rgba(248, 87, 166, 0.3);
-                  "
-                >
-                  Preview bubble
-                </div>
+              <div class="th-card" onclick="selectTheme('sunset')" id="tc-sunset" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #f857a6; margin-bottom: 6px;">🌇 Sunset Love</div>
+                <div style="background: linear-gradient(135deg, rgba(248, 87, 166, 0.2), rgba(255, 88, 88, 0.15)); border: 1px solid rgba(248, 87, 166, 0.4); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #f857a6;">Preview bubble</div>
               </div>
-              <div
-                class="th-card"
-                onclick="selectTheme('passion')"
-                id="tc-passion"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #ff007f;
-                    margin-bottom: 4px;
-                  "
-                >
-                  ⚡ Neon Passion
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(138, 43, 226, 0.2),
-                      rgba(255, 0, 127, 0.15)
-                    );
-                    border: 1px solid rgba(255, 0, 127, 0.4);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #ff007f;
-                    text-shadow: 0 0 4px rgba(255, 0, 127, 0.3);
-                  "
-                >
-                  Preview bubble
-                </div>
+              <div class="th-card" onclick="selectTheme('passion')" id="tc-passion" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #ff007f; margin-bottom: 6px;">⚡ Neon Passion</div>
+                <div style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.2), rgba(255, 0, 127, 0.15)); border: 1px solid rgba(255, 0, 127, 0.4); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #ff007f;">Preview bubble</div>
               </div>
-              <div
-                class="th-card"
-                onclick="selectTheme('serenade')"
-                id="tc-serenade"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 10px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: #38ef7d;
-                    margin-bottom: 4px;
-                  "
-                >
-                  💚 Emerald Serenade
-                </div>
-                <div
-                  style="
-                    background: linear-gradient(
-                      135deg,
-                      rgba(17, 153, 142, 0.2),
-                      rgba(56, 239, 125, 0.15)
-                    );
-                    border: 1px solid rgba(17, 153, 142, 0.4);
-                    padding: 6px;
-                    border-radius: 8px;
-                    font-size: 9px;
-                    color: #38ef7d;
-                    text-shadow: 0 0 4px rgba(17, 153, 142, 0.3);
-                  "
-                >
-                  Preview bubble
-                </div>
+              <div class="th-card" onclick="selectTheme('serenade')" id="tc-serenade" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 14px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 13px; font-weight: 700; color: #38ef7d; margin-bottom: 6px;">💚 Emerald Serenade</div>
+                <div style="background: linear-gradient(135deg, rgba(17, 153, 142, 0.2), rgba(56, 239, 125, 0.15)); border: 1px solid rgba(17, 153, 142, 0.4); padding: 8px 12px; border-radius: 12px; border-bottom-right-radius:4px; font-size: 11px; color: #38ef7d;">Preview bubble</div>
               </div>
             </div>
           </div>
 
           <!-- Custom Background Collection -->
           <div>
-            <h4
-              style="
-                font-size: 11px;
-                color: var(--ac);
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                margin-bottom: 8px;
-              "
-            >
-              Custom Design Collection
-            </h4>
-            <div style="display: grid; grid-template-columns: 1fr; gap: 8px">
-              <div
-                class="th-card"
-                onclick="selectCustomImageTheme()"
-                id="tc-custom"
-                style="
-                  background: var(--sr);
-                  border: 1px solid var(--bd);
-                  border-radius: 12px;
-                  padding: 12px;
-                  cursor: pointer;
-                  transition: all 0.2s;
-                  text-align: left;
-                "
-              >
-                <div
-                  style="
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: var(--ac);
-                    margin-bottom: 4px;
-                    display: flex;
-                    align-items: center;
-                    gap: 4px;
-                  "
-                >
-                  🖼️ Custom Background Image (+10 🪙)
+            <h4 style="font-size: 11px; color: var(--ac); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Custom Design</h4>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 10px;">
+              <div class="th-card" onclick="selectCustomImageTheme()" id="tc-custom" style="background: var(--bg3); border: 1px solid var(--bd); border-radius: 16px; padding: 16px; cursor: pointer; transition: all 0.2s;">
+                <div style="font-size: 14px; font-weight: 700; color: var(--ac); margin-bottom: 6px; display: flex; align-items: center; gap: 6px;">🖼️ Custom Background Image <span style="opacity:0.7;font-weight:500;font-size:11px;">(+10 🪙)</span></div>
+                <p style="font-size: 11px; color: var(--t2); margin-bottom: 12px; line-height:1.5;">Choose any image from your device to style your chat bubbles!</p>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <button onclick="document.getElementById('themeImgFileInput').click(); event.stopPropagation();" style="background: var(--pr); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; box-shadow:0 4px 10px rgba(124,92,252,0.3);">Upload Image</button>
+                  <span id="themeImgFileName" style="font-size: 11px; color: var(--t3); font-weight:500;">No image selected</span>
                 </div>
-                <p
-                  style="font-size: 10px; color: var(--t2); margin-bottom: 8px"
-                >
-                  Choose any image from your device to style your chat bubbles!
-                </p>
-                <div style="display: flex; align-items: center; gap: 8px">
-                  <button
-                    onclick="
-                      document.getElementById('themeImgFileInput').click();
-                      event.stopPropagation();
-                    "
-                    style="
-                      background: var(--pr);
-                      color: #fff;
-                      border: none;
-                      padding: 5px 10px;
-                      border-radius: 6px;
-                      font-size: 10px;
-                      font-weight: 600;
-                      cursor: pointer;
-                    "
-                  >
-                    Upload Image
-                  </button>
-                  <span
-                    id="themeImgFileName"
-                    style="font-size: 10px; color: var(--t3)"
-                    >No image selected</span
-                  >
-                </div>
-                <input
-                  type="file"
-                  id="themeImgFileInput"
-                  accept="image/*"
-                  style="display: none"
-                  onchange="handleThemeImageUpload(this)"
-                />
+                <input type="file" id="themeImgFileInput" accept="image/*" style="display: none" onchange="handleThemeImageUpload(this)" />
               </div>
             </div>
           </div>
         </div>
 
-        <div style="display: flex; gap: 8px; justify-content: flex-end">
-          <button
-            onclick="closeThemeModal()"
-            class="bs"
-            style="
-              padding: 10px 18px;
-              border-radius: 50px;
-              font-size: 12px;
-              font-weight: 600;
-            "
-          >
-            Cancel
-          </button>
-          <button
-            id="themeConfirmBtn"
-            onclick="confirmThemePurchase()"
-            class="bp"
-            style="
-              padding: 10px 22px;
-              border-radius: 50px;
-              font-size: 12px;
-              font-weight: 600;
-              display: flex;
-              align-items: center;
-              gap: 4px;
-            "
-          >
-            Spend 25 🪙
-          </button>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; padding-top:10px; border-top:1px solid var(--bd);">
+          <button onclick="closeThemeModal()" class="mbs" style="padding: 10px 20px;">Cancel</button>
+          <button id="themeConfirmBtn" onclick="confirmThemePurchase()" class="mbp" style="padding: 10px 24px; display: flex; align-items: center; gap: 6px;">Spend 25 🪙</button>
         </div>
       </div>
     </div>
 
+    <!-- Image Preview Modal -->
     <div id="ipm" onclick="closeImgPreview(event)">
-      <img id="ipmsrc" src="" alt="" /><button
-        id="ipm-close"
-        onclick="document.getElementById('ipm').classList.remove('on')"
-        title="Close"
-      >
-        ✕
-      </button>
+      <img id="ipmsrc" src="" alt="Preview" />
+      <button id="ipm-close" onclick="document.getElementById('ipm').classList.remove('on')" title="Close">✕</button>
     </div>
+    
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
 
     <script>
+      // Helper for mobile tabs
+      function setMobileTab(tab) {
+        document.body.setAttribute('data-tab', tab);
+        document.querySelectorAll('.mnav-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('mtab-' + tab).classList.add('active');
+      }
+      
+
       const API = "http://127.0.0.1:5000";
       const DEV_NAMES = ["KING", "king"]; // your dev username
 
