@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const authRoutes    = require('./routes/auth');
 const userRoutes    = require('./routes/user');
 const paymentRoutes = require('./routes/payment');
+const luckyDrawRoutes = require('./routes/luckyDraw');
 const setupSocket   = require('./socket/chat');
 
 const app    = express();
@@ -23,6 +24,7 @@ app.use('/api/', rateLimit({ windowMs: 15*60*1000, max: 300 }));
 app.use('/api/auth',    authRoutes);
 app.use('/api/user',    userRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/lucky-draw', luckyDrawRoutes);
 app.get('/api/health',  (_req, res) => res.json({ status: 'ok', time: new Date() }));
 
 setupSocket(io);

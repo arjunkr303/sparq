@@ -132,6 +132,7 @@ async function doLogin() {
 
 
 function saveAndGo(d) {
+  localStorage.removeItem('sc_guest');
   localStorage.setItem('sc_token', d.token);
   localStorage.setItem('sc_user',  JSON.stringify(d.user));
   // Verify it saved correctly before redirecting

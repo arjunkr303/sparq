@@ -1176,6 +1176,60 @@
           opacity: 0;
         }
       }
+      .rose-anim-main {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 120px;
+        animation: roseCentralZoom 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        filter: drop-shadow(0 0 30px rgba(255, 100, 120, 0.9));
+        text-shadow: 0 0 40px rgba(255, 100, 120, 0.6);
+      }
+      .rose-petal-drift {
+        position: absolute;
+        pointer-events: none;
+        opacity: 0;
+      }
+      @keyframes roseCentralZoom {
+        0% {
+          transform: translate(-50%, -50%) scale(0) rotate(-45deg);
+          opacity: 0;
+        }
+        15% {
+          transform: translate(-50%, -50%) scale(1.2) rotate(10deg);
+          opacity: 1;
+        }
+        30% {
+          transform: translate(-50%, -50%) scale(1) rotate(0deg);
+          opacity: 1;
+        }
+        80% {
+          transform: translate(-50%, -50%) scale(1.1) rotate(0deg);
+          opacity: 1;
+          filter: drop-shadow(0 0 50px rgba(255, 100, 120, 1));
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(0) rotate(45deg);
+          opacity: 0;
+        }
+      }
+      @keyframes petalFall {
+        0% {
+          transform: translateY(0) rotate(0deg) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        90% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(110vh) rotate(720deg) translateX(100px);
+          opacity: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -1277,6 +1331,19 @@
             "
           >
             💌 Compliment (5 🪙)
+          </button>
+          <button
+            class="cb"
+            id="btnRose"
+            onclick="sendPremiumAction('rose', 3)"
+            style="
+              display: none;
+              background: rgba(255, 100, 120, 0.1);
+              border: 1px solid rgba(255, 100, 120, 0.3);
+              color: #ff6478;
+            "
+          >
+            🌹 Send Rose (3 🪙)
           </button>
           <button
             class="cb"
@@ -2215,6 +2282,8 @@
           console.error("❌", e.message);
           if (e.message === "Auth failed" || e.message === "User not found") {
             localStorage.removeItem("sc_token");
+            localStorage.removeItem("sc_user");
+            localStorage.removeItem("sc_guest");
             location.href = "login.html";
           }
         });
@@ -2444,6 +2513,10 @@
           setTimeout(() => d.remove(), 3100);
         });
 
+        sock.on("receive_rose", () => {
+          showRoseAnimation();
+        });
+
         sock.on("partner_theme_updated", ({ themeColor }) => {
           partnerTheme = themeColor;
           document.querySelectorAll(".bub.them").forEach((bub) => {
@@ -2519,6 +2592,52 @@
             "ok",
           );
         });
+      }
+
+      function showRoseAnimation() {
+        const container = document.createElement("div");
+        container.style.position = "fixed";
+        container.style.inset = "0";
+        container.style.pointerEvents = "none";
+        container.style.zIndex = "9999";
+        container.style.overflow = "hidden";
+        document.body.appendChild(container);
+
+        // Create central glowing rose
+        const mainRose = document.createElement("div");
+        mainRose.className = "rose-anim-main";
+        mainRose.innerHTML = "🌹";
+        container.appendChild(mainRose);
+
+        // Spawn drifting petals
+        const petalCount = 24;
+        const petalTypes = ["🌹", "✨", "🌸", "💖", "🍃"];
+        for (let i = 0; i < petalCount; i++) {
+          const petal = document.createElement("div");
+          petal.className = "rose-petal-drift";
+          petal.innerHTML = petalTypes[Math.floor(Math.random() * petalTypes.length)];
+          petal.style.left = Math.random() * 100 + "vw";
+          petal.style.top = "-5vh";
+          
+          // Random size
+          const size = Math.random() * 20 + 15; // 15px to 35px
+          petal.style.fontSize = size + "px";
+          
+          // Random delay and duration
+          const duration = Math.random() * 2 + 2; // 2s to 4s
+          const delay = Math.random() * 1.5;
+          petal.style.animation = `petalFall ${duration}s linear ${delay}s forwards`;
+          
+          // Random rotation/transform
+          petal.style.transform = `rotate(${Math.random() * 360}deg)`;
+          
+          container.appendChild(petal);
+        }
+
+        // Remove container after 4.5 seconds
+        setTimeout(() => {
+          container.remove();
+        }, 4500);
       }
 
       /* ══ PREMIUM ACTIONS ══ */
@@ -2837,6 +2956,8 @@
           s === "chatting" && isIn && partnerUserId ? "block" : "none";
         $("btnCp").style.display =
           s === "chatting" && isIn && partnerUserId ? "block" : "none";
+        $("btnRose").style.display =
+          s === "chatting" && isIn && partnerUserId ? "block" : "none";
         $("btnOpener").style.display =
           s === "chatting" && isIn && partnerUserId && !openerUsedInChat
             ? "block"
@@ -2850,6 +2971,7 @@
         if (s === "chatting") {
           $("btnSL").disabled = false;
           $("btnCp").disabled = false;
+          $("btnRose").disabled = false;
           $("btnOpener").disabled = false;
           $("btnRevealInt").disabled = false;
         }

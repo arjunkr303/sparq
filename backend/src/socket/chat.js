@@ -728,6 +728,12 @@ module.exports = (io) => {
       io.to(c.partnerId).emit("receive_compliment");
     });
 
+    socket.on("send_rose", ({ targetUserId, roomId }) => {
+      const c = chats.get(socket.id);
+      if (!c || c.roomId !== roomId) return;
+      io.to(c.partnerId).emit("receive_rose");
+    });
+
     socket.on("update_theme", ({ themeColor }) => {
       socket.u.theme = themeColor;
       const c = chats.get(socket.id);

@@ -319,6 +319,7 @@ async function doReg(){
     const r=await fetch(`${API}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     const d=await r.json();
     if(!r.ok){showErr(d.message||'Registration failed');return;}
+    localStorage.removeItem('sc_guest');
     localStorage.setItem('sc_token',d.token);
     localStorage.setItem('sc_user',JSON.stringify(d.user));
     location.href='dashboard.html';

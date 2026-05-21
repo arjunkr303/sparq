@@ -127,7 +127,7 @@ router.post("/spend-coins", authMw, async (req, res) => {
       return res.status(400).json({ message: "Not enough coins" });
 
     if (
-      ["superlike", "compliment", "rematch"].includes(itemId) &&
+      ["superlike", "compliment", "rematch", "rose"].includes(itemId) &&
       !extra?.targetUserId
     ) {
       return res
@@ -150,6 +150,36 @@ router.post("/spend-coins", authMw, async (req, res) => {
 
     const upd = { coins: req.user.coins - amount };
     const now = new Date();
+
+    let reward = null;
+    if (itemId === "luckydraw") {
+      const rand = Math.random();
+      if (rand < 0.35) {
+        reward = { type: "coins", amount: 5, label: "Win 5 Coins back! 🪙" };
+        upd.coins += 5;
+      } else if (rand < 0.65) {
+        reward = { type: "nothing", amount: 0, label: "Better luck next time! 😢" };
+      } else if (rand < 0.80) {
+        reward = { type: "coins", amount: 15, label: "Win 15 Coins! 🪙" };
+        upd.coins += 15;
+      } else if (rand < 0.90) {
+        reward = { type: "coins", amount: 25, label: "Win 25 Coins! 🪙" };
+        upd.coins += 25;
+      } else if (rand < 0.95) {
+        const themes = ["rose", "passion", "sunset", "serenade", "premium", "purple"];
+        const chosenTheme = themes[Math.floor(Math.random() * themes.length)];
+        reward = { type: "theme", amount: 7, label: `Win 7 Days of ${chosenTheme.toUpperCase()} Chat Theme! 🎭`, value: chosenTheme };
+        upd.chat_theme = chosenTheme;
+        upd.theme_expiry = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      } else if (rand < 0.99) {
+        reward = { type: "vip", amount: 7, label: "Win 7 Days of VIP Status! 👑" };
+        upd.is_premium = true;
+        upd.premium_expiry = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      } else {
+        reward = { type: "coins", amount: 100, label: "💥 JACKPOT! Win 100 Coins! 🪙" };
+        upd.coins += 100;
+      }
+    }
 
     if (itemId === "boost") {
       upd.queue_boost_expiry = new Date(
@@ -193,7 +223,7 @@ router.post("/spend-coins", authMw, async (req, res) => {
 
     // Log interactions for superlike, compliment, or rematch if target is provided
     if (
-      ["superlike", "compliment", "rematch"].includes(itemId) &&
+      ["superlike", "compliment", "rematch", "rose"].includes(itemId) &&
       extra?.targetUserId
     ) {
       if (itemId === "rematch") {
@@ -223,7 +253,7 @@ router.post("/spend-coins", authMw, async (req, res) => {
     cleaned.auraExpiry = u.aura_expiry;
     cleaned.cityLockExpiry = u.city_lock_expiry;
 
-    res.json({ user: cleaned });
+    res.json({ user: cleaned, reward });
   } catch (err) {
     console.error("Spend coins error:", err);
     res.status(500).json({ message: "Server error" });
