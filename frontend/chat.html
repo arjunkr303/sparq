@@ -324,20 +324,28 @@
         display: flex; gap: 10px; align-items: center; width: 100%;
       }
       
-      /* Message Reply Feature Styling */
-      .reply-btn {
-        background: var(--glass); border: 1px solid var(--bd); color: var(--t2);
-        width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: all 0.2s ease; font-size: 12px; margin: 0 8px; flex-shrink: 0;
+      /* Message Reply & Actions (Reply, Edit, Delete) */
+      .msg-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0 8px;
+        flex-shrink: 0;
       }
       @media (hover: hover) {
-        .reply-btn { opacity: 0; }
-        .mr:hover .reply-btn { opacity: 1; }
+        .msg-actions { opacity: 0; transition: opacity 0.2s ease; }
+        .mr:hover .msg-actions { opacity: 1; }
       }
       @media (hover: none) {
-        .reply-btn { opacity: 0.6; }
+        .msg-actions { opacity: 0.6; }
       }
-      .reply-btn:hover { background: var(--glass2); color: var(--tx); border-color: var(--b2); transform: scale(1.1); }
+      .action-btn-circle {
+        background: var(--glass); border: 1px solid var(--bd); color: var(--t2);
+        width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.2s ease; font-size: 12px;
+      }
+      .action-btn-circle:hover { background: var(--glass2); color: var(--tx); border-color: var(--b2); transform: scale(1.1); }
+      .action-btn-circle.del-btn:hover { background: rgba(239, 69, 101, 0.15); color: var(--rd); border-color: rgba(239, 69, 101, 0.4); }
       
       .reply-preview-bar {
         display: flex; justify-content: space-between; align-items: center;
@@ -615,6 +623,15 @@
             </div>
             <button class="rpb-close" onclick="cancelReply()">✕</button>
           </div>
+
+          <!-- Edit Preview Bar -->
+          <div class="reply-preview-bar" id="epb" style="display: none; border-left-color: var(--gn); background: rgba(6, 214, 160, 0.08);">
+            <div class="rpb-left">
+              <span class="rpb-sender" style="color: var(--gn);">Editing Message</span>
+              <span class="rpb-content" id="epbContent"></span>
+            </div>
+            <button class="rpb-close" onclick="cancelEditMsg()">✕</button>
+          </div>
           
           <div class="input-row">
             <input type="file" id="fi" accept="image/*" onchange="sendImg(this)" />
@@ -703,6 +720,19 @@
         <div class="mbtns">
           <button class="mbp" style="background: linear-gradient(135deg, var(--gn), #00ffcc); color: #000; box-shadow: 0 6px 16px rgba(6,214,160,0.3);" id="rmAcceptBtn">Accept (Free)</button>
           <button class="mbs" id="rmDeclineBtn">Decline</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="mov" id="deleteConfMod">
+      <div class="mb" style="border-color: rgba(239, 69, 101, 0.4);">
+        <div style="font-size: 42px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));">🗑️</div>
+        <h2>Unsend Message?</h2>
+        <p>This will permanently remove the message for everyone in this chat.</p>
+        <div class="mbtns">
+          <button class="mbp" id="confirmDeleteBtn" onclick="confirmDeleteMsg()" style="background: linear-gradient(135deg, var(--rd), #d03050); box-shadow: 0 6px 16px rgba(239,69,101,0.3);">Unsend</button>
+          <button class="mbs" onclick="closeDeleteConfModal()">Cancel</button>
         </div>
       </div>
     </div>
@@ -1016,14 +1046,14 @@
         
         history.forEach(msg => {
           if (msg.type === "voice") {
-            addBub({ dataUrl: msg.content, mimeType: msg.mimeType, duration: msg.duration }, msg.isMe, msg.timestamp, "voice", msg.replyTo);
+            addBub({ dataUrl: msg.content, mimeType: msg.mimeType, duration: msg.duration }, msg.isMe, msg.timestamp, "voice", msg.replyTo, msg.messageId);
           } else {
-            addBub(msg.content, msg.isMe, msg.timestamp, msg.type, msg.replyTo);
+            addBub(msg.content, msg.isMe, msg.timestamp, msg.type, msg.replyTo, msg.messageId, msg.edited);
           }
         });
       }
 
-      function saveFriendMessage(content, isMe, type, timestamp, mimeType = null, targetFriendshipId = null, duration = null, replyTo = null) {
+      function saveFriendMessage(content, isMe, type, timestamp, mimeType = null, targetFriendshipId = null, duration = null, replyTo = null, messageId = null) {
         const fId = targetFriendshipId || friendshipId;
         if (!fId) return;
         const key = `sc_friend_msgs_${fId}`;
@@ -1034,8 +1064,8 @@
           console.error("Error reading chat history:", e);
         }
 
-        // Deduplication: check if a message with the same timestamp and sender (isMe) already exists
-        const exists = history.some(msg => msg.timestamp === timestamp && msg.isMe === isMe);
+        // Deduplication: check if a message with the same timestamp and sender (isMe) or messageId already exists
+        const exists = history.some(msg => (messageId && msg.messageId === messageId) || (msg.timestamp === timestamp && msg.isMe === isMe));
         if (exists) return;
 
         history.push({
@@ -1045,13 +1075,68 @@
           type,
           mimeType,
           duration,
-          replyTo
+          replyTo,
+          messageId
         });
 
         try {
           localStorage.setItem(key, JSON.stringify(history));
         } catch (e) {
           console.error("Error saving chat history:", e);
+        }
+      }
+
+      function updateFriendMsgInLocalStorage(fId, messageId, newContent) {
+        const key = `sc_friend_msgs_${fId}`;
+        let history = [];
+        try {
+          history = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (e) {
+          console.error("Error reading chat history:", e);
+          return;
+        }
+        
+        let updated = false;
+        history = history.map(msg => {
+          if (msg.messageId === messageId) {
+            msg.content = newContent;
+            msg.edited = true;
+            updated = true;
+          }
+          if (msg.replyTo && msg.replyTo.msgId === messageId) {
+            msg.replyTo.content = newContent;
+          }
+          return msg;
+        });
+
+        if (updated) {
+          try {
+            localStorage.setItem(key, JSON.stringify(history));
+          } catch (e) {
+            console.error("Error saving chat history to update msg:", e);
+          }
+        }
+      }
+
+      function deleteFriendMsgFromLocalStorage(fId, messageId) {
+        const key = `sc_friend_msgs_${fId}`;
+        let history = [];
+        try {
+          history = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (e) {
+          console.error("Error reading chat history:", e);
+          return;
+        }
+        
+        const originalLength = history.length;
+        history = history.filter(msg => msg.messageId !== messageId);
+
+        if (history.length !== originalLength) {
+          try {
+            localStorage.setItem(key, JSON.stringify(history));
+          } catch (e) {
+            console.error("Error saving chat history to delete msg:", e);
+          }
         }
       }
 
@@ -1277,12 +1362,12 @@
           },
         );
 
-        sock.on("receive_message", ({ from, message, timestamp, fromUserId, roomId, replyTo }) => {
+        sock.on("receive_message", ({ from, message, timestamp, fromUserId, roomId, replyTo, messageId }) => {
           const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo);
+              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo, messageId);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1292,17 +1377,17 @@
             }
           }
           hidePartnerTyping();
-          addBub(message, isMe, timestamp, "text", replyTo);
+          addBub(message, isMe, timestamp, "text", replyTo, messageId);
           if (isFriendChat) {
-            saveFriendMessage(message, isMe, "text", timestamp, null, null, null, replyTo);
+            saveFriendMessage(message, isMe, "text", timestamp, null, null, null, replyTo, messageId);
           }
         });
-        sock.on("receive_image", ({ from, dataUrl, timestamp, fromUserId, roomId, replyTo }) => {
+        sock.on("receive_image", ({ from, dataUrl, timestamp, fromUserId, roomId, replyTo, messageId }) => {
           const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo);
+              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo, messageId);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1312,17 +1397,17 @@
             }
           }
           hidePartnerTyping();
-          addBub(dataUrl, isMe, timestamp, "image", replyTo);
+          addBub(dataUrl, isMe, timestamp, "image", replyTo, messageId);
           if (isFriendChat) {
-            saveFriendMessage(dataUrl, isMe, "image", timestamp, null, null, null, replyTo);
+            saveFriendMessage(dataUrl, isMe, "image", timestamp, null, null, null, replyTo, messageId);
           }
         });
-        sock.on("receive_voice", ({ from, dataUrl, mimeType, timestamp, fromUserId, roomId, duration, replyTo }) => {
+        sock.on("receive_voice", ({ from, dataUrl, mimeType, timestamp, fromUserId, roomId, duration, replyTo, messageId }) => {
           const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo);
+              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo, messageId);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1332,10 +1417,50 @@
             }
           }
           hidePartnerTyping();
-          addBub({ dataUrl, mimeType, duration }, isMe, timestamp, "voice", replyTo);
+          addBub({ dataUrl, mimeType, duration }, isMe, timestamp, "voice", replyTo, messageId);
           if (isFriendChat) {
-            saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, null, duration, replyTo);
+            saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, null, duration, replyTo, messageId);
           }
+        });
+
+        sock.on("message_edited", ({ messageId, roomId, newMessage }) => {
+          const el = document.getElementById(messageId);
+          if (el) {
+            const bt = el.querySelector(".bt");
+            if (bt) {
+              bt.innerHTML = `${esc(newMessage)} <span style="font-size: 10px; opacity: 0.5; font-style: italic; margin-left: 4px;">(edited)</span>`;
+            }
+            const editBtn = el.querySelector(".edit-btn");
+            if (editBtn) {
+              editBtn.setAttribute("onclick", `startEditMsg('${messageId}', '${esc(newMessage).replace(/'/g, "\\'")}')`);
+            }
+            const replyBtn = el.querySelector(".reply-btn");
+            if (replyBtn) {
+              replyBtn.dataset.content = esc(newMessage);
+            }
+          }
+
+          if (roomId && roomId.startsWith("f_")) {
+            const fId = roomId.substring(2);
+            updateFriendMsgInLocalStorage(fId, messageId, newMessage);
+          }
+        });
+
+        sock.on("message_deleted", ({ messageId, roomId }) => {
+          const el = document.getElementById(messageId);
+          if (el) {
+            el.style.transition = "all 0.3s ease";
+            el.style.opacity = "0";
+            el.style.transform = "scale(0.9)";
+            setTimeout(() => el.remove(), 300);
+          }
+
+          if (roomId && roomId.startsWith("f_")) {
+            const fId = roomId.substring(2);
+            deleteFriendMsgFromLocalStorage(fId, messageId);
+          }
+          
+          showToast("Message unsent", "ok");
         });
 
         sock.on("partner_typing", ({ isTyping }) => {
@@ -1682,10 +1807,71 @@
         clearBubs();
       }
 
+      let editingMessageId = null;
+
+      window.startEditMsg = (msgId, text) => {
+        cancelReply();
+        editingMessageId = msgId;
+        const epb = $("epb");
+        if (epb) {
+          epb.style.display = "flex";
+          $("epbContent").textContent = text;
+        }
+        const mi = $("mi");
+        if (mi) {
+          mi.disabled = false;
+          mi.value = text;
+          mi.focus();
+        }
+        updSend();
+      };
+
+      window.cancelEditMsg = () => {
+        editingMessageId = null;
+        const epb = $("epb");
+        if (epb) epb.style.display = "none";
+        const mi = $("mi");
+        if (mi) {
+          mi.value = "";
+          const ok = state === "chatting";
+          mi.disabled = !ok;
+          mi.placeholder = ok ? "Type a message..." : "Start a chat first...";
+        }
+        updSend();
+      };
+
+      let pendingDeleteMessageId = null;
+
+      window.deleteMsg = (msgId) => {
+        pendingDeleteMessageId = msgId;
+        const mod = $("deleteConfMod");
+        if (mod) mod.classList.add("on");
+      };
+
+      window.closeDeleteConfModal = () => {
+        pendingDeleteMessageId = null;
+        const mod = $("deleteConfMod");
+        if (mod) mod.classList.remove("on");
+      };
+
+      window.confirmDeleteMsg = () => {
+        if (pendingDeleteMessageId) {
+          sock?.emit("delete_message", { messageId: pendingDeleteMessageId, roomId: room });
+        }
+        closeDeleteConfModal();
+      };
+
       function sendMsg() {
         const inp = $("mi"),
           msg = inp.value.trim();
         if (!msg || state !== "chatting" || !sock) return;
+        
+        if (editingMessageId) {
+          sock.emit("edit_message", { messageId: editingMessageId, roomId: room, newMessage: msg });
+          cancelEditMsg();
+          return;
+        }
+
         const payload = { message: msg, roomId: room };
         if (activeReply) {
           payload.replyTo = activeReply;
@@ -2123,11 +2309,11 @@
         }
       };
 
-      function addBub(content, isMe, ts, type, replyTo = null) {
+      function addBub(content, isMe, ts, type, replyTo = null, messageId = null, isEdited = false) {
         document.getElementById("tbub")?.remove();
         const row = document.createElement("div");
         row.className = "mr " + (isMe ? "me" : "them");
-        const msgId = 'msg_' + (ts ? new Date(ts).getTime() : Date.now());
+        const msgId = messageId || 'msg_' + (ts ? new Date(ts).getTime() : Date.now());
         row.id = msgId;
 
         const t = ts
@@ -2140,7 +2326,8 @@
         let inner = "";
 
         if (type === "text") {
-          inner = `<div class="bt">${esc(content)}</div><div class="btime">${t}</div>`;
+          const editedHtml = isEdited ? ` <span style="font-size: 10px; opacity: 0.5; font-style: italic; margin-left: 4px;">(edited)</span>` : "";
+          inner = `<div class="bt">${esc(content)}${editedHtml}</div><div class="btime">${t}</div>`;
         } else if (type === "image") {
           inner = `<img src="${content}" loading="lazy" onclick="previewImg(this.src)"/><div class="btime">${t}</div>`;
         } else if (type === "voice") {
@@ -2184,11 +2371,23 @@
           }
         }
 
-        // Construct reply button HTML
+        // Construct reply & actions HTML
         const senderName = isMe ? "You" : (isFriendChat ? friendUsername : (strangerUsername || "Stranger"));
         const rawContent = (type === "text") ? content : "";
         const escContent = (typeof rawContent === "string") ? rawContent : "";
-        const replyBtnHtml = `<button class="reply-btn" data-msg-id="${msgId}" data-sender="${esc(senderName)}" data-content="${esc(escContent)}" data-type="${type}" onclick="handleReplyClick(this)">↩</button>`;
+
+        let actionsHtml = "";
+        if (isMe) {
+          const editBtn = type === "text"
+            ? `<button class="action-btn-circle edit-btn" title="Edit" data-msg-id="${msgId}" data-text="${esc(escContent)}" onclick="startEditMsg(this.dataset.msgId, this.dataset.text)">✎</button>`
+            : "";
+          const delBtn = `<button class="action-btn-circle del-btn" title="Delete" onclick="deleteMsg('${msgId}')">🗑</button>`;
+          const replyBtn = `<button class="action-btn-circle reply-btn" title="Reply" data-msg-id="${msgId}" data-sender="${esc(senderName)}" data-content="${esc(escContent)}" data-type="${type}" onclick="handleReplyClick(this)">↩</button>`;
+          actionsHtml = `<div class="msg-actions">${editBtn}${delBtn}${replyBtn}</div>`;
+        } else {
+          const replyBtn = `<button class="action-btn-circle reply-btn" title="Reply" data-msg-id="${msgId}" data-sender="${esc(senderName)}" data-content="${esc(escContent)}" data-type="${type}" onclick="handleReplyClick(this)">↩</button>`;
+          actionsHtml = `<div class="msg-actions">${replyBtn}</div>`;
+        }
 
         // Construct reply preview inside bubble HTML
         let replyPreviewHtml = "";
@@ -2210,8 +2409,8 @@
         }
 
         row.innerHTML = isMe
-          ? `${replyBtnHtml}<div class="bub ${side}${themeClass}"${inlineStyle}>${replyPreviewHtml}${inner}</div>`
-          : `<div class="bub ${side}${themeClass}"${inlineStyle}>${replyPreviewHtml}${inner}</div>${replyBtnHtml}`;
+          ? `${actionsHtml}<div class="bub ${side}${themeClass}"${inlineStyle}>${replyPreviewHtml}${inner}</div>`
+          : `<div class="bub ${side}${themeClass}"${inlineStyle}>${replyPreviewHtml}${inner}</div>${actionsHtml}`;
         $("msgs").appendChild(row);
         scrollB();
       }

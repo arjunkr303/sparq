@@ -471,6 +471,7 @@ module.exports = (io) => {
       try {
         msg = filter.clean(msg);
       } catch {}
+      const messageId = "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
       io.to(roomId).emit("receive_message", {
         from: socket.id,
         fromUserId: u.id,
@@ -478,6 +479,7 @@ module.exports = (io) => {
         message: msg,
         timestamp: new Date().toISOString(),
         replyTo: replyTo || null,
+        messageId,
       });
     });
 
@@ -501,6 +503,7 @@ module.exports = (io) => {
         socket.emit("media_error", { msg: "Image too large (max 5MB)" });
         return;
       }
+      const messageId = "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
       io.to(roomId).emit("receive_image", {
         from: socket.id,
         fromUserId: u.id,
@@ -508,6 +511,7 @@ module.exports = (io) => {
         dataUrl,
         timestamp: new Date().toISOString(),
         replyTo: replyTo || null,
+        messageId,
       });
     });
 
@@ -531,6 +535,7 @@ module.exports = (io) => {
         socket.emit("media_error", { msg: "Voice too large (max 4MB)" });
         return;
       }
+      const messageId = "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
       io.to(roomId).emit("receive_voice", {
         from: socket.id,
         fromUserId: u.id,
@@ -540,6 +545,48 @@ module.exports = (io) => {
         duration: duration || null,
         timestamp: new Date().toISOString(),
         replyTo: replyTo || null,
+        messageId,
+      });
+    });
+
+    // ── Edit Message ──
+    socket.on("edit_message", ({ messageId, roomId, newMessage }) => {
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
+      let msg = newMessage?.trim();
+      if (!msg || msg.length > 500) return;
+      try {
+        msg = filter.clean(msg);
+      } catch {}
+
+      io.to(roomId).emit("message_edited", {
+        messageId,
+        roomId,
+        newMessage: msg,
+      });
+    });
+
+    // ── Delete Message (Unsend) ──
+    socket.on("delete_message", ({ messageId, roomId }) => {
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
+      io.to(roomId).emit("message_deleted", {
+        messageId,
+        roomId,
       });
     });
 
