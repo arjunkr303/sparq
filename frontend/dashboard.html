@@ -2314,7 +2314,7 @@ function renderFriends() {
   } catch (e) { console.error('Render Friends error:', e); }
 }
 
-function saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType = null, duration = null, replyTo = null) {
+function saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType = null, duration = null, replyTo = null, messageId = null, seen = false) {
   const key = `sc_friend_msgs_${friendshipId}`;
   let history = [];
   try {
@@ -2322,7 +2322,7 @@ function saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeTyp
   } catch (e) {
     console.error("Error reading chat history:", e);
   }
-  const exists = history.some(msg => msg.timestamp === timestamp && msg.isMe === isMe);
+  const exists = history.some(msg => (messageId && msg.messageId === messageId) || (msg.timestamp === timestamp && msg.isMe === isMe));
   if (exists) return;
 
   history.push({
@@ -2332,7 +2332,9 @@ function saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeTyp
     type,
     mimeType,
     duration,
-    replyTo
+    replyTo,
+    messageId,
+    seen
   });
 
   try {
@@ -2353,25 +2355,30 @@ function initDashboardSocket() {
     console.log("Dashboard socket connected");
   });
 
-  socket.on("receive_message", ({ from, fromUserId, roomId, message, timestamp, replyTo }) => {
-    handleIncomingSocketMessage({ from, fromUserId, roomId, content: message, type: "text", timestamp, replyTo });
+  socket.on("receive_message", ({ from, fromUserId, roomId, message, timestamp, replyTo, messageId }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: message, type: "text", timestamp, replyTo, messageId });
   });
 
-  socket.on("receive_image", ({ from, fromUserId, roomId, dataUrl, timestamp, replyTo }) => {
-    handleIncomingSocketMessage({ from, fromUserId, roomId, content: dataUrl, type: "image", timestamp, replyTo });
+  socket.on("receive_image", ({ from, fromUserId, roomId, dataUrl, timestamp, replyTo, messageId }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: dataUrl, type: "image", timestamp, replyTo, messageId });
   });
 
-  socket.on("receive_voice", ({ from, fromUserId, roomId, dataUrl, mimeType, timestamp, duration, replyTo }) => {
-    handleIncomingSocketMessage({ from, fromUserId, roomId, content: dataUrl, type: "voice", timestamp, mimeType, duration, replyTo });
+  socket.on("receive_voice", ({ from, fromUserId, roomId, dataUrl, mimeType, timestamp, duration, replyTo, messageId }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: dataUrl, type: "voice", timestamp, mimeType, duration, replyTo, messageId });
+  });
+
+  socket.on("receive_gif", ({ from, fromUserId, roomId, gifUrl, timestamp, replyTo, messageId }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: gifUrl, type: "gif", timestamp, replyTo, messageId });
   });
 }
 
-function handleIncomingSocketMessage({ from, fromUserId, roomId, content, type, timestamp, mimeType = null, duration = null, replyTo = null }) {
+function handleIncomingSocketMessage({ from, fromUserId, roomId, content, type, timestamp, mimeType = null, duration = null, replyTo = null, messageId = null }) {
   if (!roomId || !roomId.startsWith("f_")) return;
   const friendshipId = roomId.substring(2);
 
   const isMe = fromUserId === user.id;
-  saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType, duration, replyTo);
+  const seenState = isMe; // self-sent messages (from other tabs) are already seen. incoming friend messages start unseen.
+  saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType, duration, replyTo, messageId, seenState);
 
   if (!isMe) {
     const unreadKey = `sc_friend_unread_${friendshipId}`;

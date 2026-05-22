@@ -449,7 +449,7 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("send_message", ({ message, roomId, replyTo }) => {
+    socket.on("send_message", ({ message, roomId, replyTo, messageId }) => {
       let isAllowed = false;
       if (chats.has(socket.id)) {
         const c = chats.get(socket.id);
@@ -464,7 +464,7 @@ module.exports = (io) => {
       try {
         msg = filter.clean(msg);
       } catch {}
-      const messageId = "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
       io.to(roomId).emit("receive_message", {
         from: socket.id,
         fromUserId: u.id,
@@ -472,12 +472,12 @@ module.exports = (io) => {
         message: msg,
         timestamp: new Date().toISOString(),
         replyTo: replyTo || null,
-        messageId,
+        messageId: msgId,
       });
     });
 
     // ── Image ──
-    socket.on("send_image", ({ dataUrl, roomId, replyTo }) => {
+    socket.on("send_image", ({ dataUrl, roomId, replyTo, messageId }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send images" });
         return;
@@ -496,7 +496,7 @@ module.exports = (io) => {
         socket.emit("media_error", { msg: "Image too large (max 5MB)" });
         return;
       }
-      const messageId = "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
       io.to(roomId).emit("receive_image", {
         from: socket.id,
         fromUserId: u.id,
@@ -504,12 +504,40 @@ module.exports = (io) => {
         dataUrl,
         timestamp: new Date().toISOString(),
         replyTo: replyTo || null,
-        messageId,
+        messageId: msgId,
+      });
+    });
+    
+    // ── GIF ──
+    socket.on("send_gif", ({ gifUrl, roomId, replyTo, messageId }) => {
+      if (u.guest) {
+        socket.emit("media_error", { msg: "Sign in to send GIFs" });
+        return;
+      }
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
+      if (!gifUrl || typeof gifUrl !== 'string') return;
+      const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+      io.to(roomId).emit("receive_gif", {
+        from: socket.id,
+        fromUserId: u.id,
+        roomId: roomId,
+        gifUrl,
+        timestamp: new Date().toISOString(),
+        replyTo: replyTo || null,
+        messageId: msgId,
       });
     });
 
     // ── Voice — send as proper audio blob ──
-    socket.on("send_voice", ({ dataUrl, roomId, mimeType, duration, replyTo }) => {
+    socket.on("send_voice", ({ dataUrl, roomId, mimeType, duration, replyTo, messageId }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send voice" });
         return;
@@ -528,7 +556,7 @@ module.exports = (io) => {
         socket.emit("media_error", { msg: "Voice too large (max 4MB)" });
         return;
       }
-      const messageId = "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
+      const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
       io.to(roomId).emit("receive_voice", {
         from: socket.id,
         fromUserId: u.id,
@@ -538,7 +566,7 @@ module.exports = (io) => {
         duration: duration || null,
         timestamp: new Date().toISOString(),
         replyTo: replyTo || null,
-        messageId,
+        messageId: msgId,
       });
     });
 
@@ -581,6 +609,33 @@ module.exports = (io) => {
         messageId,
         roomId,
       });
+    });
+
+    // ── Message Seen Receipts ──
+    socket.on("message_seen", ({ messageId, roomId }) => {
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
+      socket.to(roomId).emit("message_seen", { messageId, roomId });
+    });
+
+    socket.on("chat_seen", ({ roomId }) => {
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
+      socket.to(roomId).emit("chat_seen", { roomId });
     });
 
     socket.on("typing", ({ roomId, isTyping }) => {

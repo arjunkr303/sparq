@@ -301,10 +301,50 @@
       .bub.them .vpb:hover { background: var(--pr2); }
       
       .wv { flex: 1; height: 24px; display: flex; align-items: center; gap: 2px; justify-content: center; }
-      .wb { width: 3px; border-radius: 2px; background: rgba(255,255,255,0.6); animation: wave 1.2s ease infinite; }
+      .wb { width: 3px; border-radius: 2px; background: rgba(255,255,255,0.6); animation: wave 1.2s ease infinite; animation-play-state: paused; }
+      .vrow.playing .wb { animation-play-state: running; }
       .bub.them .wb { background: var(--pr); }
       .vdur { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8); margin-left: 4px; }
       .bub.them .vdur { color: var(--t2); }
+
+      /* Message Status Indicator (Ticks & Seen & Loader) */
+      .msg-status-indicator {
+        margin-left: 6px;
+        font-size: 10px;
+        opacity: 0.7;
+        display: inline-flex;
+        align-items: center;
+        vertical-align: middle;
+        user-select: none;
+      }
+      /* Sending State: Spinner */
+      .mr.sending .msg-status-indicator::after {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-top-color: var(--ac);
+        border-radius: 50%;
+        animation: spin-status 0.8s linear infinite;
+        display: inline-block;
+      }
+      /* Sent State: Single Tick */
+      .mr.me:not(.sending):not(.seen) .msg-status-indicator::after {
+        content: "✓";
+        color: var(--t2);
+      }
+      /* Seen State: Seen text */
+      .mr.me.seen .msg-status-indicator::after {
+        content: "Seen";
+        color: var(--ac);
+        font-weight: 700;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      @keyframes spin-status {
+        to { transform: rotate(360deg); }
+      }
 
       /* Typing Indicator */
       .typing-bub { display: flex; align-items: center; gap: 10px; padding: 12px 18px; min-height: 42px; }
@@ -527,6 +567,55 @@
         .bub { max-width: 85%; }
         #btnInfoToggle { display: none !important; } /* Hidden on mobile as we use bottom nav */
       }
+
+      /* GIF Search Panel & Watermarks */
+      #btnGif { font-size: 11px; font-weight: 800; font-family: "Syne", sans-serif; letter-spacing: 0.5px; color: var(--ac); }
+      #gifPanel {
+        display: none; flex-direction: column; gap: 12px; max-height: 280px;
+        background: rgba(10, 10, 20, 0.95); border: 1px solid var(--bd); border-radius: 16px;
+        padding: 12px; margin-bottom: 8px;
+        animation: slideUpGif 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
+      }
+      @keyframes slideUpGif {
+        from { transform: translateY(15px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      .gif-header-row { display: flex; gap: 10px; align-items: center; }
+      #gifSearchInput {
+        flex: 1; background: var(--bg3); border: 1px solid var(--bd); border-radius: 12px;
+        padding: 8px 14px; color: var(--tx); font-size: 13px; outline: none; transition: all 0.2s;
+      }
+      #gifSearchInput:focus { border-color: var(--pr); box-shadow: inset 0 2px 6px rgba(0,0,0,0.2), 0 0 0 3px rgba(124,92,252,0.15); }
+      .gif-close-btn { background: none; border: none; color: var(--t3); font-size: 16px; cursor: pointer; transition: color 0.2s; padding: 4px; }
+      .gif-close-btn:hover { color: var(--rd); }
+      
+      .gif-grid {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 8px; overflow-y: auto; max-height: 210px; padding-right: 4px;
+      }
+      .gif-item { height: 80px; border-radius: 8px; overflow: hidden; cursor: pointer; background: var(--bg3); position: relative; transition: transform 0.2s, box-shadow 0.2s; }
+      .gif-item:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(124,92,252,0.3); z-index: 2; }
+      .gif-item img { width: 100%; height: 100%; object-fit: cover; }
+      
+      .gif-skeleton {
+        background: linear-gradient(90deg, var(--bg3) 25%, rgba(124,92,252,0.1) 50%, var(--bg3) 75%);
+        background-size: 200% 100%; animation: loadingSkeleton 1.5s infinite;
+      }
+      @keyframes loadingSkeleton {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      .gif-msg-wrapper { position: relative; border-radius: 12px; overflow: hidden; display: block; max-width: 220px; margin-top: 4px; }
+      .gif-msg-wrapper img { width: 100%; height: auto; max-height: 280px; display: block; cursor: zoom-in; transition: transform 0.2s; }
+      .gif-msg-wrapper img:hover { transform: scale(1.02); }
+      .gif-badge {
+        position: absolute; bottom: 8px; left: 8px;
+        background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+        color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
+        letter-spacing: 0.5px; text-transform: uppercase; pointer-events: none;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
     </style>
   </head>
   <body data-tab="chat">
@@ -632,11 +721,21 @@
             </div>
             <button class="rpb-close" onclick="cancelEditMsg()">✕</button>
           </div>
+
+          <!-- GIF Picker Panel -->
+          <div id="gifPanel">
+            <div class="gif-header-row">
+              <input type="text" id="gifSearchInput" placeholder="🔍 Search GIFs..." autocomplete="off" />
+              <button class="gif-close-btn" onclick="toggleGifPanel(false)">✕</button>
+            </div>
+            <div class="gif-grid" id="gifGrid"></div>
+          </div>
           
           <div class="input-row">
             <input type="file" id="fi" accept="image/*" onchange="sendImg(this)" />
             <button class="iab" id="btnImg" onclick="document.getElementById('fi').click()" disabled title="Sign in to send images">🖼️</button>
             <button class="iab" id="btnVc" disabled title="Hold to record voice" onmousedown="startRec(event)" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
+            <button class="iab" id="btnGif" disabled title="Send a GIF" onclick="toggleGifPanel()">GIF</button>
             <div class="input-wrapper">
               <input type="text" id="mi" placeholder="Type a message..." disabled maxlength="500" />
             </div>
@@ -881,6 +980,7 @@
       }
 
       const $ = (id) => document.getElementById(id);
+      const generateMessageId = () => "msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9);
 
       function showPartnerTyping() {
         if (state !== "chatting") return;
@@ -1011,6 +1111,7 @@
           $("mi").placeholder = isIn ? "Type a message..." : "Sign in to chat...";
           $("btnImg").disabled = !isIn;
           $("btnVc").disabled = !isIn;
+          if ($("btnGif")) $("btnGif").disabled = !isIn;
 
           // Load chat history from localStorage
           localStorage.setItem(`sc_friend_unread_${friendshipId}`, "0");
@@ -1045,15 +1146,18 @@
         clearBubs();
         
         history.forEach(msg => {
+          const status = msg.seen ? "seen" : "sent";
           if (msg.type === "voice") {
-            addBub({ dataUrl: msg.content, mimeType: msg.mimeType, duration: msg.duration }, msg.isMe, msg.timestamp, "voice", msg.replyTo, msg.messageId);
+            addBub({ dataUrl: msg.content, mimeType: msg.mimeType, duration: msg.duration }, msg.isMe, msg.timestamp, "voice", msg.replyTo, msg.messageId, false, status);
+          } else if (msg.type === "gif") {
+            addBub(msg.content, msg.isMe, msg.timestamp, "gif", msg.replyTo, msg.messageId, false, status);
           } else {
-            addBub(msg.content, msg.isMe, msg.timestamp, msg.type, msg.replyTo, msg.messageId, msg.edited);
+            addBub(msg.content, msg.isMe, msg.timestamp, msg.type, msg.replyTo, msg.messageId, msg.edited, status);
           }
         });
       }
 
-      function saveFriendMessage(content, isMe, type, timestamp, mimeType = null, targetFriendshipId = null, duration = null, replyTo = null, messageId = null) {
+      function saveFriendMessage(content, isMe, type, timestamp, mimeType = null, targetFriendshipId = null, duration = null, replyTo = null, messageId = null, seen = false) {
         const fId = targetFriendshipId || friendshipId;
         if (!fId) return;
         const key = `sc_friend_msgs_${fId}`;
@@ -1076,13 +1180,66 @@
           mimeType,
           duration,
           replyTo,
-          messageId
+          messageId,
+          seen
         });
 
         try {
           localStorage.setItem(key, JSON.stringify(history));
         } catch (e) {
           console.error("Error saving chat history:", e);
+        }
+      }
+
+      function markFriendMsgSeenInLocalStorage(fId, messageId) {
+        if (!fId || !messageId) return;
+        const key = `sc_friend_msgs_${fId}`;
+        let history = [];
+        try {
+          history = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (e) {
+          console.error("Error reading chat history:", e);
+          return;
+        }
+        let updated = false;
+        history.forEach(msg => {
+          if (msg.messageId === messageId && !msg.seen) {
+            msg.seen = true;
+            updated = true;
+          }
+        });
+        if (updated) {
+          try {
+            localStorage.setItem(key, JSON.stringify(history));
+          } catch (e) {
+            console.error("Error saving updated chat history:", e);
+          }
+        }
+      }
+
+      function markAllFriendMsgsSeenInLocalStorage(fId) {
+        if (!fId) return;
+        const key = `sc_friend_msgs_${fId}`;
+        let history = [];
+        try {
+          history = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (e) {
+          console.error("Error reading chat history:", e);
+          return;
+        }
+        let updated = false;
+        history.forEach(msg => {
+          if (!msg.seen) {
+            msg.seen = true;
+            updated = true;
+          }
+        });
+        if (updated) {
+          try {
+            localStorage.setItem(key, JSON.stringify(history));
+          } catch (e) {
+            console.error("Error saving updated chat history:", e);
+          }
         }
       }
 
@@ -1196,6 +1353,8 @@
             sock.emit("join_friend_chat", { friendshipId }, (res) => {
               if (res && res.success) {
                 updatePartnerOnlineStatus(res.partnerOnline);
+                markAllFriendMsgsSeenInLocalStorage(friendshipId);
+                sock.emit("chat_seen", { roomId: room });
               } else {
                 console.error("join_friend_chat failure:", res?.message);
                 showToast("Could not join friend chat room", "err");
@@ -1367,7 +1526,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo, messageId);
+              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo, messageId, isMe);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1377,9 +1536,17 @@
             }
           }
           hidePartnerTyping();
-          addBub(message, isMe, timestamp, "text", replyTo, messageId);
+          const existingEl = document.getElementById(messageId);
+          if (existingEl) {
+            existingEl.classList.remove("sending");
+          } else {
+            addBub(message, isMe, timestamp, "text", replyTo, messageId);
+          }
           if (isFriendChat) {
-            saveFriendMessage(message, isMe, "text", timestamp, null, null, null, replyTo, messageId);
+            saveFriendMessage(message, isMe, "text", timestamp, null, null, null, replyTo, messageId, !isMe);
+          }
+          if (isFriendChat && !isMe) {
+            sock.emit("message_seen", { messageId, roomId: room });
           }
         });
         sock.on("receive_image", ({ from, dataUrl, timestamp, fromUserId, roomId, replyTo, messageId }) => {
@@ -1387,7 +1554,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo, messageId);
+              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo, messageId, isMe);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1397,9 +1564,45 @@
             }
           }
           hidePartnerTyping();
-          addBub(dataUrl, isMe, timestamp, "image", replyTo, messageId);
+          const existingEl = document.getElementById(messageId);
+          if (existingEl) {
+            existingEl.classList.remove("sending");
+          } else {
+            addBub(dataUrl, isMe, timestamp, "image", replyTo, messageId);
+          }
           if (isFriendChat) {
-            saveFriendMessage(dataUrl, isMe, "image", timestamp, null, null, null, replyTo, messageId);
+            saveFriendMessage(dataUrl, isMe, "image", timestamp, null, null, null, replyTo, messageId, !isMe);
+          }
+          if (isFriendChat && !isMe) {
+            sock.emit("message_seen", { messageId, roomId: room });
+          }
+        });
+        sock.on("receive_gif", ({ from, gifUrl, timestamp, fromUserId, roomId, replyTo, messageId }) => {
+          const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
+          if (roomId && roomId.startsWith("f_")) {
+            const incomingFid = roomId.substring(2);
+            if (!isFriendChat || incomingFid !== friendshipId) {
+              saveFriendMessage(gifUrl, isMe, "gif", timestamp, null, incomingFid, null, replyTo, messageId, isMe);
+              if (!isMe) {
+                const unreadKey = `sc_friend_unread_${incomingFid}`;
+                const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+                localStorage.setItem(unreadKey, current + 1);
+              }
+              return;
+            }
+          }
+          hidePartnerTyping();
+          const existingEl = document.getElementById(messageId);
+          if (existingEl) {
+            existingEl.classList.remove("sending");
+          } else {
+            addBub(gifUrl, isMe, timestamp, "gif", replyTo, messageId);
+          }
+          if (isFriendChat) {
+            saveFriendMessage(gifUrl, isMe, "gif", timestamp, null, null, null, replyTo, messageId, !isMe);
+          }
+          if (isFriendChat && !isMe) {
+            sock.emit("message_seen", { messageId, roomId: room });
           }
         });
         sock.on("receive_voice", ({ from, dataUrl, mimeType, timestamp, fromUserId, roomId, duration, replyTo, messageId }) => {
@@ -1407,7 +1610,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo, messageId);
+              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo, messageId, isMe);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1417,9 +1620,17 @@
             }
           }
           hidePartnerTyping();
-          addBub({ dataUrl, mimeType, duration }, isMe, timestamp, "voice", replyTo, messageId);
+          const existingEl = document.getElementById(messageId);
+          if (existingEl) {
+            existingEl.classList.remove("sending");
+          } else {
+            addBub({ dataUrl, mimeType, duration }, isMe, timestamp, "voice", replyTo, messageId);
+          }
           if (isFriendChat) {
-            saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, null, duration, replyTo, messageId);
+            saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, null, duration, replyTo, messageId, !isMe);
+          }
+          if (isFriendChat && !isMe) {
+            sock.emit("message_seen", { messageId, roomId: room });
           }
         });
 
@@ -1461,6 +1672,27 @@
           }
           
           showToast("Message unsent", "ok");
+        });
+
+        sock.on("message_seen", ({ messageId, roomId }) => {
+          const el = document.getElementById(messageId);
+          if (el) {
+            el.classList.remove("sending");
+            el.classList.add("seen");
+          }
+          if (isFriendChat) {
+            markFriendMsgSeenInLocalStorage(friendshipId, messageId);
+          }
+        });
+
+        sock.on("chat_seen", ({ roomId }) => {
+          document.querySelectorAll(".mr.me:not(.seen)").forEach(el => {
+            el.classList.remove("sending");
+            el.classList.add("seen");
+          });
+          if (isFriendChat) {
+            markAllFriendMsgsSeenInLocalStorage(friendshipId);
+          }
         });
 
         sock.on("partner_typing", ({ isTyping }) => {
@@ -1872,11 +2104,16 @@
           return;
         }
 
-        const payload = { message: msg, roomId: room };
+        const msgId = generateMessageId();
+        const payload = { message: msg, roomId: room, messageId: msgId };
         if (activeReply) {
           payload.replyTo = activeReply;
           cancelReply();
         }
+
+        // Proactively render sending bubble
+        addBub(msg, true, new Date().toISOString(), "text", payload.replyTo, msgId, false, "sending");
+
         sock.emit("send_message", payload);
         inp.value = "";
         sock.emit("typing", { roomId: room, isTyping: false });
@@ -1929,11 +2166,16 @@
             showToast("Image still too large after compression", "err");
             return;
           }
-          const payload = { dataUrl, roomId: room };
+          const msgId = generateMessageId();
+          const payload = { dataUrl, roomId: room, messageId: msgId };
           if (activeReply) {
             payload.replyTo = activeReply;
             cancelReply();
           }
+
+          // Proactively render sending bubble
+          addBub(dataUrl, true, new Date().toISOString(), "image", payload.replyTo, msgId, false, "sending");
+
           sock?.emit("send_image", payload);
         };
         img.onerror = () => {
@@ -2072,16 +2314,22 @@
             const blob = new Blob(audioCh, { type: recMime });
             const fr = new FileReader();
             fr.onload = (e2) => {
+              const msgId = generateMessageId();
               const payload = {
                 dataUrl: e2.target.result,
                 mimeType: recMime,
                 roomId: room,
                 duration: durationSec,
+                messageId: msgId,
               };
               if (activeReply) {
                 payload.replyTo = activeReply;
                 cancelReply();
               }
+
+              // Proactively render sending bubble
+              addBub({ dataUrl: payload.dataUrl, mimeType: payload.mimeType, duration: payload.duration }, true, new Date().toISOString(), "voice", payload.replyTo, msgId, false, "sending");
+
               sock?.emit("send_voice", payload);
             };
             fr.readAsDataURL(blob);
@@ -2131,6 +2379,105 @@
         if (!isIn || !partnerUserId) return;
         sock?.emit("send_friend_request", { targetUserId: partnerUserId });
       }
+
+      /* ══ GIF PICKER ══ */
+      let gifPanelOpen = false;
+      let gifPanelInitialized = false;
+      let gifSearchDebounce = null;
+
+      function toggleGifPanel(show) {
+        const panel = $("gifPanel");
+        if (!panel) return;
+        if (show === false) {
+          gifPanelOpen = false;
+          panel.style.display = "none";
+          return;
+        }
+        gifPanelOpen = !gifPanelOpen;
+        panel.style.display = gifPanelOpen ? "flex" : "none";
+        if (gifPanelOpen && !gifPanelInitialized) {
+          gifPanelInitialized = true;
+          fetchTrendingGifs();
+        }
+        if (gifPanelOpen) {
+          setTimeout(() => { const inp = $("gifSearchInput"); if (inp) inp.focus(); }, 100);
+        }
+      }
+
+      function renderGifSkeletons(count = 8) {
+        const grid = $("gifGrid");
+        if (!grid) return;
+        grid.innerHTML = Array.from({ length: count }, () =>
+          '<div class="gif-item gif-skeleton"></div>'
+        ).join("");
+      }
+
+      function renderGifs(gifs) {
+        const grid = $("gifGrid");
+        if (!grid) return;
+        if (!gifs || gifs.length === 0) {
+          grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--t3);font-size:13px;padding:24px 0;">No GIFs found 😢</div>';
+          return;
+        }
+        grid.innerHTML = gifs.map(g => {
+          const safeSrc = String(g.url || "").replace(/"/g, "&quot;");
+          const safeTitle = String(g.title || "GIF").replace(/"/g, "&quot;");
+          return `<div class="gif-item" onclick="sendGif('${safeSrc}')" title="${safeTitle}"><img src="${safeSrc}" alt="${safeTitle}" loading="lazy" /></div>`;
+        }).join("");
+      }
+
+      async function fetchTrendingGifs() {
+        renderGifSkeletons(8);
+        try {
+          const res = await fetch(`${API}/api/gifs/trending`);
+          const data = await res.json();
+          if (data.success) renderGifs(data.gifs);
+          else renderGifs([]);
+        } catch (e) {
+          renderGifs([]);
+        }
+      }
+
+      async function searchGifs(query) {
+        if (!query.trim()) { fetchTrendingGifs(); return; }
+        renderGifSkeletons(8);
+        try {
+          const res = await fetch(`${API}/api/gifs/search?q=${encodeURIComponent(query.trim())}`);
+          const data = await res.json();
+          if (data.success) renderGifs(data.gifs);
+          else renderGifs([]);
+        } catch (e) {
+          renderGifs([]);
+        }
+      }
+
+      function sendGif(gifUrl) {
+        if (state !== "chatting" || !sock) return;
+        if (!gifUrl) return;
+        const msgId = generateMessageId();
+        const payload = { gifUrl, roomId: room, messageId: msgId };
+        if (activeReply) {
+          payload.replyTo = activeReply;
+          cancelReply();
+        }
+
+        // Proactively render sending bubble
+        addBub(gifUrl, true, new Date().toISOString(), "gif", payload.replyTo, msgId, false, "sending");
+
+        sock.emit("send_gif", payload);
+        toggleGifPanel(false);
+      }
+
+      // Bind debounced search (script runs after DOM, so direct binding works)
+      (function initGifSearch() {
+        const gifInput = $("gifSearchInput");
+        if (gifInput) {
+          gifInput.addEventListener("input", () => {
+            clearTimeout(gifSearchDebounce);
+            gifSearchDebounce = setTimeout(() => searchGifs(gifInput.value), 400);
+          });
+        }
+      })();
 
       /* ══ STATE ══ */
       function setState(s) {
@@ -2192,6 +2539,7 @@
           : "Start a chat first...";
         $("btnImg").disabled = !(ok && isIn);
         $("btnVc").disabled = !(ok && isIn);
+        if ($("btnGif")) $("btnGif").disabled = !ok;
         if (s !== "chatting") {
           $("hdIdle").style.display = "flex";
           $("hdChat").style.display = "none";
@@ -2265,19 +2613,68 @@
         if (e.target === document.getElementById("ipm"))
           document.getElementById("ipm").classList.remove("on");
       }
+      let currentAudio = null;
+      let currentAudioBtn = null;
+
+      function stopVoice() {
+        if (currentAudio) {
+          try {
+            currentAudio.pause();
+          } catch (e) {
+            console.error("Error pausing audio:", e);
+          }
+          if (currentAudioBtn) {
+            currentAudioBtn.textContent = "▶";
+            currentAudioBtn.parentElement?.classList.remove("playing");
+          }
+          currentAudio = null;
+          currentAudioBtn = null;
+        }
+      }
+
       window.playVoice = (src, mime, btnEl) => {
         try {
+          // If clicked the same button, toggle play/pause
+          if (currentAudio && currentAudioBtn === btnEl) {
+            if (currentAudio.paused) {
+              currentAudio.play().catch(console.error);
+              btnEl.textContent = "⏸";
+              btnEl.parentElement?.classList.add("playing");
+            } else {
+              currentAudio.pause();
+              btnEl.textContent = "▶";
+              btnEl.parentElement?.classList.remove("playing");
+            }
+            return;
+          }
+
+          // Otherwise stop any other playing audio
+          stopVoice();
+
           const audio = new Audio();
           audio.src = src;
-          // Try to set type
           if (mime && audio.canPlayType(mime) !== "") {
             audio.type = mime;
           }
+
+          currentAudio = audio;
+          currentAudioBtn = btnEl;
+
           audio.onplay = () => {
-            if (btnEl) btnEl.textContent = "⏸";
+            if (btnEl) {
+              btnEl.textContent = "⏸";
+              btnEl.parentElement?.classList.add("playing");
+            }
           };
           audio.onended = () => {
-            if (btnEl) btnEl.textContent = "▶";
+            if (btnEl) {
+              btnEl.textContent = "▶";
+              btnEl.parentElement?.classList.remove("playing");
+            }
+            if (currentAudio === audio) {
+              currentAudio = null;
+              currentAudioBtn = null;
+            }
           };
           audio.onerror = () => {
             // Try blob URL approach
@@ -2286,33 +2683,70 @@
               .then((blob) => {
                 const url = URL.createObjectURL(blob);
                 const a2 = new Audio(url);
+                
+                if (currentAudioBtn === btnEl) {
+                  currentAudio = a2;
+                }
+
                 a2.onplay = () => {
-                  if (btnEl) btnEl.textContent = "⏸";
+                  if (btnEl) {
+                    btnEl.textContent = "⏸";
+                    btnEl.parentElement?.classList.add("playing");
+                  }
                 };
                 a2.onended = () => {
-                  if (btnEl) btnEl.textContent = "▶";
+                  if (btnEl) {
+                    btnEl.textContent = "▶";
+                    btnEl.parentElement?.classList.remove("playing");
+                  }
                   URL.revokeObjectURL(url);
+                  if (currentAudio === a2) {
+                    currentAudio = null;
+                    currentAudioBtn = null;
+                  }
                 };
                 a2.play().catch(console.error);
               })
               .catch(() => {
-                if (btnEl) btnEl.textContent = "▶";
+                if (btnEl) {
+                  btnEl.textContent = "▶";
+                  btnEl.parentElement?.classList.remove("playing");
+                }
                 showToast("Cannot play audio", "err");
+                if (currentAudio === audio) {
+                  currentAudio = null;
+                  currentAudioBtn = null;
+                }
               });
           };
+
           audio.play().catch((err) => {
             console.error("Play error:", err);
-            if (btnEl) btnEl.textContent = "▶";
+            if (btnEl) {
+              btnEl.textContent = "▶";
+              btnEl.parentElement?.classList.remove("playing");
+            }
+            if (currentAudio === audio) {
+              currentAudio = null;
+              currentAudioBtn = null;
+            }
           });
         } catch (e) {
           console.error(e);
         }
       };
 
-      function addBub(content, isMe, ts, type, replyTo = null, messageId = null, isEdited = false) {
+      function addBub(content, isMe, ts, type, replyTo = null, messageId = null, isEdited = false, status = "sent") {
         document.getElementById("tbub")?.remove();
         const row = document.createElement("div");
         row.className = "mr " + (isMe ? "me" : "them");
+        if (isMe) {
+          if (status === "sending") {
+            row.classList.add("sending");
+          } else if (status === "seen") {
+            row.classList.add("seen");
+          }
+        }
         const msgId = messageId || 'msg_' + (ts ? new Date(ts).getTime() : Date.now());
         row.id = msgId;
 
@@ -2323,13 +2757,22 @@
             })
           : "";
         const side = isMe ? "me" : "them";
+        
+        let statusHtml = "";
+        if (isMe) {
+          statusHtml = `<span class="msg-status-indicator"></span>`;
+        }
+        const btimeHtml = `<div class="btime">${t}${statusHtml}</div>`;
         let inner = "";
 
         if (type === "text") {
           const editedHtml = isEdited ? ` <span style="font-size: 10px; opacity: 0.5; font-style: italic; margin-left: 4px;">(edited)</span>` : "";
-          inner = `<div class="bt">${esc(content)}${editedHtml}</div><div class="btime">${t}</div>`;
+          inner = `<div class="bt">${esc(content)}${editedHtml}</div>${btimeHtml}`;
+        } else if (type === "gif") {
+          const safeSrc = String(content || "").replace(/"/g, "&quot;");
+          inner = `<div class="gif-msg-wrapper"><img src="${safeSrc}" alt="GIF" loading="lazy" onclick="previewImg(this.src)" /><span class="gif-badge">GIF</span></div>${btimeHtml}`;
         } else if (type === "image") {
-          inner = `<img src="${content}" loading="lazy" onclick="previewImg(this.src)"/><div class="btime">${t}</div>`;
+          inner = `<img src="${content}" loading="lazy" onclick="previewImg(this.src)"/>${btimeHtml}`;
         } else if (type === "voice") {
           // content is {dataUrl, mimeType}
           const src = content.dataUrl || (typeof content === "string" ? content : "");
@@ -2357,7 +2800,7 @@
         onclick="playVoice(this.dataset.src,this.dataset.mime,this)">▶</button>
       <div class="wv">${bars}</div>
       <span class="vdur">${durText}</span>
-    </div><div class="btime">${t}</div>`;
+    </div>${btimeHtml}`;
         }
 
         const activeTheme = isMe ? ourTheme : partnerTheme;
@@ -2595,6 +3038,7 @@
           .catch(() => showToast("Server error", "err"));
       }
       function clearBubs() {
+        stopVoice();
         Array.from($("msgs").children).forEach((c) => {
           if (c.id !== "boxIdle" && c.id !== "boxSearch") c.remove();
         });
@@ -2620,6 +3064,7 @@
           .replace(/"/g, "&quot;");
       }
       function goBack() {
+        stopVoice();
         sock?.disconnect();
         location.href = isIn ? "dashboard.html" : "index.html";
       }

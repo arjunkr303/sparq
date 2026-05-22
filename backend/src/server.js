@@ -10,6 +10,7 @@ const authRoutes    = require('./routes/auth');
 const userRoutes    = require('./routes/user');
 const paymentRoutes = require('./routes/payment');
 const luckyDrawRoutes = require('./routes/luckyDraw');
+const gifsRoutes    = require('./routes/gifs');
 const setupSocket   = require('./socket/chat');
 
 const app    = express();
@@ -25,6 +26,7 @@ app.use('/api/auth',    authRoutes);
 app.use('/api/user',    userRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/lucky-draw', luckyDrawRoutes);
+app.use('/api/gifs',       gifsRoutes);
 app.get('/api/health',  (_req, res) => res.json({ status: 'ok', time: new Date() }));
 app.get('/api/stats',   (_req, res) => res.json({
   onlineNow: io.sockets.sockets.size,
