@@ -169,6 +169,26 @@ module.exports = (io) => {
       `🔌 ${u.name} (${u.guest ? "guest" : "user"}) sid=${socket.id}`,
     );
 
+    if (!u.guest && u.id) {
+      supabase
+        .from("friendships")
+        .select("id")
+        .or(`user_id.eq.${u.id},friend_id.eq.${u.id}`)
+        .eq("status", "accepted")
+        .then(({ data: fr }) => {
+          if (fr) {
+            fr.forEach((f) => {
+              const roomName = `f_${f.id}`;
+              socket.join(roomName);
+              socket.to(roomName).emit("partner_status", { online: true });
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("error joining friend rooms on connect:", err);
+        });
+    }
+
     socket.on("find_match", async ({ genderFilter } = {}) => {
       if (chats.has(socket.id)) return;
       queue.delete(socket.id);
@@ -375,9 +395,77 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("send_message", ({ message, roomId }) => {
-      const c = chats.get(socket.id);
-      if (!c || c.roomId !== roomId) return;
+    socket.on("init_dashboard", async () => {
+      if (u.guest || !u.id) return;
+      try {
+        const { data: fr } = await supabase
+          .from("friendships")
+          .select("id")
+          .or(`user_id.eq.${u.id},friend_id.eq.${u.id}`)
+          .eq("status", "accepted");
+        if (fr) {
+          fr.forEach((f) => {
+            const roomName = `f_${f.id}`;
+            socket.join(roomName);
+            // Optionally, tell others we are "online" when dashboard is open
+            socket.to(roomName).emit("partner_status", { online: true });
+          });
+        }
+      } catch (err) {
+        console.error("init_dashboard error:", err);
+      }
+    });
+
+    socket.on("join_friend_chat", async ({ friendshipId }, callback) => {
+      if (u.guest || !u.id || !friendshipId) {
+        if (callback) callback({ success: false, message: "Invalid request" });
+        return;
+      }
+      try {
+        const { data: fr } = await supabase
+          .from("friendships")
+          .select("id, user_id, friend_id, status")
+          .eq("id", friendshipId)
+          .maybeSingle();
+
+        if (!fr || fr.status !== "accepted") {
+          if (callback) callback({ success: false, message: "Friendship not accepted" });
+          return;
+        }
+
+        if (fr.user_id !== u.id && fr.friend_id !== u.id) {
+          if (callback) callback({ success: false, message: "Unauthorized" });
+          return;
+        }
+
+        const roomName = `f_${friendshipId}`;
+        socket.join(roomName);
+
+        // Check if partner is online in this room
+        const clients = io.sockets.adapter.rooms.get(roomName);
+        const numClients = clients ? clients.size : 0;
+        const partnerOnline = numClients > 1;
+
+        // Broadcast to room that user is online in the friend chat
+        socket.to(roomName).emit("partner_status", { online: true });
+
+        if (callback) callback({ success: true, partnerOnline });
+      } catch (err) {
+        console.error("join_friend_chat error:", err);
+        if (callback) callback({ success: false, message: "Server error" });
+      }
+    });
+
+    socket.on("send_message", ({ message, roomId, replyTo }) => {
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
       let msg = message?.trim();
       if (!msg || msg.length > 500) return;
       try {
@@ -385,19 +473,29 @@ module.exports = (io) => {
       } catch {}
       io.to(roomId).emit("receive_message", {
         from: socket.id,
+        fromUserId: u.id,
+        roomId: roomId,
         message: msg,
         timestamp: new Date().toISOString(),
+        replyTo: replyTo || null,
       });
     });
 
     // ── Image ──
-    socket.on("send_image", ({ dataUrl, roomId }) => {
+    socket.on("send_image", ({ dataUrl, roomId, replyTo }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send images" });
         return;
       }
-      const c = chats.get(socket.id);
-      if (!c || c.roomId !== roomId) return;
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
       if (!dataUrl?.startsWith("data:image/")) return;
       if (dataUrl.length > 5 * 1024 * 1024) {
         socket.emit("media_error", { msg: "Image too large (max 5MB)" });
@@ -405,19 +503,29 @@ module.exports = (io) => {
       }
       io.to(roomId).emit("receive_image", {
         from: socket.id,
+        fromUserId: u.id,
+        roomId: roomId,
         dataUrl,
         timestamp: new Date().toISOString(),
+        replyTo: replyTo || null,
       });
     });
 
     // ── Voice — send as proper audio blob ──
-    socket.on("send_voice", ({ dataUrl, roomId, mimeType }) => {
+    socket.on("send_voice", ({ dataUrl, roomId, mimeType, duration, replyTo }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send voice" });
         return;
       }
-      const c = chats.get(socket.id);
-      if (!c || c.roomId !== roomId) return;
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
       if (!dataUrl?.startsWith("data:audio/")) return;
       if (dataUrl.length > 4 * 1024 * 1024) {
         socket.emit("media_error", { msg: "Voice too large (max 4MB)" });
@@ -425,16 +533,26 @@ module.exports = (io) => {
       }
       io.to(roomId).emit("receive_voice", {
         from: socket.id,
+        fromUserId: u.id,
+        roomId: roomId,
         dataUrl,
         mimeType: mimeType || "audio/webm",
+        duration: duration || null,
         timestamp: new Date().toISOString(),
+        replyTo: replyTo || null,
       });
     });
 
     socket.on("typing", ({ roomId, isTyping }) => {
-      const c = chats.get(socket.id);
-      if (!c || c.roomId !== roomId || !c.partnerId) return;
-      io.to(c.partnerId).emit("partner_typing", { isTyping: !!isTyping });
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (!c || c.roomId !== roomId || !c.partnerId) return;
+        io.to(c.partnerId).emit("partner_typing", { isTyping: !!isTyping });
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) {
+          socket.to(roomId).emit("partner_typing", { isTyping: !!isTyping });
+        }
+      }
     });
 
     socket.on("skip", async () => {
@@ -926,6 +1044,14 @@ module.exports = (io) => {
         socket.emit("media_error", {
           msg: "Partner is offline or unavailable.",
         });
+      }
+    });
+
+    socket.on("disconnecting", () => {
+      for (const roomName of socket.rooms) {
+        if (roomName.startsWith("f_")) {
+          socket.to(roomName).emit("partner_status", { online: false });
+        }
       }
     });
 

@@ -75,10 +75,6 @@ router.post("/register", async (req, res) => {
       ageConfirmed,
     } = req.body;
 
-    if (!ageConfirmed)
-      return res.status(400).json({ message: "Must confirm 18+" });
-    if (parseInt(age) < 18)
-      return res.status(400).json({ message: "Must be 18+" });
     if (!["male", "female", "other"].includes(gender))
       return res.status(400).json({ message: "Invalid gender" });
 
@@ -105,7 +101,7 @@ router.post("/register", async (req, res) => {
         password: pw,
         username,
         gender,
-        age: parseInt(age),
+        age: age ? parseInt(age) : null,
         country: country || "",
         state: state || "",
         city: city || "",

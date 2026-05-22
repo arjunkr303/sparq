@@ -1,195 +1,711 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Register — StrangerNear</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Create Account — StrangerNear</title>
+<meta name="description" content="Join StrangerNear for free. Meet real people from your city, state, or anywhere in the world. Create your account in minutes."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#08080f;--bg2:#0f0f1a;--bg3:#141426;--sr:#1a1a2e;--bd:rgba(120,100,255,.15);--b2:rgba(120,100,255,.28);--pr:#7c5cfc;--pr2:#9b7ffe;--pg:rgba(124,92,252,.35);--gn:#06d6a0;--rd:#ef4565;--tx:#f0eeff;--t2:#a89fd8;--t3:#6b638f}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
-h1{font-family:'Syne',sans-serif;font-weight:800}
-button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .25s}
-input,select{font-family:'DM Sans',sans-serif}
-a{text-decoration:none}
-.card{width:100%;max-width:480px;background:var(--sr);border:1px solid var(--bd);border-radius:22px;padding:34px 30px;animation:fi .5s ease}
-.top{text-align:center;margin-bottom:20px}
-.icon{font-size:28px;color:var(--pr);display:block;margin-bottom:10px}
-.top h1{font-size:21px;margin-bottom:4px}
-.top p{color:var(--t2);font-size:13px}
-.prog{display:flex;gap:7px;justify-content:center;margin-bottom:20px}
-.dot{width:30px;height:4px;border-radius:2px;background:var(--bd);transition:background .3s}
-.dot.on{background:var(--pr)}
-.step{display:none}.step.on{display:block}
-.slbl{font-family:'Syne',sans-serif;font-size:14px;color:var(--t2);margin-bottom:14px}
-.field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
-label{font-size:12px;font-weight:600;color:var(--t2)}
-.iw{position:relative}
-.iw input{width:100%;padding:10px 40px 10px 13px;background:var(--bg3);border:1px solid var(--bd);color:var(--tx);border-radius:9px;font-size:13px;transition:border .2s;font-family:'DM Sans',sans-serif}
-.iw input:focus{outline:none;border-color:var(--pr)}
-.iw input::placeholder{color:var(--t3)}
-.eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;line-height:1}
-.eye:hover{color:var(--pr2)}
-input:not(.iw input),select{background:var(--bg3);border:1px solid var(--bd);color:var(--tx);padding:10px 13px;border-radius:9px;font-size:13px;transition:border .2s;width:100%}
-input:focus,select:focus{outline:none;border-color:var(--pr)}
-input::placeholder{color:var(--t3)}
-select option{background:var(--bg3);color:var(--tx)}
-select:disabled{opacity:.4;cursor:not-allowed}
-.hint{font-size:11px;min-height:14px;margin-top:2px}
-.hint.ok{color:var(--gn)}.hint.err{color:var(--rd)}.hint.inf{color:var(--t3)}
-.urow{display:flex;gap:7px;align-items:flex-start}
-.urow>div{flex:1}
-.dice{padding:10px 11px;border-radius:9px;background:rgba(124,92,252,.12);border:1px solid var(--b2);color:var(--pr2);font-size:16px;cursor:pointer;flex-shrink:0;transition:all .2s}
-.dice:hover{background:rgba(124,92,252,.25);transform:rotate(20deg)}
-.grow{display:flex;gap:7px}
-.gb{flex:1;padding:9px 4px;border-radius:9px;background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
-.gb.on{background:rgba(124,92,252,.15);border-color:var(--pr);color:var(--pr2)}
-.btnp{width:100%;background:linear-gradient(135deg,var(--pr),var(--pr2));color:#fff;padding:11px;border-radius:50px;font-weight:600;font-size:13px;box-shadow:0 4px 20px var(--pg);margin-top:4px}
-.btnp:hover{transform:translateY(-2px)}.btnp:disabled{opacity:.6;cursor:not-allowed;transform:none}
-.btns{background:transparent;color:var(--t2);padding:11px;border-radius:50px;font-weight:500;font-size:13px;border:1px solid var(--b2);width:100%;margin-top:4px}
-.btns:hover{border-color:var(--pr);color:var(--pr2)}
-.row{display:flex;gap:9px}.row .btns{flex:1}.row .btnp{flex:2}
-/* Interest tags with categories */
-.int-section{margin-bottom:10px}
-.int-cat{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.tags{display:flex;flex-wrap:wrap;gap:5px}
-.tag{padding:4px 10px;border-radius:50px;background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-size:11px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
-.tag.on{background:rgba(124,92,252,.15);border-color:var(--pr);color:var(--pr2)}
-.err{background:rgba(239,69,101,.1);border:1px solid rgba(239,69,101,.3);color:var(--rd);border-radius:9px;padding:9px 13px;font-size:12px;margin-bottom:12px;display:none}
-.ckrow{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--t2)}
-.ckrow input[type=checkbox]{width:14px;height:14px;accent-color:var(--pr);flex-shrink:0}
-.ft{text-align:center;margin-top:16px;color:var(--t2);font-size:13px}
-.ft a{color:var(--pr2);font-weight:600}
-.bl{display:inline-block;margin-bottom:12px;color:var(--t2);font-size:13px}
-.int-count{color:var(--t3);font-size:11px;font-weight:400}
-@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --bg:          #060610;
+  --bg-2:        #0b0b1e;
+  --bg-3:        #12122a;
+  --surface:     rgba(255,255,255,0.04);
+  --surface-2:   rgba(255,255,255,0.07);
+  --glass:       rgba(10,9,30,0.75);
+  --border:      rgba(139,117,255,0.16);
+  --border-2:    rgba(139,117,255,0.30);
+  --border-glow: rgba(139,117,255,0.60);
+
+  --violet:      #7c5cfc;
+  --violet-2:    #9b7ffe;
+  --violet-3:    #b89fff;
+  --cyan:        #22d3ee;
+  --rose:        #f472b6;
+  --gold:        #fbbf24;
+  --green:       #34d399;
+  --red:         #ef4444;
+
+  --glow-v:      rgba(124,92,252,0.45);
+  --glow-c:      rgba(34,211,238,0.25);
+
+  --text:        #f0edff;
+  --text-2:      #a99fd4;
+  --text-3:      #6b6390;
+
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+  --r-pill: 999px;
+
+  --t: 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size:16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4 { font-family:'Outfit',sans-serif; font-weight:800; line-height:1.15; }
+a { text-decoration:none; color:inherit; }
+button { font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; outline:none; }
+input, select { font-family:'Space Grotesk',sans-serif; }
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ── CANVAS ── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── BG BLOBS ── */
+.bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+}
+.bg-blob-1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(ellipse, rgba(124,92,252,0.12) 0%, transparent 70%);
+  top: -200px; left: -100px;
+}
+.bg-blob-2 {
+  width: 500px; height: 500px;
+  background: radial-gradient(ellipse, rgba(34,211,238,0.08) 0%, transparent 70%);
+  bottom: -150px; right: -100px;
+}
+
+/* ═══════════════════════════════════════════════
+   CARD / LAYOUT
+═══════════════════════════════════════════════ */
+.card-wrap {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 520px;
+  animation: fade-in 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes fade-in {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Glow border wrapper */
+.card-glow {
+  position: relative;
+  border-radius: var(--r-xl);
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(124,92,252,0.4), rgba(34,211,238,0.15), rgba(124,92,252,0.1));
+  box-shadow: 0 0 60px rgba(124,92,252,0.15), 0 24px 80px rgba(0,0,0,0.5);
+}
+
+.card {
+  background: var(--glass);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-radius: calc(var(--r-xl) - 1px);
+  padding: 40px 36px;
+}
+
+/* ── BACK LINK ── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-3);
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 28px;
+  transition: var(--t);
+  padding: 6px 0;
+}
+.back-link:hover { color: var(--violet-2); }
+.back-link svg { transition: transform var(--t); }
+.back-link:hover svg { transform: translateX(-3px); }
+
+/* ── HEADER ── */
+.card-header { text-align: center; margin-bottom: 28px; }
+
+.logo-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+  border-radius: 16px;
+  font-size: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 0 24px var(--glow-v);
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%,100% { box-shadow: 0 0 24px var(--glow-v); }
+  50%      { box-shadow: 0 0 44px var(--glow-v), 0 0 80px rgba(34,211,238,0.2); }
+}
+
+.card-header h1 {
+  font-size: 26px;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #fff, var(--violet-3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+.card-header p {
+  color: var(--text-3);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-wrap { margin-bottom: 28px; }
+.progress-track {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.progress-dot {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--r-pill);
+  background: rgba(139,117,255,0.15);
+  transition: background 0.4s;
+}
+.progress-dot.active { background: var(--violet); }
+.progress-dot.done {
+  background: linear-gradient(90deg, var(--violet), var(--cyan));
+}
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-3);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.progress-labels span.active { color: var(--violet-2); }
+
+/* ── ERROR BOX ── */
+.err-box {
+  display: none;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--r-md);
+  padding: 11px 16px;
+  font-size: 13px;
+  color: #f87171;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.err-box[hidden] { display: none !important; }
+
+/* ── STEP ── */
+.step { display: none; }
+.step.active { display: block; animation: step-in 0.3s ease both; }
+@keyframes step-in {
+  from { opacity:0; transform:translateX(12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.step-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-2);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.step-label::before {
+  content: '';
+  display: inline-block;
+  width: 4px; height: 18px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, var(--violet), var(--cyan));
+  flex-shrink: 0;
+}
+
+/* ── FIELD ── */
+.field { margin-bottom: 16px; }
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  margin-bottom: 7px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── INPUT WRAPPER ── */
+.iw { position: relative; }
+.iw input {
+  width: 100%;
+  padding: 12px 44px 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--r-md);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.iw input:focus {
+  outline: none;
+  border-color: var(--violet);
+  background: rgba(124,92,252,0.04);
+  box-shadow: 0 0 0 3px rgba(124,92,252,0.12);
+}
+.iw input::placeholder { color: var(--text-3); }
+
+.eye-btn {
+  position: absolute;
+  right: 13px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  color: var(--text-3); cursor: pointer;
+  font-size: 14px; line-height: 1;
+  padding: 4px;
+  transition: color var(--t);
+}
+.eye-btn:hover { color: var(--violet-2); }
+
+/* Generic input (non-.iw) */
+input[type="number"], input[type="text"]:not(.iw input), select {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--r-md);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+input[type="number"]:focus, select:focus {
+  outline: none;
+  border-color: var(--violet);
+  background: rgba(124,92,252,0.04);
+  box-shadow: 0 0 0 3px rgba(124,92,252,0.12);
+}
+input::placeholder { color: var(--text-3); }
+select option { background: #0f0f24; color: var(--text); }
+select:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── HINT ── */
+.hint {
+  font-size: 11.5px;
+  min-height: 16px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+.hint.ok  { color: var(--green); }
+.hint.err { color: var(--red); }
+.hint.inf { color: var(--text-3); }
+
+/* ── USERNAME ROW ── */
+.urow { display: flex; gap: 8px; align-items: flex-start; }
+.urow > div { flex: 1; }
+.dice-btn {
+  padding: 12px 13px;
+  border-radius: var(--r-md);
+  background: rgba(124,92,252,0.10);
+  border: 1px solid var(--border-2);
+  color: var(--violet-2);
+  font-size: 17px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  margin-top: 0;
+}
+.dice-btn:hover { background: rgba(124,92,252,0.22); transform: rotate(20deg); }
+
+/* ── GENDER BUTTONS ── */
+.gender-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.gender-btn {
+  padding: 12px 8px;
+  border-radius: var(--r-md);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.gender-btn .g-icon { font-size: 20px; }
+.gender-btn:hover { border-color: var(--border-2); background: rgba(255,255,255,0.06); color: var(--text); }
+.gender-btn.selected {
+  background: rgba(124,92,252,0.12);
+  border-color: var(--violet);
+  color: var(--violet-2);
+  box-shadow: 0 0 16px rgba(124,92,252,0.2);
+}
+
+/* ── INTEREST TAGS ── */
+.int-section { margin-bottom: 12px; }
+.int-cat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tag:hover { border-color: var(--border-2); color: var(--text); }
+.tag.selected {
+  background: rgba(124,92,252,0.12);
+  border-color: var(--violet);
+  color: var(--violet-2);
+}
+.int-count-badge {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  margin-left: 6px;
+}
+
+/* ── CHECKBOX ── */
+.ck-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.ck-row input[type=checkbox] {
+  width: 16px; height: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  accent-color: var(--violet);
+  cursor: pointer;
+}
+.ck-row a { color: var(--violet-2); font-weight: 600; }
+.ck-row a:hover { color: var(--violet-3); }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--violet), #5e3de8);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 28px var(--glow-v), 0 4px 16px rgba(0,0,0,0.3);
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.btn-primary::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.14), transparent);
+  opacity: 0; transition: opacity 0.25s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 44px var(--glow-v), 0 8px 28px rgba(0,0,0,0.4); }
+.btn-primary:hover::after { opacity: 1; }
+.btn-primary:active { transform: translateY(-1px); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-secondary {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--r-pill);
+  background: transparent;
+  border: 1px solid var(--border-2);
+  color: var(--text-2);
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.25s;
+  margin-top: 6px;
+}
+.btn-secondary:hover { border-color: var(--violet); color: var(--violet-2); background: rgba(124,92,252,0.06); }
+
+.btn-row { display: flex; gap: 10px; }
+.btn-row .btn-primary { flex: 2; }
+
+/* ── FOOTER TEXT ── */
+.footer-text {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--text-3);
+  font-size: 13.5px;
+}
+.footer-text a { color: var(--violet-2); font-weight: 600; transition: color var(--t); }
+.footer-text a:hover { color: var(--violet-3); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--violet); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 560px) {
+  .card { padding: 28px 20px; }
+  .gender-grid { grid-template-columns: repeat(3,1fr); }
+}
 </style>
 </head>
 <body>
-<div class="card">
-  <a href="index.html" class="bl">← Back</a>
-  <div class="top"><span class="icon">◈</span><h1>Create Account</h1><p>Join free — takes 2 minutes</p></div>
-  <div class="prog">
-    <div class="dot on" id="d1"></div>
-    <div class="dot" id="d2"></div>
-    <div class="dot" id="d3"></div>
-  </div>
-  <div class="err" id="err"></div>
 
-  <!-- Step 1: Account -->
-  <div class="step on" id="s1">
-    <div class="slbl">Account Info</div>
-    <div class="field">
-      <label>Email</label>
-      <div class="iw"><input type="email" id="email" placeholder="you@example.com" oninput="chkEmail()"/></div>
-      <span class="hint" id="emailHint"></span>
-    </div>
-    <div class="field">
-      <label>Username</label>
-      <div class="urow">
-        <div>
-          <div class="iw"><input type="text" id="uname" placeholder="coolstranger99" maxlength="20" oninput="chkUname()"/></div>
-          <span class="hint" id="unameHint"></span>
+<!-- BG Elements -->
+<canvas id="bg-canvas"></canvas>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="card-wrap">
+  <a href="index.html" class="back-link">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Back to home
+  </a>
+
+  <div class="card-glow">
+    <div class="card">
+
+      <!-- Header -->
+      <div class="card-header">
+        <div class="logo-icon">◈</div>
+        <h1>Create Account</h1>
+        <p>Join StrangerNear free — takes 2 minutes</p>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-dot active" id="pd1"></div>
+          <div class="progress-dot" id="pd2"></div>
+          <div class="progress-dot" id="pd3"></div>
         </div>
-        <button class="dice" title="Random username" onclick="randUname()">🎲</button>
+        <div class="progress-labels">
+          <span id="pl1" class="active">Account</span>
+          <span id="pl2">Profile</span>
+          <span id="pl3">Interests</span>
+        </div>
       </div>
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <div class="iw">
-        <input type="password" id="pass" placeholder="Min 6 characters" oninput="chkPass()"/>
-        <button class="eye" id="eye1" onclick="togEye('pass','eye1')">👁</button>
-      </div>
-      <span class="hint" id="passHint"></span>
-    </div>
-    <div class="field">
-      <label>Confirm Password</label>
-      <div class="iw">
-        <input type="password" id="pass2" placeholder="Re-enter password" oninput="chkPass2()"/>
-        <button class="eye" id="eye2" onclick="togEye('pass2','eye2')">👁</button>
-      </div>
-      <span class="hint" id="pass2Hint"></span>
-    </div>
-    <button class="btnp" onclick="next1()">Continue →</button>
-  </div>
 
-  <!-- Step 2: About -->
-  <div class="step" id="s2">
-    <div class="slbl">About You</div>
-    <div class="field">
-      <label>Gender</label>
-      <div class="grow">
-        <button class="gb" onclick="setG('male',this)">♂ Male</button>
-        <button class="gb" onclick="setG('female',this)">♀ Female</button>
-        <button class="gb" onclick="setG('other',this)">⚧ Other</button>
+      <!-- Error Box -->
+      <div class="err-box" id="errBox" hidden>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0">
+          <circle cx="8" cy="8" r="7" stroke="#f87171" stroke-width="1.4"/>
+          <path d="M8 5v3.5M8 10.5v.5" stroke="#f87171" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span id="errText"></span>
       </div>
-    </div>
-    <div class="field"><label>Age</label><input type="number" id="age" placeholder="18" min="18" max="100"/></div>
-    <div class="field">
-      <label class="ckrow"><input type="checkbox" id="ageChk"/> I confirm I am 18 or older</label>
-    </div>
-    <div class="row">
-      <button class="btns" onclick="goStep(1)">← Back</button>
-      <button class="btnp" onclick="next2()">Continue →</button>
-    </div>
-  </div>
 
-  <!-- Step 3: Location + Interests -->
-  <div class="step" id="s3">
-    <div class="slbl">Location & Interests</div>
-    <div class="field">
-      <label>Country (optional)</label>
-      <select id="country" onchange="onCountry()"><option value="">Select country</option></select>
-    </div>
-    <div class="field">
-      <label>State / Province (optional)</label>
-      <select id="state" disabled onchange="onState()"><option value="">Select country first</option></select>
-    </div>
-    <div class="field">
-      <label>City / District (optional)</label>
-      <select id="city" disabled><option value="">Select state first</option></select>
-    </div>
-    <div class="field">
-      <label>Interests — pick up to 8 <span class="int-count" id="intCnt">(0/8)</span></label>
-      <div id="tagBox"></div>
-    </div>
-    <div class="row">
-      <button class="btns" onclick="goStep(2)">← Back</button>
-      <button class="btnp" id="regBtn" onclick="doReg()">Create Account 🎉</button>
-    </div>
-  </div>
+      <!-- ─── STEP 1: Account Info ─── -->
+      <div class="step active" id="s1">
+        <div class="step-label">Account Info</div>
 
-  <p class="ft">Already have an account? <a href="login.html">Sign in</a></p>
-</div>
+        <div class="field">
+          <label class="field-label" for="email">Email Address</label>
+          <div class="iw">
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" oninput="chkEmail()"/>
+          </div>
+          <div class="hint" id="emailHint"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="uname">Username</label>
+          <div class="urow">
+            <div>
+              <div class="iw">
+                <input type="text" id="uname" placeholder="coolstranger99" maxlength="20" autocomplete="username" oninput="chkUname()"/>
+              </div>
+              <div class="hint" id="unameHint"></div>
+            </div>
+            <button class="dice-btn" title="Generate random username" onclick="randUname()">🎲</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="pass">Password</label>
+          <div class="iw">
+            <input type="password" id="pass" placeholder="Min 6 characters" autocomplete="new-password" oninput="chkPass()"/>
+            <button class="eye-btn" id="eye1" onclick="togEye('pass','eye1')">👁</button>
+          </div>
+          <div class="hint" id="passHint"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="pass2">Confirm Password</label>
+          <div class="iw">
+            <input type="password" id="pass2" placeholder="Re-enter password" autocomplete="new-password" oninput="chkPass2()"/>
+            <button class="eye-btn" id="eye2" onclick="togEye('pass2','eye2')">👁</button>
+          </div>
+          <div class="hint" id="pass2Hint"></div>
+        </div>
+
+        <button class="btn-primary" id="nextBtn1" onclick="next1()">Continue →</button>
+      </div>
+
+      <!-- ─── STEP 2: Profile ─── -->
+      <div class="step" id="s2">
+        <div class="step-label">Your Profile</div>
+
+        <div class="field">
+          <label class="field-label">Gender</label>
+          <div class="gender-grid">
+            <button class="gender-btn" id="gb-male" onclick="setGender('male',this)">
+              <span class="g-icon">♂</span> Male
+            </button>
+            <button class="gender-btn" id="gb-female" onclick="setGender('female',this)">
+              <span class="g-icon">♀</span> Female
+            </button>
+            <button class="gender-btn" id="gb-other" onclick="setGender('other',this)">
+              <span class="g-icon">⚧</span> Other
+            </button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="age">Age</label>
+          <input type="number" id="age" placeholder="Enter your age" min="1" max="120"/>
+        </div>
+
+        <div class="field">
+          <label class="ck-row" for="termsChk">
+            <input type="checkbox" id="termsChk"/>
+            I agree to the <a href="#" onclick="return false">Terms of Service</a> &amp; <a href="#" onclick="return false">Privacy Policy</a>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+          <button class="btn-primary" id="nextBtn2" onclick="next2()">Continue →</button>
+        </div>
+      </div>
+
+      <!-- ─── STEP 3: Location & Interests ─── -->
+      <div class="step" id="s3">
+        <div class="step-label">Location &amp; Interests</div>
+
+        <div class="field">
+          <label class="field-label" for="country">Country <span style="font-weight:400;text-transform:none;color:var(--text-3)">(optional)</span></label>
+          <select id="country" onchange="onCountry()"><option value="">Select country</option></select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="state">State / Province <span style="font-weight:400;text-transform:none;color:var(--text-3)">(optional)</span></label>
+          <select id="state" disabled onchange="onState()"><option value="">Select country first</option></select>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="city">City / District <span style="font-weight:400;text-transform:none;color:var(--text-3)">(optional)</span></label>
+          <select id="city" disabled><option value="">Select state first</option></select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">
+            Interests
+            <span class="int-count-badge" id="intCnt">(0/8 selected)</span>
+          </label>
+          <div id="tagBox"></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+          <button class="btn-primary" id="regBtn" onclick="doReg()">Create Account 🎉</button>
+        </div>
+      </div>
+
+    </div><!-- /.card -->
+  </div><!-- /.card-glow -->
+
+  <p class="footer-text">Already have an account? <a href="login.html">Sign in</a></p>
+
+</div><!-- /.card-wrap -->
 
 <script>
 const API = 'http://127.0.0.1:5000';
 
-/* ── Interest categories ── */
+/* ── Interest Categories ── */
 const INTEREST_CATS = {
   'Entertainment': ['Gaming','Movies','Anime','Manga','K-Drama','Netflix','Music','Concerts','Stand-up Comedy','Podcasts'],
-  'Personality': ['Introvert','Extrovert','Ambivert','Night Owl','Early Bird','Empath','Overthinker','Dreamer'],
-  'Lifestyle': ['Travel','Food','Cooking','Coffee','Fitness','Yoga','Meditation','Minimalism','Fashion','Photography'],
-  'Knowledge': ['Tech','Books','Science','History','Philosophy','Psychology','Politics','Art','Writing','Journalism'],
-  'Social': ['Sports','Cricket','Football','Basketball','Gym','Dancing','Hiking','Cycling','Swimming','Chess'],
-  'Vibe': ['Chill','Deep Talks','Memes','Dark Humor','Motivational','Spiritual','Aesthetic','Vintage','Lo-fi'],
+  'Personality':   ['Introvert','Extrovert','Ambivert','Night Owl','Early Bird','Empath','Overthinker','Dreamer'],
+  'Lifestyle':     ['Travel','Food','Cooking','Coffee','Fitness','Yoga','Meditation','Minimalism','Fashion','Photography'],
+  'Knowledge':     ['Tech','Books','Science','History','Philosophy','Psychology','Politics','Art','Writing','Journalism'],
+  'Sports':        ['Cricket','Football','Basketball','Gym','Dancing','Hiking','Cycling','Swimming','Chess'],
+  'Vibe':          ['Chill','Deep Talks','Memes','Dark Humor','Motivational','Spiritual','Aesthetic','Vintage','Lo-fi'],
 };
 
+/* ── Location Data ── */
 const LOC = {'India':{'Andhra Pradesh':['Visakhapatnam','Vijayawada','Guntur','Tirupati','Kurnool','Nellore'],'Arunachal Pradesh':['Itanagar','Naharlagun'],'Assam':['Guwahati','Silchar','Dibrugarh','Jorhat'],'Bihar':['Patna','Gaya','Bhagalpur','Muzaffarpur'],'Chhattisgarh':['Raipur','Bhilai','Bilaspur'],'Goa':['Panaji','Margao','Vasco da Gama'],'Gujarat':['Ahmedabad','Surat','Vadodara','Rajkot','Bhavnagar'],'Haryana':['Faridabad','Gurugram','Panipat','Ambala','Hisar'],'Himachal Pradesh':['Shimla','Manali','Dharamshala','Kullu'],'Jharkhand':['Ranchi','Jamshedpur','Dhanbad'],'Karnataka':['Bengaluru','Mysuru','Hubli','Mangaluru','Belagavi'],'Kerala':['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kollam','Palakkad','Kannur','Alappuzha','Malappuram','Kottayam','Idukki','Wayanad','Pathanamthitta','Kasaragod'],'Madhya Pradesh':['Bhopal','Indore','Jabalpur','Gwalior','Ujjain'],'Maharashtra':['Mumbai','Pune','Nagpur','Nashik','Aurangabad','Solapur','Thane'],'Manipur':['Imphal','Churachandpur'],'Meghalaya':['Shillong','Tura'],'Mizoram':['Aizawl','Lunglei'],'Nagaland':['Kohima','Dimapur'],'Odisha':['Bhubaneswar','Cuttack','Rourkela','Sambalpur'],'Punjab':['Ludhiana','Amritsar','Jalandhar','Patiala','Bathinda'],'Rajasthan':['Jaipur','Jodhpur','Udaipur','Kota','Bikaner','Ajmer'],'Sikkim':['Gangtok','Namchi'],'Tamil Nadu':['Chennai','Coimbatore','Madurai','Tiruchirappalli','Salem','Tirunelveli','Vellore','Erode'],'Telangana':['Hyderabad','Warangal','Nizamabad','Khammam','Karimnagar'],'Tripura':['Agartala','Udaipur'],'Uttar Pradesh':['Lucknow','Kanpur','Agra','Varanasi','Meerut','Allahabad','Ghaziabad','Noida'],'Uttarakhand':['Dehradun','Haridwar','Roorkee','Haldwani'],'West Bengal':['Kolkata','Howrah','Durgapur','Asansol','Siliguri','Bardhaman'],'Delhi':['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi','Central Delhi'],'Jammu & Kashmir':['Srinagar','Jammu','Anantnag','Baramulla'],'Ladakh':['Leh','Kargil']},'United States':{'California':['Los Angeles','San Francisco','San Diego','San Jose','Sacramento','Oakland','Fresno'],'Texas':['Houston','Dallas','Austin','San Antonio','Fort Worth','El Paso'],'Florida':['Miami','Orlando','Tampa','Jacksonville','St. Petersburg'],'New York':['New York City','Buffalo','Rochester','Yonkers','Syracuse'],'Illinois':['Chicago','Aurora','Rockford','Joliet','Naperville'],'Pennsylvania':['Philadelphia','Pittsburgh','Allentown','Erie'],'Ohio':['Columbus','Cleveland','Cincinnati','Toledo'],'Georgia':['Atlanta','Augusta','Columbus','Savannah'],'North Carolina':['Charlotte','Raleigh','Greensboro','Durham'],'Michigan':['Detroit','Grand Rapids','Warren','Ann Arbor'],'Washington':['Seattle','Spokane','Tacoma','Vancouver'],'Arizona':['Phoenix','Tucson','Mesa','Chandler','Scottsdale'],'Massachusetts':['Boston','Worcester','Springfield','Cambridge'],'Colorado':['Denver','Colorado Springs','Aurora','Fort Collins'],'Tennessee':['Nashville','Memphis','Knoxville','Chattanooga']},'United Kingdom':{'England':['London','Manchester','Birmingham','Leeds','Sheffield','Liverpool','Bristol','Newcastle','Nottingham','Leicester'],'Scotland':['Edinburgh','Glasgow','Aberdeen','Dundee','Inverness'],'Wales':['Cardiff','Swansea','Newport','Wrexham'],'Northern Ireland':['Belfast','Londonderry','Lisburn']},'Canada':{'Ontario':['Toronto','Ottawa','Mississauga','Brampton','Hamilton','London'],'Quebec':['Montreal','Quebec City','Laval','Gatineau'],'British Columbia':['Vancouver','Surrey','Burnaby','Richmond','Victoria'],'Alberta':['Calgary','Edmonton','Red Deer','Lethbridge'],'Manitoba':['Winnipeg','Brandon'],'Saskatchewan':['Saskatoon','Regina'],'Nova Scotia':['Halifax','Dartmouth']},'Australia':{'New South Wales':['Sydney','Newcastle','Wollongong','Central Coast'],'Victoria':['Melbourne','Geelong','Ballarat','Bendigo'],'Queensland':['Brisbane','Gold Coast','Sunshine Coast','Townsville','Cairns'],'Western Australia':['Perth','Fremantle','Bunbury'],'South Australia':['Adelaide','Mount Gambier'],'Tasmania':['Hobart','Launceston']},'Germany':{'Bavaria':['Munich','Nuremberg','Augsburg','Regensburg'],'Berlin':['Berlin'],'Hamburg':['Hamburg'],'Hesse':['Frankfurt','Wiesbaden','Kassel','Darmstadt'],'Baden-Württemberg':['Stuttgart','Mannheim','Karlsruhe','Freiburg'],'North Rhine-Westphalia':['Cologne','Düsseldorf','Dortmund','Essen','Bonn']},'France':{'Île-de-France':['Paris','Boulogne-Billancourt','Versailles'],'PACA':['Marseille','Nice','Toulon','Cannes'],'Auvergne-Rhône-Alpes':['Lyon','Grenoble','Saint-Étienne'],'Occitanie':['Toulouse','Montpellier','Nîmes']},'Brazil':{'São Paulo':['São Paulo','Campinas','Santos','Ribeirão Preto'],'Rio de Janeiro':['Rio de Janeiro','Niterói','Duque de Caxias'],'Minas Gerais':['Belo Horizonte','Uberlândia','Juiz de Fora'],'Bahia':['Salvador','Feira de Santana'],'Paraná':['Curitiba','Londrina','Maringá']},'Japan':{'Tokyo':['Shinjuku','Shibuya','Minato','Chiyoda','Setagaya','Nerima'],'Osaka':['Osaka','Sakai','Higashiosaka'],'Kanagawa':['Yokohama','Kawasaki','Sagamihara'],'Aichi':['Nagoya','Toyota','Okazaki'],'Hokkaido':['Sapporo','Asahikawa','Hakodate'],'Kyoto':['Kyoto','Uji'],'Fukuoka':['Fukuoka','Kitakyushu','Kurume']},'Other':{'Other':['Other City']}};
 
-let gender='', selInt=[];
+let gender = '', selInt = [];
 
-/* ── Build interest tags with categories ── */
+/* ── Build Interest Tags ── */
 function buildTagBox() {
   const box = document.getElementById('tagBox');
   box.innerHTML = '';
   Object.entries(INTEREST_CATS).forEach(([cat, tags]) => {
-    const sec = document.createElement('div'); sec.className = 'int-section';
-    sec.innerHTML = `<div class="int-cat">${cat}</div>`;
-    const row = document.createElement('div'); row.className = 'tags';
+    const sec = document.createElement('div');
+    sec.className = 'int-section';
+    sec.innerHTML = `<div class="int-cat-label">${cat}</div>`;
+    const row = document.createElement('div');
+    row.className = 'tags';
     tags.forEach(tag => {
       const b = document.createElement('button');
-      b.className = 'tag'; b.textContent = tag;
+      b.className = 'tag';
+      b.textContent = tag;
       b.onclick = () => togTag(b, tag);
       row.appendChild(b);
     });
@@ -200,135 +716,275 @@ function buildTagBox() {
 
 function togTag(el, tag) {
   if (selInt.includes(tag)) {
-    selInt = selInt.filter(i => i !== tag); el.classList.remove('on');
+    selInt = selInt.filter(i => i !== tag);
+    el.classList.remove('selected');
   } else if (selInt.length < 8) {
-    selInt.push(tag); el.classList.add('on');
+    selInt.push(tag);
+    el.classList.add('selected');
   }
-  document.getElementById('intCnt').textContent = `(${selInt.length}/8)`;
+  document.getElementById('intCnt').textContent = `(${selInt.length}/8 selected)`;
 }
 
 /* ── Location ── */
 const cSel = document.getElementById('country');
-Object.keys(LOC).forEach(c => { const o=document.createElement('option');o.value=c;o.textContent=c;cSel.appendChild(o); });
+Object.keys(LOC).forEach(c => {
+  const o = document.createElement('option');
+  o.value = c; o.textContent = c;
+  cSel.appendChild(o);
+});
 
 function onCountry() {
-  const c=document.getElementById('country').value;
-  const ss=document.getElementById('state'), cs=document.getElementById('city');
-  ss.innerHTML='<option value="">Select state</option>';
-  cs.innerHTML='<option value="">Select state first</option>'; cs.disabled=true;
-  if(!c){ss.disabled=true;return;} ss.disabled=false;
-  Object.keys(LOC[c]||{}).forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;ss.appendChild(o);});
+  const c = document.getElementById('country').value;
+  const ss = document.getElementById('state'), cs = document.getElementById('city');
+  ss.innerHTML = '<option value="">Select state</option>';
+  cs.innerHTML = '<option value="">Select state first</option>'; cs.disabled = true;
+  if (!c) { ss.disabled = true; return; }
+  ss.disabled = false;
+  Object.keys(LOC[c] || {}).forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s; ss.appendChild(o);
+  });
 }
+
 function onState() {
-  const c=document.getElementById('country').value, s=document.getElementById('state').value;
-  const cs=document.getElementById('city');
-  cs.innerHTML='<option value="">Select city</option>';
-  if(!s){cs.disabled=true;return;} cs.disabled=false;
-  (LOC[c]||{})[s]?.forEach(city=>{const o=document.createElement('option');o.value=city;o.textContent=city;cs.appendChild(o);});
+  const c = document.getElementById('country').value;
+  const s = document.getElementById('state').value;
+  const cs = document.getElementById('city');
+  cs.innerHTML = '<option value="">Select city</option>';
+  if (!s) { cs.disabled = true; return; }
+  cs.disabled = false;
+  (LOC[c] || {})[s]?.forEach(city => {
+    const o = document.createElement('option');
+    o.value = city; o.textContent = city; cs.appendChild(o);
+  });
 }
 
 /* ── Validation ── */
-let eT,uT;
+let eT, uT;
+
 function chkEmail() {
-  const v=document.getElementById('email').value.trim(), h=document.getElementById('emailHint');
-  if(!v){h.textContent='';h.className='hint';return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)){h.textContent='Invalid email';h.className='hint err';return;}
-  clearTimeout(eT);h.textContent='Checking...';h.className='hint inf';
-  eT=setTimeout(async()=>{
-    try{const r=await fetch(`${API}/api/auth/check-email?email=${encodeURIComponent(v)}`),d=await r.json();
-    h.textContent=d.taken?'❌ Email taken':'✓ Available';h.className='hint '+(d.taken?'err':'ok');}
-    catch{h.textContent='';h.className='hint';}
-  },600);
+  const v = document.getElementById('email').value.trim();
+  const h = document.getElementById('emailHint');
+  if (!v) { h.textContent = ''; h.className = 'hint'; return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+    h.textContent = 'Invalid email format'; h.className = 'hint err'; return;
+  }
+  clearTimeout(eT); h.textContent = 'Checking availability…'; h.className = 'hint inf';
+  eT = setTimeout(async () => {
+    try {
+      const r = await fetch(`${API}/api/auth/check-email?email=${encodeURIComponent(v)}`);
+      const d = await r.json();
+      h.textContent = d.taken ? '✗ Email already taken' : '✓ Available';
+      h.className = 'hint ' + (d.taken ? 'err' : 'ok');
+    } catch { h.textContent = ''; h.className = 'hint'; }
+  }, 600);
 }
+
 function chkUname() {
-  const v=document.getElementById('uname').value.trim(), h=document.getElementById('unameHint');
-  if(!v){h.textContent='';h.className='hint';return;}
-  if(v.length<3){h.textContent='Min 3 characters';h.className='hint err';return;}
-  if(!/^[a-zA-Z0-9_]+$/.test(v)){h.textContent='Letters, numbers, _ only';h.className='hint err';return;}
-  clearTimeout(uT);h.textContent='Checking...';h.className='hint inf';
-  uT=setTimeout(async()=>{
-    try{const r=await fetch(`${API}/api/auth/check-username?username=${encodeURIComponent(v)}`),d=await r.json();
-    h.textContent=d.taken?'❌ Username taken':'✓ Available';h.className='hint '+(d.taken?'err':'ok');}
-    catch{h.textContent='';h.className='hint';}
-  },600);
+  const v = document.getElementById('uname').value.trim();
+  const h = document.getElementById('unameHint');
+  if (!v) { h.textContent = ''; h.className = 'hint'; return; }
+  if (v.length < 3) { h.textContent = 'Minimum 3 characters'; h.className = 'hint err'; return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(v)) { h.textContent = 'Letters, numbers, _ only'; h.className = 'hint err'; return; }
+  clearTimeout(uT); h.textContent = 'Checking availability…'; h.className = 'hint inf';
+  uT = setTimeout(async () => {
+    try {
+      const r = await fetch(`${API}/api/auth/check-username?username=${encodeURIComponent(v)}`);
+      const d = await r.json();
+      h.textContent = d.taken ? '✗ Username taken' : '✓ Available';
+      h.className = 'hint ' + (d.taken ? 'err' : 'ok');
+    } catch { h.textContent = ''; h.className = 'hint'; }
+  }, 600);
 }
+
 function chkPass() {
-  const v=document.getElementById('pass').value, h=document.getElementById('passHint');
-  if(!v){h.textContent='';return;}
-  if(v.length<6){h.textContent='Min 6 characters';h.className='hint err';}
-  else{h.textContent='✓ Good password';h.className='hint ok';}
-  if(document.getElementById('pass2').value) chkPass2();
+  const v = document.getElementById('pass').value;
+  const h = document.getElementById('passHint');
+  if (!v) { h.textContent = ''; h.className = 'hint'; return; }
+  if (v.length < 6) { h.textContent = 'Minimum 6 characters'; h.className = 'hint err'; }
+  else { h.textContent = '✓ Strong password'; h.className = 'hint ok'; }
+  if (document.getElementById('pass2').value) chkPass2();
 }
+
 function chkPass2() {
-  const v=document.getElementById('pass2').value, p=document.getElementById('pass').value, h=document.getElementById('pass2Hint');
-  if(!v){h.textContent='';return;}
-  h.textContent=v!==p?'❌ Passwords do not match':'✓ Passwords match';
-  h.className='hint '+(v!==p?'err':'ok');
+  const v = document.getElementById('pass2').value;
+  const p = document.getElementById('pass').value;
+  const h = document.getElementById('pass2Hint');
+  if (!v) { h.textContent = ''; h.className = 'hint'; return; }
+  if (v !== p) { h.textContent = '✗ Passwords do not match'; h.className = 'hint err'; }
+  else { h.textContent = '✓ Passwords match'; h.className = 'hint ok'; }
 }
-function togEye(id,bid){const i=document.getElementById(id),b=document.getElementById(bid);i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈';}
 
-const ADJ=['Cool','Swift','Bold','Dark','Epic','Neon','Wild','Zen','Iron','Luna','Nova','Turbo','Cyber','Storm','Blaze','Ghost','Pixel','Hyper','Sonic','Viper','Shadow','Frost','Rogue','Mystic'];
-const NOU=['Tiger','Falcon','Phoenix','Comet','Hawk','Wolf','Eagle','Raven','Titan','Knight','Ninja','Ranger','Wizard','Sniper','Rider','Spark','Hunter','Dragon','Samurai','Phantom'];
-function randUname(){document.getElementById('uname').value=ADJ[Math.floor(Math.random()*ADJ.length)]+NOU[Math.floor(Math.random()*NOU.length)]+Math.floor(Math.random()*999);chkUname();}
-
-function setG(g,el){gender=g;document.querySelectorAll('.gb').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
-
-function goStep(n){
-  document.querySelectorAll('.step').forEach(s=>s.classList.remove('on'));
-  document.getElementById('s'+n).classList.add('on');
-  [1,2,3].forEach(i=>document.getElementById('d'+i).classList.toggle('on',i<=n));
-  document.getElementById('err').style.display='none';
+function togEye(id, bid) {
+  const i = document.getElementById(id), b = document.getElementById(bid);
+  i.type = i.type === 'password' ? 'text' : 'password';
+  b.textContent = i.type === 'password' ? '👁' : '🙈';
 }
-function showErr(m){const e=document.getElementById('err');e.textContent=m;e.style.display='block';}
 
-function next1(){
-  const email=document.getElementById('email').value.trim();
-  const uname=document.getElementById('uname').value.trim();
-  const pass=document.getElementById('pass').value;
-  const pass2=document.getElementById('pass2').value;
-  if(!email||!uname||!pass||!pass2)return showErr('All fields are required');
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return showErr('Enter a valid email');
-  if(uname.length<3)return showErr('Username must be at least 3 characters');
-  if(pass.length<6)return showErr('Password must be at least 6 characters');
-  if(pass!==pass2)return showErr('Passwords do not match');
+/* ── Random Username ── */
+const ADJ = ['Cool','Swift','Bold','Dark','Epic','Neon','Wild','Zen','Iron','Luna','Nova','Turbo','Cyber','Storm','Blaze','Ghost','Pixel','Hyper','Sonic','Viper','Shadow','Frost','Rogue','Mystic'];
+const NOU = ['Tiger','Falcon','Phoenix','Comet','Hawk','Wolf','Eagle','Raven','Titan','Knight','Ninja','Ranger','Wizard','Sniper','Rider','Spark','Hunter','Dragon','Samurai','Phantom'];
+
+function randUname() {
+  document.getElementById('uname').value =
+    ADJ[Math.floor(Math.random() * ADJ.length)] +
+    NOU[Math.floor(Math.random() * NOU.length)] +
+    Math.floor(Math.random() * 999);
+  chkUname();
+}
+
+/* ── Gender ── */
+function setGender(g, el) {
+  gender = g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ── Step Navigation ── */
+function goStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('s' + n).classList.add('active');
+
+  [1, 2, 3].forEach(i => {
+    const dot = document.getElementById('pd' + i);
+    const lbl = document.getElementById('pl' + i);
+    dot.classList.remove('active', 'done');
+    lbl.classList.remove('active');
+    if (i < n) { dot.classList.add('done'); }
+    else if (i === n) { dot.classList.add('active'); lbl.classList.add('active'); }
+  });
+
+  hideErr();
+}
+
+function showErr(msg) {
+  const box = document.getElementById('errBox');
+  document.getElementById('errText').textContent = msg;
+  box.hidden = false;
+}
+
+function hideErr() {
+  document.getElementById('errBox').hidden = true;
+}
+
+/* ── Step 1 Validation ── */
+function next1() {
+  const email = document.getElementById('email').value.trim();
+  const uname = document.getElementById('uname').value.trim();
+  const pass  = document.getElementById('pass').value;
+  const pass2 = document.getElementById('pass2').value;
+  if (!email || !uname || !pass || !pass2) return showErr('All fields are required.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr('Enter a valid email address.');
+  if (uname.length < 3) return showErr('Username must be at least 3 characters.');
+  if (!/^[a-zA-Z0-9_]+$/.test(uname)) return showErr('Username can only contain letters, numbers, and underscores.');
+  if (pass.length < 6) return showErr('Password must be at least 6 characters.');
+  if (pass !== pass2) return showErr('Passwords do not match.');
   goStep(2);
 }
-function next2(){
-  const age=parseInt(document.getElementById('age').value);
-  if(!gender)return showErr('Please select your gender');
-  if(!age||age<18)return showErr('You must be 18 or older');
-  if(!document.getElementById('ageChk').checked)return showErr('Please confirm you are 18+');
+
+/* ── Step 2 Validation ── */
+function next2() {
+  const age = parseInt(document.getElementById('age').value);
+  if (!gender) return showErr('Please select your gender.');
+  if (!age || age < 1) return showErr('Please enter a valid age.');
+  if (!document.getElementById('termsChk').checked)
+    return showErr('Please agree to the Terms of Service & Privacy Policy.');
   goStep(3);
 }
 
-async function doReg(){
-  const btn=document.getElementById('regBtn');
-  btn.disabled=true;btn.textContent='Creating account...';
-  document.getElementById('err').style.display='none';
-  const body={
-    email:document.getElementById('email').value.trim(),
-    password:document.getElementById('pass').value,
-    username:document.getElementById('uname').value.trim(),
-    gender, age:parseInt(document.getElementById('age').value),
-    country:document.getElementById('country').value,
-    state:document.getElementById('state').value,
-    city:document.getElementById('city').value,
-    interests:selInt, ageConfirmed:true
+/* ── Registration ── */
+async function doReg() {
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating account…';
+  hideErr();
+
+  const body = {
+    email:    document.getElementById('email').value.trim(),
+    password: document.getElementById('pass').value,
+    username: document.getElementById('uname').value.trim(),
+    gender,
+    age:      parseInt(document.getElementById('age').value),
+    country:  document.getElementById('country').value,
+    state:    document.getElementById('state').value,
+    city:     document.getElementById('city').value,
+    interests: selInt,
+    ageConfirmed: true,
   };
-  try{
-    const r=await fetch(`${API}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-    const d=await r.json();
-    if(!r.ok){showErr(d.message||'Registration failed');return;}
+
+  try {
+    const r = await fetch(`${API}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const d = await r.json();
+    if (!r.ok) { showErr(d.message || 'Registration failed. Please try again.'); return; }
     localStorage.removeItem('sc_guest');
-    localStorage.setItem('sc_token',d.token);
-    localStorage.setItem('sc_user',JSON.stringify(d.user));
-    location.href='dashboard.html';
-  }catch(e){console.error(e);showErr('Cannot connect to server. Is the backend running?');}
-  finally{btn.disabled=false;btn.textContent='Create Account 🎉';}
+    localStorage.setItem('sc_token', d.token);
+    localStorage.setItem('sc_user', JSON.stringify(d.user));
+    location.href = 'dashboard.html';
+  } catch (e) {
+    console.error(e);
+    showErr('Cannot connect to server. Is the backend running?');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account 🎉';
+  }
 }
 
+/* ── Init ── */
 buildTagBox();
-if(localStorage.getItem('sc_token'))location.href='dashboard.html';
+if (localStorage.getItem('sc_token')) location.href = 'dashboard.html';
+
+/* ── Canvas Particle Network ── */
+(function () {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  const COLORS = ['rgba(124,92,252,', 'rgba(34,211,238,', 'rgba(244,114,182,'];
+
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+  function mkParticle() {
+    const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+    return { x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.6 + 0.4,
+             dx: (Math.random() - 0.5) * 0.3, dy: (Math.random() - 0.5) * 0.3,
+             o: Math.random() * 0.45 + 0.12, color: c };
+  }
+
+  function init() { resize(); particles = Array.from({ length: 55 }, mkParticle); }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d  = Math.sqrt(dx * dx + dy * dy);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = particles[i].color + (0.07 * (1 - d / 120)) + ')';
+          ctx.lineWidth = 0.5; ctx.stroke();
+        }
+      }
+    }
+    particles.forEach(p => {
+      p.x += p.dx; p.y += p.dy;
+      if (p.x < 0 || p.x > W) p.dx *= -1;
+      if (p.y < 0 || p.y > H) p.dy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + p.o + ')'; ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize', init);
+  init(); draw();
+})();
 </script>
 </body>
 </html>

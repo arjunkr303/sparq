@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   password TEXT NOT NULL,
   username TEXT UNIQUE NOT NULL,
   gender TEXT NOT NULL CHECK (gender IN ('male','female','other')),
-  age INTEGER NOT NULL CHECK (age >= 18),
+  age INTEGER NOT NULL CHECK (age >= 1),
   country TEXT DEFAULT '',
   state TEXT DEFAULT '',
   city TEXT DEFAULT '',

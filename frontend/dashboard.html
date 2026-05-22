@@ -5,6 +5,7 @@
 <title>Dashboard — StrangerNear</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 <style>
 /* ═══════════════════════════════ DESIGN SYSTEM & TOKENS ═══════════════════════════════ */
 :root {
@@ -1487,6 +1488,7 @@ nav {
     <div class="mbtns">
       <button class="mbp" id="camBtn" onclick="startCam()">📷 Open Camera</button>
       <button class="mbp" id="verOkBtn" onclick="doVerify()" style="display:none;background:linear-gradient(135deg,var(--gn),#00b4d8)">✓ Verify Me</button>
+      <button class="mbp" id="changeGenderBtn" onclick="changeGenderAndRetry()" style="display:none;background:linear-gradient(135deg,#f472b6,#7c5cfc)">🔄 Change Gender &amp; Retry</button>
       <button class="mbs" onclick="closeVM()">Cancel</button>
     </div>
   </div>
@@ -1502,7 +1504,7 @@ nav {
     <button class="tab on" onclick="switchTab('profile',this)">👤 Profile</button>
     <button class="tab"    onclick="switchTab('friends',this)">👥 Friends <span id="frBadge" style="background:var(--rd);color:#fff;padding:1px 5px;border-radius:50px;font-size:9px;margin-left:2px;display:none">0</span></button>
     <button class="tab"    onclick="switchTab('security',this)">🔐 Security</button>
-    <button class="tab" id="tabBtnLuckyDraw" onclick="switchTab('lucky-draw',this)" style="display:none">🎰 Lucky Draw</button>
+    <button class="tab" id="tabBtnLuckyDraw" onclick="switchTab('lucky-draw',this)" style="display:none">🎰 Lucky Draw <span id="ldBadge" style="background:var(--gn);color:#fff;padding:1px 5px;border-radius:50px;font-size:9px;margin-left:2px;display:none">0</span></button>
   </div>
 
   <!-- PROFILE TAB -->
@@ -1772,7 +1774,7 @@ const INTEREST_CATS = {
 
 const LOC = {'India':{'Andhra Pradesh':['Visakhapatnam','Vijayawada','Guntur','Tirupati'],'Assam':['Guwahati','Silchar','Dibrugarh'],'Bihar':['Patna','Gaya','Bhagalpur'],'Gujarat':['Ahmedabad','Surat','Vadodara','Rajkot'],'Haryana':['Faridabad','Gurugram','Panipat'],'Karnataka':['Bengaluru','Mysuru','Hubli','Mangaluru'],'Kerala':['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kollam','Palakkad','Kannur','Alappuzha','Malappuram','Kottayam','Idukki','Wayanad','Pathanamthitta','Kasaragod'],'Madhya Pradesh':['Bhopal','Indore','Jabalpur'],'Maharashtra':['Mumbai','Pune','Nagpur','Nashik','Thane'],'Odisha':['Bhubaneswar','Cuttack','Rourkela'],'Punjab':['Ludhiana','Amritsar','Jalandhar'],'Rajasthan':['Jaipur','Jodhpur','Udaipur','Kota'],'Tamil Nadu':['Chennai','Coimbatore','Madurai','Salem','Vellore'],'Telangana':['Hyderabad','Warangal','Nizamabad'],'Uttar Pradesh':['Lucknow','Kanpur','Agra','Varanasi','Noida','Ghaziabad'],'West Bengal':['Kolkata','Howrah','Durgapur','Siliguri'],'Delhi':['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi'],'Jammu & Kashmir':['Srinagar','Jammu'],'Goa':['Panaji','Margao'],'Himachal Pradesh':['Shimla','Manali'],'Uttarakhand':['Dehradun','Haridwar'],'Jharkhand':['Ranchi','Jamshedpur'],'Chhattisgarh':['Raipur','Bhilai'],'Nagaland':['Kohima','Dimapur'],'Manipur':['Imphal'],'Meghalaya':['Shillong'],'Arunachal Pradesh':['Itanagar'],'Mizoram':['Aizawl'],'Tripura':['Agartala'],'Sikkim':['Gangtok'],'Ladakh':['Leh','Kargil']},'United States':{'California':['Los Angeles','San Francisco','San Diego','San Jose'],'Texas':['Houston','Dallas','Austin'],'Florida':['Miami','Orlando','Tampa'],'New York':['New York City','Buffalo'],'Illinois':['Chicago'],'Washington':['Seattle'],'Arizona':['Phoenix','Tucson']},'United Kingdom':{'England':['London','Manchester','Birmingham'],'Scotland':['Edinburgh','Glasgow'],'Wales':['Cardiff'],'Northern Ireland':['Belfast']},'Canada':{'Ontario':['Toronto','Ottawa'],'Quebec':['Montreal'],'British Columbia':['Vancouver']},'Australia':{'New South Wales':['Sydney'],'Victoria':['Melbourne'],'Queensland':['Brisbane']},'Germany':{'Bavaria':['Munich'],'Berlin':['Berlin'],'Hamburg':['Hamburg']},'Other':{'Other':['Other City']}};
 
-let user=null, token=null, editing=false, selInt=[], camStream=null, modelsLoaded=false;
+let user=null, token=null, editing=false, selInt=[], camStream=null, modelsLoaded=false, acceptedFriends=[], pendingFriends=[], socket=null;
 token = localStorage.getItem('sc_token');
 if (!token) { location.href = 'login.html'; }
 else { localStorage.removeItem('sc_guest'); }
@@ -2093,6 +2095,7 @@ function closeVM() {
   $('wcam').style.display = 'none';
   $('camBtn').style.display = 'block';
   $('verOkBtn').style.display = 'none';
+  $('changeGenderBtn').style.display = 'none';
   $('vstat').textContent = '';
 }
 function stopCam() { if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; } }
@@ -2143,14 +2146,19 @@ async function doVerify() {
     // Gender matching check
     const detectedGender = detection.gender; // 'male' or 'female'
     const profileGender = (user.gender || '').toLowerCase();
-    
+
     if (profileGender === 'male' || profileGender === 'female') {
-       if (detectedGender !== profileGender) {
-          vstat.textContent = `❌ Gender mismatch. Profile says ${profileGender}, but AI detected ${detectedGender}.`;
-          vstat.style.color = 'var(--rd)';
-          btn.disabled = false; btn.textContent = '✓ Verify Me';
-          return;
-       }
+      if (detectedGender !== profileGender) {
+        vstat.innerHTML = `❌ Gender mismatch — your profile says <strong>${profileGender}</strong> but your face looks <strong>${detectedGender}</strong>.<br><span style="font-size:11px;color:var(--t3)">Click below to update your gender to <strong>${detectedGender}</strong> and verify.</span>`;
+        vstat.style.color = 'var(--rd)';
+        // Store detected gender on button for the handler to read
+        const cgBtn = $('changeGenderBtn');
+        cgBtn.dataset.detected = detectedGender;
+        cgBtn.style.display = 'inline-block';
+        btn.style.display = 'none'; // hide Verify Me while mismatch shown
+        btn.disabled = false; btn.textContent = '✓ Verify Me';
+        return;
+      }
     }
 
     // Success - call API
@@ -2177,6 +2185,56 @@ async function doVerify() {
 }
 
 
+/* ── Change Gender during verification ── */
+async function changeGenderAndRetry() {
+  const cgBtn = $('changeGenderBtn');
+  const detectedGender = cgBtn.dataset.detected;
+  if (!detectedGender) return;
+
+  cgBtn.disabled = true;
+  cgBtn.textContent = 'Updating...';
+  const vstat = $('vstat');
+
+  try {
+    const r = await fetch(`${API}/api/user/update-gender`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+      body: JSON.stringify({ gender: detectedGender })
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      vstat.textContent = `❌ Could not update gender: ${d.message}`;
+      vstat.style.color = 'var(--rd)';
+      cgBtn.disabled = false;
+      cgBtn.textContent = '🔄 Change Gender & Retry';
+      return;
+    }
+    // Update local user object
+    user = { ...user, ...d.user };
+    localStorage.setItem('sc_user', JSON.stringify(user));
+    loadUI();
+
+    vstat.textContent = `✅ Gender updated to ${detectedGender}. Running verification...`;
+    vstat.style.color = 'var(--gn)';
+
+    // Hide change-gender btn, show Verify Me, then auto-click
+    cgBtn.style.display = 'none';
+    cgBtn.disabled = false;
+    cgBtn.textContent = '🔄 Change Gender & Retry';
+    const verBtn = $('verOkBtn');
+    verBtn.style.display = 'inline-block';
+    showToast(`Gender changed to ${detectedGender}`, 'ok');
+
+    // Small delay then re-run verify automatically
+    setTimeout(() => doVerify(), 800);
+  } catch (e) {
+    console.error('Gender update error:', e);
+    vstat.textContent = 'Server error while updating gender.';
+    vstat.style.color = 'var(--rd)';
+    cgBtn.disabled = false;
+    cgBtn.textContent = '🔄 Change Gender & Retry';
+  }
+}
 
 /* ── Friends ── */
 async function loadFriends() {
@@ -2184,15 +2242,20 @@ async function loadFriends() {
     const r = await fetch(`${API}/api/user/friends`, { headers: { 'Authorization':`Bearer ${token}` } });
     const d = await r.json();
     const rows = d.friends || [];
-    const pending  = rows.filter(f => f.status === 'pending' && f.friend_id === user.id);
-    const accepted = rows.filter(f => f.status === 'accepted');
+    pendingFriends  = rows.filter(f => f.status === 'pending' && f.friend_id === user.id);
+    acceptedFriends = rows.filter(f => f.status === 'accepted');
+    renderFriends();
+  } catch (e) { console.error('Friends error:', e); }
+}
 
+function renderFriends() {
+  try {
+    // Render Pending
     const pEl = $('pendingList');
-    if (pending.length === 0) { pEl.innerHTML = '<p class="empty-msg">No pending requests</p>'; }
+    if (pendingFriends.length === 0) { pEl.innerHTML = '<p class="empty-msg">No pending requests</p>'; }
     else {
       pEl.innerHTML = '';
-      $('frBadge').textContent = pending.length; $('frBadge').style.display = 'inline';
-      pending.forEach(f => {
+      pendingFriends.forEach(f => {
         const them = f.sender;
         const div = document.createElement('div'); div.className = 'friend-card';
         const av = them?.profile_photo
@@ -2203,21 +2266,119 @@ async function loadFriends() {
       });
     }
 
+    // Calculate total unread
+    let totalUnread = 0;
+    acceptedFriends.forEach(f => {
+      const unread = parseInt(localStorage.getItem(`sc_friend_unread_${f.id}`) || '0', 10);
+      totalUnread += unread;
+    });
+
+    // Update global Tab Badge (Pending requests + Unread messages)
+    const badgeCount = pendingFriends.length + totalUnread;
+    if (badgeCount > 0) {
+      $('frBadge').textContent = badgeCount;
+      $('frBadge').style.display = 'inline';
+    } else {
+      $('frBadge').style.display = 'none';
+    }
+
+    // Render Accepted
     const fEl = $('friendsList');
-    if (accepted.length === 0) { fEl.innerHTML = '<p class="empty-msg">No friends yet</p>'; }
+    if (acceptedFriends.length === 0) { fEl.innerHTML = '<p class="empty-msg">No friends yet</p>'; }
     else {
       fEl.innerHTML = '';
-      accepted.forEach(f => {
+      acceptedFriends.forEach(f => {
         const them = f.user_id === user.id ? f.receiver : f.sender;
-        const div = document.createElement('div'); div.className = 'friend-card';
+        const div = document.createElement('div');
+        div.className = 'friend-card';
+        div.style.cursor = 'pointer';
+        
         const av = them?.profile_photo
           ? `<div class="fav"><img src="${them.profile_photo}" alt=""/></div>`
           : `<div class="fav">${(them?.username||'?').charAt(0).toUpperCase()}</div>`;
-        div.innerHTML = `${av}<div><div class="fname">${them?.username||'?'}</div><div style="font-size:10px;color:var(--t3)">Friend ✓</div></div>`;
+        
+        const unread = parseInt(localStorage.getItem(`sc_friend_unread_${f.id}`) || '0', 10);
+        const unreadBadge = unread > 0 
+          ? `<span style="background:var(--gn);color:#fff;padding:2px 6px;border-radius:50px;font-size:10px;font-weight:bold;margin-left:auto;height:fit-content;min-width:20px;text-align:center;">${unread}</span>` 
+          : '';
+
+        div.innerHTML = `${av}<div><div class="fname">${them?.username||'?'}</div><div style="font-size:10px;color:var(--t3)">Friend ✓ • Click to chat</div></div>${unreadBadge}`;
+        
+        div.onclick = () => {
+          sessionStorage.setItem(`sc_friendPhoto_${f.id}`, them.profile_photo || '');
+          location.href = `chat.html?friendId=${encodeURIComponent(them.id)}&friendshipId=${encodeURIComponent(f.id)}&friendUsername=${encodeURIComponent(them.username)}`;
+        };
         fEl.appendChild(div);
       });
     }
-  } catch (e) { console.error('Friends error:', e); }
+  } catch (e) { console.error('Render Friends error:', e); }
+}
+
+function saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType = null, duration = null, replyTo = null) {
+  const key = `sc_friend_msgs_${friendshipId}`;
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem(key) || "[]");
+  } catch (e) {
+    console.error("Error reading chat history:", e);
+  }
+  const exists = history.some(msg => msg.timestamp === timestamp && msg.isMe === isMe);
+  if (exists) return;
+
+  history.push({
+    content,
+    isMe,
+    timestamp,
+    type,
+    mimeType,
+    duration,
+    replyTo
+  });
+
+  try {
+    localStorage.setItem(key, JSON.stringify(history));
+  } catch (e) {
+    console.error("Error saving chat history:", e);
+  }
+}
+
+function initDashboardSocket() {
+  if (socket) return;
+  const token = localStorage.getItem('sc_token');
+  if (!token) return;
+
+  socket = io(API, { auth: { token }, transports: ["websocket"] });
+
+  socket.on("connect", () => {
+    console.log("Dashboard socket connected");
+  });
+
+  socket.on("receive_message", ({ from, fromUserId, roomId, message, timestamp, replyTo }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: message, type: "text", timestamp, replyTo });
+  });
+
+  socket.on("receive_image", ({ from, fromUserId, roomId, dataUrl, timestamp, replyTo }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: dataUrl, type: "image", timestamp, replyTo });
+  });
+
+  socket.on("receive_voice", ({ from, fromUserId, roomId, dataUrl, mimeType, timestamp, duration, replyTo }) => {
+    handleIncomingSocketMessage({ from, fromUserId, roomId, content: dataUrl, type: "voice", timestamp, mimeType, duration, replyTo });
+  });
+}
+
+function handleIncomingSocketMessage({ from, fromUserId, roomId, content, type, timestamp, mimeType = null, duration = null, replyTo = null }) {
+  if (!roomId || !roomId.startsWith("f_")) return;
+  const friendshipId = roomId.substring(2);
+
+  const isMe = fromUserId === user.id;
+  saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType, duration, replyTo);
+
+  if (!isMe) {
+    const unreadKey = `sc_friend_unread_${friendshipId}`;
+    const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+    localStorage.setItem(unreadKey, current + 1);
+    renderFriends();
+  }
 }
 
 async function respondFriend(id, action) {
@@ -2568,6 +2729,16 @@ async function loadLuckyDrawStatus() {
 function updateLuckyDrawUI(data) {
   spinsRemaining = data.freeSpinsLeft;
   
+  const tabBadge = $('ldBadge');
+  if (tabBadge) {
+    if (spinsRemaining > 0) {
+      tabBadge.textContent = spinsRemaining;
+      tabBadge.style.display = 'inline';
+    } else {
+      tabBadge.style.display = 'none';
+    }
+  }
+  
   const badge = $('spins-badge-text');
   const cost = $('coins-cost-text');
   const luckyBalance = $('lucky-coins-balance');
@@ -2881,6 +3052,9 @@ function stopCelebration() {
 loadUI();
 initReels();
 refreshUser();
+initDashboardSocket();
+loadFriends();
+loadLuckyDrawStatus();
 </script>
 
 <!-- Reward/Victory Modal -->

@@ -26,6 +26,10 @@ app.use('/api/user',    userRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/lucky-draw', luckyDrawRoutes);
 app.get('/api/health',  (_req, res) => res.json({ status: 'ok', time: new Date() }));
+app.get('/api/stats',   (_req, res) => res.json({
+  onlineNow: io.sockets.sockets.size,
+  time: new Date()
+}));
 
 setupSocket(io);
 

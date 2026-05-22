@@ -1,131 +1,1095 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>StrangerNear — Meet people near you</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>StrangerNear — Meet Real People Near You</title>
+<meta name="description" content="Chat with real people from your city, state, or anywhere in the world. Safe, verified, and always interesting. Start free on StrangerNear."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{--bg:#08080f;--bg2:#0f0f1a;--surface:#1a1a2e;--border:rgba(120,100,255,.15);--border2:rgba(120,100,255,.28);--primary:#7c5cfc;--primary2:#9b7ffe;--pglow:rgba(124,92,252,.35);--accent:#00e5ff;--gold:#ffd166;--text:#f0eeff;--text2:#a89fd8;--text3:#6b638f}
-*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
-h1,h2,h3{font-family:'Syne',sans-serif;font-weight:800;line-height:1.15}
-a{color:inherit;text-decoration:none}button{font-family:'DM Sans',sans-serif;cursor:pointer;border:none;outline:none;transition:all .25s}
-canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
-.bp{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;padding:12px 28px;border-radius:50px;font-weight:600;font-size:14px;box-shadow:0 4px 20px var(--pglow)}
-.bp:hover{transform:translateY(-2px)}
-.bs{background:transparent;color:var(--text2);padding:12px 28px;border-radius:50px;font-weight:500;font-size:14px;border:1px solid var(--border2)}
-.bs:hover{border-color:var(--primary);color:var(--primary2)}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(8,8,15,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
-.ni{max-width:1100px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
-.logo span:first-child{color:var(--primary)}
-.nl{display:flex;align-items:center;gap:20px}
-.nl a{color:var(--text2);font-size:14px;font-weight:500}
-section{position:relative;z-index:1}
-.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 24px 60px}
-.hi{max-width:680px;margin:0 auto;text-align:center;animation:fi .6s ease}
-.pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--accent);border-radius:50px;padding:6px 16px;font-size:13px;margin-bottom:32px}
-.hero h1{font-size:clamp(46px,8vw,78px);margin-bottom:18px}
-.gr{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{color:var(--text2);font-size:16px;line-height:1.7;margin-bottom:36px}
-.hb{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:50px}
-.stats{display:flex;gap:44px;justify-content:center;flex-wrap:wrap}
-.sn{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--primary2)}
-.sl{color:var(--text3);font-size:12px;margin-top:3px}
-.sec{padding:80px 24px}.si{max-width:1080px;margin:0 auto}
-.ey{text-align:center;color:var(--primary);font-size:11px;font-weight:700;letter-spacing:3px;margin-bottom:14px}
-.st{text-align:center;font-size:clamp(26px,4vw,38px);margin-bottom:48px}
-.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px}
-.cn{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:var(--primary);opacity:.22;margin-bottom:12px}
-.card h3{font-size:17px;margin-bottom:9px}.card p{color:var(--text2);font-size:13px;line-height:1.7}
-.tags{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-.tag{background:var(--surface);border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-size:13px;color:var(--text2)}
-.feat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px;transition:border-color .2s,transform .2s}
-.feat:hover{border-color:var(--primary);transform:translateY(-3px)}
-.fi2{font-size:24px;margin-bottom:12px}.feat h3{font-size:16px;margin-bottom:8px}.feat p{color:var(--text2);font-size:13px;line-height:1.6}
-.cta{padding:80px 24px;text-align:center;background:linear-gradient(180deg,transparent,rgba(124,92,252,.05),transparent)}
-.cta h2{font-size:clamp(26px,5vw,42px);margin-bottom:12px}
-.cta p{color:var(--text2);margin-bottom:28px;font-size:15px}
-footer{border-top:1px solid var(--border);padding:24px}
-.fi3{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.fl{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--primary)}
-footer p{color:var(--text3);font-size:12px}
-@keyframes fi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --bg:          #060610;
+  --bg-2:        #0b0b1e;
+  --surface:     rgba(255,255,255,0.04);
+  --surface-2:   rgba(255,255,255,0.07);
+  --glass:       rgba(15,14,35,0.72);
+  --border:      rgba(139,117,255,0.14);
+  --border-2:    rgba(139,117,255,0.28);
+  --border-glow: rgba(139,117,255,0.55);
+
+  --violet:      #7c5cfc;
+  --violet-2:    #9b7ffe;
+  --violet-3:    #b89fff;
+  --cyan:        #22d3ee;
+  --rose:        #f472b6;
+  --gold:        #fbbf24;
+  --green:       #34d399;
+
+  --glow-v:      rgba(124,92,252,0.4);
+  --glow-c:      rgba(34,211,238,0.25);
+  --glow-r:      rgba(244,114,182,0.25);
+
+  --text:        #f0edff;
+  --text-2:      #a99fd4;
+  --text-3:      #6b6390;
+
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 28px;
+  --r-xl: 40px;
+  --r-pill: 999px;
+
+  --t: 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+h1,h2,h3,h4 { font-family:'Outfit',sans-serif; font-weight:800; line-height:1.12; }
+a { color:inherit; text-decoration:none; }
+button { font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; outline:none; }
+img { display:block; max-width:100%; }
+
+/* ═══════════════════════════════════════════════
+   CANVAS BACKGROUND
+═══════════════════════════════════════════════ */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   NOISE OVERLAY
+═══════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+}
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.container { max-width:1120px; margin:0 auto; padding:0 28px; }
+section { position:relative; z-index:2; }
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  background: linear-gradient(135deg, var(--violet), #5e3de8);
+  color: #fff;
+  padding: 14px 32px;
+  border-radius: var(--r-pill);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 28px var(--glow-v), 0 4px 16px rgba(0,0,0,0.4);
+  transition: var(--t);
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary::after {
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  opacity:0; transition:var(--t);
+}
+.btn-primary:hover { transform:translateY(-3px); box-shadow:0 0 44px var(--glow-v),0 8px 32px rgba(0,0,0,0.5); }
+.btn-primary:hover::after { opacity:1; }
+.btn-primary:active { transform:translateY(-1px); }
+
+.btn-ghost {
+  display:inline-flex; align-items:center; gap:8px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-2);
+  padding: 14px 30px;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px solid var(--border-2);
+  transition: var(--t);
+  backdrop-filter: blur(10px);
+}
+.btn-ghost:hover {
+  background: rgba(139,117,255,0.1);
+  color: var(--violet-3);
+  border-color: var(--violet);
+  transform: translateY(-2px);
+}
+
+/* ═══════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 200;
+  padding: 0;
+}
+.nav-wrap {
+  background: rgba(6,6,16,0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 28px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: -0.03em;
+}
+.logo-icon {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--violet), var(--cyan));
+  border-radius: 10px;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 18px;
+  box-shadow: 0 0 18px var(--glow-v);
+  animation: logo-pulse 3s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%,100% { box-shadow:0 0 18px var(--glow-v); }
+  50%      { box-shadow:0 0 32px var(--glow-v),0 0 60px rgba(34,211,238,0.2); }
+}
+.logo-text { background:linear-gradient(135deg,#fff,var(--violet-3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.nav-links { display:flex; align-items:center; gap:8px; }
+.nav-link { color:var(--text-2); font-size:14px; font-weight:500; padding:8px 16px; border-radius:var(--r-pill); transition:var(--t); }
+.nav-link:hover { color:var(--text); background:rgba(255,255,255,0.06); }
+.nav-actions { display:flex; align-items:center; gap:10px; }
+.nav-btn-ghost {
+  color:var(--text-2); font-size:13px; font-weight:600;
+  padding:8px 18px; border-radius:var(--r-pill);
+  border:1px solid var(--border-2); background:transparent;
+  transition:var(--t);
+}
+.nav-btn-ghost:hover { color:var(--violet-3); border-color:var(--violet); background:rgba(124,92,252,0.08); }
+.nav-btn-primary {
+  color:#fff; font-size:13px; font-weight:700;
+  padding:9px 20px; border-radius:var(--r-pill);
+  background:linear-gradient(135deg,var(--violet),#5e3de8);
+  box-shadow:0 0 18px var(--glow-v);
+  transition:var(--t);
+}
+.nav-btn-primary:hover { transform:translateY(-1px); box-shadow:0 0 28px var(--glow-v); }
+
+/* ═══════════════════════════════════════════════
+   HERO SECTION
+═══════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 28px 80px;
+  position: relative;
+  overflow: hidden;
+}
+/* Radial gradient bg blobs */
+.hero::before {
+  content:'';
+  position:absolute;
+  width: 900px; height: 900px;
+  background: radial-gradient(ellipse, rgba(124,92,252,0.12) 0%, transparent 70%);
+  top: -200px; left: 50%;
+  transform: translateX(-50%);
+  pointer-events:none; z-index:1;
+}
+.hero::after {
+  content:'';
+  position:absolute;
+  width:600px; height:600px;
+  background:radial-gradient(ellipse, rgba(34,211,238,0.08) 0%, transparent 70%);
+  bottom:0; right:-100px;
+  pointer-events:none; z-index:1;
+}
+
+.hero-inner {
+  max-width: 780px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Live pill */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(34,211,238,0.08);
+  border: 1px solid rgba(34,211,238,0.25);
+  border-radius: var(--r-pill);
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cyan);
+  margin-bottom: 36px;
+  letter-spacing: 0.04em;
+  animation: fade-slide-up 0.6s ease both;
+}
+.live-dot {
+  width: 8px; height: 8px;
+  background: var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--cyan);
+  animation: blink 1.4s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+
+/* Hero heading */
+.hero h1 {
+  font-size: clamp(52px, 9vw, 90px);
+  letter-spacing: -0.04em;
+  margin-bottom: 24px;
+  animation: fade-slide-up 0.7s 0.1s ease both;
+}
+.hero h1 .line-1 { display:block; color:var(--text); }
+.hero h1 .line-2 {
+  display: block;
+  background: linear-gradient(135deg, var(--violet), var(--cyan), var(--rose));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% auto;
+  animation: fade-slide-up 0.7s 0.1s ease both, shimmer 4s linear infinite;
+}
+@keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
+
+/* Hero sub */
+.hero-sub {
+  font-size: 18px;
+  line-height: 1.75;
+  color: var(--text-2);
+  max-width: 560px;
+  margin: 0 auto 44px;
+  font-weight: 400;
+  animation: fade-slide-up 0.7s 0.2s ease both;
+}
+
+/* CTA row */
+.hero-cta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 72px;
+  animation: fade-slide-up 0.7s 0.3s ease both;
+}
+
+/* ═══════════════════════════════════════════════
+   LIVE STATS BAR
+═══════════════════════════════════════════════ */
+.stats-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  animation: fade-slide-up 0.7s 0.4s ease both;
+  backdrop-filter: blur(20px);
+}
+.stat-cell {
+  flex: 1;
+  padding: 22px 28px;
+  background: rgba(255,255,255,0.025);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: var(--t);
+  position: relative;
+}
+.stat-cell:hover { background:rgba(124,92,252,0.07); }
+.stat-cell + .stat-cell::before {
+  content:'';
+  position:absolute; left:0; top:20%; bottom:20%;
+  width:1px;
+  background:var(--border-2);
+}
+.stat-number {
+  font-family:'Outfit',sans-serif;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--violet-3), #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.stat-number.live-count {
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.stat-live-indicator {
+  display:flex; align-items:center; gap:5px;
+  font-size:11px; color:var(--cyan); font-weight:600;
+  letter-spacing:0.06em;
+}
+.stat-live-dot {
+  width:6px;height:6px;
+  background:var(--cyan); border-radius:50%;
+  box-shadow:0 0 6px var(--cyan);
+  animation:blink 1.4s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION COMMON
+═══════════════════════════════════════════════ */
+.section { padding: 100px 28px; }
+.section-tag {
+  display: inline-block;
+  color: var(--violet-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.section-title {
+  font-size: clamp(30px, 4.5vw, 46px);
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+.section-sub {
+  font-size: 17px;
+  color: var(--text-2);
+  line-height: 1.7;
+  max-width: 540px;
+  font-weight: 400;
+}
+.section-header { text-align:center; margin-bottom:60px; }
+.section-header .section-sub { margin:0 auto; }
+
+/* ═══════════════════════════════════════════════
+   HOW IT WORKS
+═══════════════════════════════════════════════ */
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
+  gap: 20px;
+}
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 36px 30px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--t);
+  cursor: default;
+}
+.step-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at top left, rgba(124,92,252,0.08), transparent 60%);
+  opacity: 0;
+  transition: var(--t);
+}
+.step-card:hover { border-color:var(--border-2); transform:translateY(-4px); background:var(--surface-2); }
+.step-card:hover::before { opacity:1; }
+.step-number {
+  font-family:'Outfit',sans-serif;
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--violet);
+  opacity: 0.15;
+  line-height: 1;
+  margin-bottom: 16px;
+  letter-spacing:-0.04em;
+}
+.step-card h3 { font-size:20px; margin-bottom:10px; color:var(--text); }
+.step-card p { color:var(--text-2); font-size:14px; line-height:1.75; font-weight:400; }
+
+/* ═══════════════════════════════════════════════
+   FEATURES GRID
+═══════════════════════════════════════════════ */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 18px;
+}
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: var(--t);
+  position: relative;
+  overflow: hidden;
+}
+.feature-card::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--violet),transparent);
+  transform:scaleX(0); transition:var(--t);
+  transform-origin:left;
+}
+.feature-card:hover { border-color:var(--border-glow); transform:translateY(-3px); background:var(--surface-2); }
+.feature-card:hover::after { transform:scaleX(1); }
+
+.feat-icon {
+  width: 48px; height: 48px;
+  border-radius: var(--r-sm);
+  display: flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  flex-shrink: 0;
+  background: rgba(124,92,252,0.12);
+  border: 1px solid rgba(124,92,252,0.2);
+}
+.feat-icon.cyan  { background:rgba(34,211,238,0.1);  border-color:rgba(34,211,238,0.2); }
+.feat-icon.rose  { background:rgba(244,114,182,0.1); border-color:rgba(244,114,182,0.2); }
+.feat-icon.gold  { background:rgba(251,191,36,0.1);  border-color:rgba(251,191,36,0.2); }
+.feat-icon.green { background:rgba(52,211,153,0.1);  border-color:rgba(52,211,153,0.2); }
+
+.feat-body h3 { font-size:16px; margin-bottom:7px; color:var(--text); }
+.feat-body p  { font-size:13px; color:var(--text-2); line-height:1.7; font-weight:400; }
+
+/* ═══════════════════════════════════════════════
+   INTERESTS CLOUD
+═══════════════════════════════════════════════ */
+.interests-section { padding:80px 28px; }
+.tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.tag {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: default;
+  transition: var(--t);
+  position: relative;
+  overflow: hidden;
+}
+.tag::before {
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(124,92,252,0.15),rgba(34,211,238,0.08));
+  opacity:0; transition:var(--t);
+  border-radius:var(--r-pill);
+}
+.tag:hover { color:var(--violet-3); border-color:var(--violet); transform:scale(1.05); }
+.tag:hover::before { opacity:1; }
+
+/* ═══════════════════════════════════════════════
+   TRUST / SOCIAL PROOF
+═══════════════════════════════════════════════ */
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 1px;
+  background: var(--border);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 0 0 100px;
+}
+.trust-item {
+  background: var(--bg);
+  padding: 32px 24px;
+  text-align: center;
+  position: relative;
+}
+.trust-icon { font-size: 28px; margin-bottom: 10px; }
+.trust-label { font-size: 13px; color: var(--text-3); font-weight: 500; }
+.trust-value { font-family:'Outfit',sans-serif; font-size:22px; font-weight:800; color:var(--violet-3); margin-top:4px; }
+
+/* ═══════════════════════════════════════════════
+   CTA SECTION
+═══════════════════════════════════════════════ */
+.cta-section {
+  padding: 100px 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-section::before {
+  content:'';
+  position:absolute;
+  width:800px;height:800px;
+  background:radial-gradient(ellipse,rgba(124,92,252,0.1) 0%,transparent 65%);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.cta-card {
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--glass);
+  border: 1px solid var(--border-2);
+  border-radius: var(--r-xl);
+  padding: 64px 48px;
+  backdrop-filter: blur(30px);
+  position: relative;
+  z-index:2;
+}
+.cta-card h2 { font-size:clamp(28px,5vw,44px); letter-spacing:-0.03em; margin-bottom:14px; }
+.cta-card p { font-size:16px; color:var(--text-2); margin-bottom:36px; line-height:1.7; }
+.cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 28px;
+  position: relative;
+  z-index: 2;
+}
+.footer-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-logo {
+  font-family:'Outfit',sans-serif;
+  font-weight:900;
+  font-size:18px;
+  color:var(--violet-3);
+  display:flex;align-items:center;gap:8px;
+}
+.footer-logo-icon {
+  width:28px;height:28px;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+.footer-links { display:flex;gap:24px;flex-wrap:wrap; }
+.footer-links a { font-size:13px; color:var(--text-3); font-weight:500; transition:var(--t); }
+.footer-links a:hover { color:var(--violet-3); }
+.footer-copy { font-size:12px; color:var(--text-3); }
+
+/* ═══════════════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════════════ */
+.reveal { opacity:0; transform:translateY(24px); transition:opacity 0.6s ease,transform 0.6s ease; }
+.reveal.in { opacity:1; transform:translateY(0); }
+.reveal-delay-1 { transition-delay:0.1s; }
+.reveal-delay-2 { transition-delay:0.2s; }
+.reveal-delay-3 { transition-delay:0.3s; }
+.reveal-delay-4 { transition-delay:0.4s; }
+.reveal-delay-5 { transition-delay:0.5s; }
+
+/* ═══════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════ */
+@keyframes fade-slide-up {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+@keyframes count-up {
+  from { opacity:0.3; }
+  to   { opacity:1; }
+}
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════ */
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border-2); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:var(--violet); }
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:640px){
+  .stats-bar { flex-direction:column; gap:0; }
+  .stat-cell+.stat-cell::before { display:none; }
+  .nav-links { display:none; }
+  .cta-card { padding:40px 24px; }
+  .hero-cta .btn-primary,.hero-cta .btn-ghost { width:100%; justify-content:center; }
+}
 </style>
 </head>
 <body>
-<canvas id="c"></canvas>
+
+<!-- ─── PARTICLE CANVAS ─── -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══════════════════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════════════════ -->
 <nav>
-  <div class="ni">
-    <div class="logo"><span>◈</span><span>StrangerNear</span></div>
-    <div class="nl" id="navLinks">
-      <a href="login.html">Login</a>
-      <a href="chat.html"><button class="bs" style="padding:8px 16px;font-size:13px">Guest Chat</button></a>
-      <a href="register.html"><button class="bp" style="padding:8px 20px;font-size:13px">Sign Up Free</button></a>
+  <div class="nav-wrap">
+    <div class="nav-inner">
+      <div class="logo">
+        <div class="logo-icon">◈</div>
+        <span class="logo-text">StrangerNear</span>
+      </div>
+      <div class="nav-links">
+        <a href="#how-it-works" class="nav-link">How it Works</a>
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#interests" class="nav-link">Interests</a>
+      </div>
+      <div class="nav-actions" id="navActions">
+        <a href="login.html"><button class="nav-btn-ghost">Login</button></a>
+        <a href="chat.html"><button class="nav-btn-ghost">Guest Chat</button></a>
+        <a href="register.html"><button class="nav-btn-primary">Sign Up Free →</button></a>
+      </div>
     </div>
   </div>
 </nav>
+
+<!-- ═══════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════ -->
 <section class="hero">
-  <div class="hi">
-    <div class="pill">◉ Live now — people chatting worldwide</div>
-    <h1>Meet strangers<br><span class="gr">near you</span></h1>
-    <p>Chat with real people from your city, state, or anywhere in the world.<br>Safe, verified, and always interesting.</p>
-    <div class="hb">
-      <a href="register.html"><button class="bp" style="padding:13px 34px;font-size:15px">Start Free →</button></a>
-      <a href="chat.html"><button class="bs" style="padding:13px 28px">Chat as Guest</button></a>
+  <div class="hero-inner">
+
+    <!-- Live badge -->
+    <div class="live-badge">
+      <span class="live-dot"></span>
+      <span id="heroBadgeText">Live now — connecting strangers worldwide</span>
     </div>
-    <div class="stats">
-      <div class="stat"><div class="sn">10K+</div><div class="sl">Active Users</div></div>
-      <div class="stat"><div class="sn">180+</div><div class="sl">Countries</div></div>
-      <div class="stat"><div class="sn">99%</div><div class="sl">Safe Chats</div></div>
+
+    <!-- Heading -->
+    <h1>
+      <span class="line-1">Meet strangers</span>
+      <span class="line-2">near you, now.</span>
+    </h1>
+
+    <!-- Sub -->
+    <p class="hero-sub">
+      Chat with real people from your city, state, or anywhere on Earth.
+      Safe, verified, and always interesting — no setup required.
+    </p>
+
+    <!-- CTA -->
+    <div class="hero-cta">
+      <a href="register.html">
+        <button class="btn-primary" id="heroSignup">
+          Start Free <span style="font-size:18px;line-height:1">→</span>
+        </button>
+      </a>
+      <a href="chat.html">
+        <button class="btn-ghost" id="heroGuest">
+          <span style="font-size:16px">👤</span> Chat as Guest
+        </button>
+      </a>
+    </div>
+
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <div class="stat-cell">
+        <div class="stat-number live-count" id="onlineCount">—</div>
+        <div class="stat-live-indicator">
+          <span class="stat-live-dot"></span>
+          LIVE NOW
+        </div>
+        <div class="stat-label">Active Users</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number" id="countriesCount">180+</div>
+        <div class="stat-label">Countries</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number" id="chatsCount">99%</div>
+        <div class="stat-label">Safe Chats</div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-number">0s</div>
+        <div class="stat-label">Wait Time</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     TRUST STRIP
+═══════════════════════════════════════════════════ -->
+<div class="trust-strip reveal">
+  <div class="trust-item">
+    <div class="trust-icon">🛡️</div>
+    <div class="trust-value">Verified</div>
+    <div class="trust-label">Real identities only</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">🔒</div>
+    <div class="trust-value">Private</div>
+    <div class="trust-label">No chat logs stored</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">⚡</div>
+    <div class="trust-value">Instant</div>
+    <div class="trust-label">Match in seconds</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon">🌍</div>
+    <div class="trust-value">Global</div>
+    <div class="trust-label">180+ countries</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════════════ -->
+<section class="section" id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag reveal">HOW IT WORKS</p>
+      <h2 class="section-title reveal reveal-delay-1">Three steps to connect</h2>
+      <p class="section-sub reveal reveal-delay-2">No friction, no fluff. Just real conversations with real people — starting in seconds.</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal reveal-delay-1">
+        <div class="step-number">01</div>
+        <h3>Start Instantly</h3>
+        <p>No signup needed as a guest. Drop straight into the chat. Or create a free account for access to more features, history, and friends.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-2">
+        <div class="step-number">02</div>
+        <h3>Get Verified</h3>
+        <p>Optional face verification earns you a trusted badge, better matches, and priority placement in the queue. Real people first.</p>
+      </div>
+      <div class="step-card reveal reveal-delay-3">
+        <div class="step-number">03</div>
+        <h3>Match Nearby</h3>
+        <p>City first, then state, then country, then global — you're never left waiting. VIP members get full location-based matching.</p>
+      </div>
     </div>
   </div>
 </section>
-<section class="sec">
-  <div class="si">
-    <p class="ey">HOW IT WORKS</p><h2 class="st">Three steps to connect</h2>
-    <div class="grid3">
-      <div class="card"><div class="cn">01</div><h3>Start Instantly</h3><p>No signup needed as a guest. Or create a free account for more features.</p></div>
-      <div class="card"><div class="cn">02</div><h3>Get Verified</h3><p>Optional face verification earns you a trusted badge and better matches.</p></div>
-      <div class="card"><div class="cn">03</div><h3>Match Nearby</h3><p>City first, then state, then country, then global — you're never left waiting.</p></div>
+
+<!-- ═══════════════════════════════════════════════════
+     INTERESTS
+═══════════════════════════════════════════════════ -->
+<section class="interests-section" id="interests">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag reveal">SHARED INTERESTS</p>
+      <h2 class="section-title reveal reveal-delay-1">Match by what you love</h2>
+      <p class="section-sub reveal reveal-delay-2">Our engine pairs you with people who share your passions — making every conversation feel instantly familiar.</p>
+    </div>
+    <div class="tags-wrap reveal reveal-delay-3">
+      <span class="tag">🎮 Gaming</span>
+      <span class="tag">🎵 Music</span>
+      <span class="tag">🎬 Movies</span>
+      <span class="tag">✈️ Travel</span>
+      <span class="tag">🍕 Food</span>
+      <span class="tag">⚽ Sports</span>
+      <span class="tag">💻 Tech</span>
+      <span class="tag">🎨 Art</span>
+      <span class="tag">📚 Books</span>
+      <span class="tag">💪 Fitness</span>
+      <span class="tag">👨‍🍳 Cooking</span>
+      <span class="tag">📸 Photography</span>
+      <span class="tag">🐾 Pets</span>
+      <span class="tag">🌱 Nature</span>
+      <span class="tag">🎭 Theater</span>
+      <span class="tag">🎤 Podcasts</span>
     </div>
   </div>
 </section>
-<section class="sec" style="padding-top:0">
-  <div class="si"><p class="ey">INTERESTS</p><h2 class="st">Match by what you love</h2>
-    <div class="tags"><div class="tag">Gaming</div><div class="tag">Music</div><div class="tag">Movies</div><div class="tag">Travel</div><div class="tag">Food</div><div class="tag">Sports</div><div class="tag">Tech</div><div class="tag">Art</div><div class="tag">Books</div><div class="tag">Fitness</div><div class="tag">Cooking</div><div class="tag">Photography</div></div>
-  </div>
-</section>
-<section class="sec" style="padding-top:0">
-  <div class="si"><p class="ey">FEATURES</p><h2 class="st">Built different</h2>
-    <div class="grid3">
-      <div class="feat"><div class="fi2">📍</div><h3>Location Matching</h3><p>City → State → Country → Global. Always nearby first.</p></div>
-      <div class="feat"><div class="fi2">👤</div><h3>No Signup Needed</h3><p>Jump in as a guest instantly. Sign up only when you want more.</p></div>
-      <div class="feat"><div class="fi2">✅</div><h3>Verified Badges</h3><p>Face check confirms real users. No fakes, no bots.</p></div>
-      <div class="feat"><div class="fi2">🎤</div><h3>Voice & Images</h3><p>Send photos and voice messages (signed-in users).</p></div>
-      <div class="feat"><div class="fi2">🛡️</div><h3>Smart Moderation</h3><p>Keyword filter, report system, trust scores.</p></div>
-      <div class="feat"><div class="fi2">🔒</div><h3>Private by Default</h3><p>No chat history stored. Conversations vanish when you leave.</p></div>
+
+<!-- ═══════════════════════════════════════════════════
+     FEATURES
+═══════════════════════════════════════════════════ -->
+<section class="section" id="features" style="padding-top:0">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-tag reveal">FEATURES</p>
+      <h2 class="section-title reveal reveal-delay-1">Built different</h2>
+      <p class="section-sub reveal reveal-delay-2">Every detail crafted to make your experience safer, smarter, and more fun.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feat-icon cyan">📍</div>
+        <div class="feat-body">
+          <h3>Location Matching</h3>
+          <p>City → State → Country → Global. Always tries nearby first so conversations feel local and personal.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feat-icon">👤</div>
+        <div class="feat-body">
+          <h3>No Signup Needed</h3>
+          <p>Jump in as a guest in one click. Create an account only when you want more features and preferences.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feat-icon green">✅</div>
+        <div class="feat-body">
+          <h3>Verified Badges</h3>
+          <p>Face check confirms real humans. No fakes, no bots. Verified users get trusted badges and priority matching.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal reveal-delay-4">
+        <div class="feat-icon rose">🎤</div>
+        <div class="feat-body">
+          <h3>Voice & Images</h3>
+          <p>Send photos and voice messages to make conversations richer. Available for signed-in users.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal reveal-delay-5">
+        <div class="feat-icon gold">🛡️</div>
+        <div class="feat-body">
+          <h3>Smart Moderation</h3>
+          <p>Keyword filter, report system, and trust scores keep the community clean and respectful.</p>
+        </div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon cyan">🔒</div>
+        <div class="feat-body">
+          <h3>Private by Default</h3>
+          <p>No chat history stored on our servers. Conversations vanish when you leave — total privacy.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-<section class="cta">
-  <h2>Ready to meet someone?</h2>
-  <p>Chat as a guest or create a free account for more features</p>
-  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
-    <a href="chat.html"><button class="bs" style="padding:12px 26px;font-size:14px">Chat as Guest</button></a>
-    <a href="register.html"><button class="bp" style="padding:12px 26px;font-size:14px">Sign Up Free →</button></a>
+
+<!-- ═══════════════════════════════════════════════════
+     CTA
+═══════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-card reveal">
+    <h2>Ready to meet someone?</h2>
+    <p>Join thousands of people connecting right now — no account needed to start.</p>
+    <div class="cta-btns">
+      <a href="chat.html"><button class="btn-ghost" id="ctaGuest">Chat as Guest</button></a>
+      <a href="register.html"><button class="btn-primary" id="ctaSignup">Sign Up Free →</button></a>
+    </div>
   </div>
 </section>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
 <footer>
-  <div class="fi3"><div class="fl">◈ StrangerNear</div><p>© 2025 StrangerNear. 18+ only.</p></div>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="footer-logo-icon">◈</div>
+      StrangerNear
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Safety</a>
+      <a href="#">Contact</a>
+    </div>
+    <p class="footer-copy">© 2025 StrangerNear · All rights reserved</p>
+  </div>
 </footer>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════ -->
 <script>
-const c=document.getElementById('c'),x=c.getContext('2d');let W,H,P=[];
-function init(){W=c.width=innerWidth;H=c.height=innerHeight;P=Array.from({length:60},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.5,dx:(Math.random()-.5)*.4,dy:(Math.random()-.5)*.4,o:Math.random()*.5+.1}));}
-function draw(){x.clearRect(0,0,W,H);P.forEach(p=>{p.x+=p.dx;p.y+=p.dy;if(p.x<0||p.x>W)p.dx*=-1;if(p.y<0||p.y>H)p.dy*=-1;x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fillStyle=`rgba(124,92,252,${p.o})`;x.fill();});for(let i=0;i<P.length;i++)for(let j=i+1;j<P.length;j++){const d=Math.hypot(P[i].x-P[j].x,P[i].y-P[j].y);if(d<120){x.beginPath();x.moveTo(P[i].x,P[i].y);x.lineTo(P[j].x,P[j].y);x.strokeStyle=`rgba(124,92,252,${.06*(1-d/120)})`;x.lineWidth=.5;x.stroke();}}requestAnimationFrame(draw);}
-window.addEventListener('resize',init);init();draw();
-if(localStorage.getItem('sc_token')){document.getElementById('navLinks').innerHTML='<a href="dashboard.html">Dashboard</a><a href="chat.html"><button class="bp" style="padding:8px 20px;font-size:13px">Start Chat</button></a>';}
+/* ─── CANVAS PARTICLE NETWORK ─── */
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  const COLORS = ['rgba(124,92,252,', 'rgba(34,211,238,', 'rgba(244,114,182,'];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function createParticle() {
+    const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+    return {
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      r:  Math.random() * 1.8 + 0.4,
+      dx: (Math.random() - 0.5) * 0.35,
+      dy: (Math.random() - 0.5) * 0.35,
+      o:  Math.random() * 0.5 + 0.15,
+      color: c,
+    };
+  }
+
+  function init() {
+    resize();
+    particles = Array.from({ length: 70 }, createParticle);
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 130) {
+          const alpha = 0.07 * (1 - dist / 130);
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = particles[i].color + alpha + ')';
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw dots
+    particles.forEach(p => {
+      p.x += p.dx;
+      p.y += p.dy;
+      if (p.x < 0 || p.x > W) p.dx *= -1;
+      if (p.y < 0 || p.y > H) p.dy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color + p.o + ')';
+      ctx.fill();
+    });
+
+    requestAnimationFrame(drawFrame);
+  }
+
+  window.addEventListener('resize', init);
+  init();
+  drawFrame();
+})();
+
+/* ─── SCROLL REVEAL ─── */
+(function() {
+  const els = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+})();
+
+/* ─── NAV AUTH STATE ─── */
+(function() {
+  if (localStorage.getItem('sc_token')) {
+    document.getElementById('navActions').innerHTML = `
+      <a href="dashboard.html"><button class="nav-btn-ghost">Dashboard</button></a>
+      <a href="chat.html"><button class="nav-btn-primary">Start Chat →</button></a>
+    `;
+  }
+})();
+
+/* ─── LIVE ACTIVE USER COUNT ─── */
+(function() {
+  const el = document.getElementById('onlineCount');
+  const badge = document.getElementById('heroBadgeText');
+  const API = 'http://localhost:5000/api/stats';
+
+  function animateCount(target) {
+    const duration = 1200;
+    const start = performance.now();
+    const from = parseInt(el.textContent.replace(/\D/g, '')) || 0;
+
+    function step(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(from + (target - from) * eased);
+      el.textContent = current.toLocaleString();
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function fetchStats() {
+    fetch(API)
+      .then(r => r.json())
+      .then(data => {
+        const n = data.onlineNow || 0;
+        animateCount(n);
+        if (badge) {
+          badge.textContent = `${n.toLocaleString()} ${n === 1 ? 'person' : 'people'} online right now`;
+        }
+      })
+      .catch(() => {
+        // Fallback: show a plausible number with gentle random walk
+        const cur = parseInt(el.textContent.replace(/\D/g, '')) || 0;
+        const fallback = cur > 0
+          ? Math.max(1, cur + Math.floor((Math.random() - 0.45) * 3))
+          : 1;
+        animateCount(fallback);
+      });
+  }
+
+  fetchStats();
+  setInterval(fetchStats, 8000); // refresh every 8 seconds
+})();
+
+/* ─── NAV SCROLL EFFECT ─── */
+(function() {
+  const nav = document.querySelector('.nav-wrap');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 40) {
+      nav.style.boxShadow = '0 1px 40px rgba(0,0,0,0.5)';
+    } else {
+      nav.style.boxShadow = 'none';
+    }
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>

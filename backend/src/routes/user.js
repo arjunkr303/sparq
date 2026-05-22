@@ -120,6 +120,28 @@ router.post("/verify", authMw, async (req, res) => {
   }
 });
 
+// ── update gender ──
+router.put("/update-gender", authMw, async (req, res) => {
+  try {
+    const { gender } = req.body;
+    if (!["male", "female", "other"].includes(gender))
+      return res.status(400).json({ message: "Invalid gender value" });
+
+    const { data: u, error } = await supabase
+      .from("users")
+      .update({ gender })
+      .eq("id", req.user.id)
+      .select()
+      .single();
+
+    if (error) return res.status(500).json({ message: "Update failed" });
+    res.json({ user: clean(u), message: "Gender updated!" });
+  } catch {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 // ── spend coins ──
 router.post("/spend-coins", authMw, async (req, res) => {
   try {

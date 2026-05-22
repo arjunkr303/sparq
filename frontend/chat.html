@@ -251,7 +251,7 @@
       .sysmsg { display: flex; justify-content: center; margin: 8px 0; }
       .sysmsg span { background: rgba(255,255,255,0.05); border: 1px solid var(--glass2); color: var(--t3); font-size: 11px; font-weight: 600; padding: 4px 14px; border-radius: 50px; backdrop-filter: blur(4px); }
       
-      .mr { display: flex; margin-bottom: 2px; }
+      .mr { display: flex; margin-bottom: 2px; align-items: center; position: relative; }
       .mr.me { justify-content: flex-end; }
       .mr.them { justify-content: flex-start; }
       
@@ -318,8 +318,61 @@
       .input-area {
         padding: 16px 24px; padding-bottom: calc(16px + var(--safe-bottom));
         background: rgba(10, 10, 20, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-        border-top: 1px solid var(--bd); display: flex; gap: 10px; align-items: center; flex-shrink: 0; z-index: 10;
+        border-top: 1px solid var(--bd); display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; z-index: 10;
       }
+      .input-row {
+        display: flex; gap: 10px; align-items: center; width: 100%;
+      }
+      
+      /* Message Reply Feature Styling */
+      .reply-btn {
+        background: var(--glass); border: 1px solid var(--bd); color: var(--t2);
+        width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: all 0.2s ease; font-size: 12px; margin: 0 8px; flex-shrink: 0;
+      }
+      @media (hover: hover) {
+        .reply-btn { opacity: 0; }
+        .mr:hover .reply-btn { opacity: 1; }
+      }
+      @media (hover: none) {
+        .reply-btn { opacity: 0.6; }
+      }
+      .reply-btn:hover { background: var(--glass2); color: var(--tx); border-color: var(--b2); transform: scale(1.1); }
+      
+      .reply-preview-bar {
+        display: flex; justify-content: space-between; align-items: center;
+        background: rgba(124, 92, 252, 0.08); border-left: 4px solid var(--ac);
+        padding: 8px 16px; border-radius: 12px; margin-bottom: 4px; width: 100%;
+        animation: slideDownReply 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+      }
+      .rpb-left { display: flex; flex-direction: column; overflow: hidden; margin-right: 12px; text-align: left; }
+      .rpb-sender { font-size: 11px; font-weight: 700; color: var(--ac); margin-bottom: 2px; }
+      .rpb-content { font-size: 13px; color: rgba(255, 255, 255, 0.8); font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .rpb-close { background: transparent; border: none; color: var(--t3); font-size: 16px; cursor: pointer; padding: 4px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; }
+      .rpb-close:hover { color: var(--rd); }
+      @keyframes slideDownReply {
+        from { transform: translateY(-10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      
+      .reply-preview-in-bubble {
+        background: rgba(255, 255, 255, 0.08); border-left: 3px solid var(--ac);
+        border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; font-size: 12px;
+        cursor: pointer; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        transition: background 0.2s ease; text-align: left;
+      }
+      .bub.me .reply-preview-in-bubble { background: rgba(0, 0, 0, 0.2); border-left-color: var(--ac); }
+      .reply-preview-in-bubble:hover { background: rgba(255, 255, 255, 0.15); }
+      .bub.me .reply-preview-in-bubble:hover { background: rgba(0, 0, 0, 0.3); }
+      .reply-preview-sender { font-weight: 700; color: var(--ac); margin-bottom: 2px; font-size: 11px; }
+      .reply-preview-content { color: rgba(255, 255, 255, 0.8); font-style: italic; }
+      
+      @keyframes flashHighlight {
+        0% { filter: brightness(1); }
+        30% { filter: brightness(1.6) saturate(1.2); box-shadow: 0 0 15px var(--ac); }
+        100% { filter: brightness(1); }
+      }
+      .reply-flash { animation: flashHighlight 1.2s ease-in-out; }
       .iab {
         width: 42px; height: 42px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--bd);
         color: var(--t2); font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
@@ -554,13 +607,24 @@
 
         <!-- Input Area -->
         <div class="input-area ia">
-          <input type="file" id="fi" accept="image/*" onchange="sendImg(this)" />
-          <button class="iab" id="btnImg" onclick="document.getElementById('fi').click()" disabled title="Sign in to send images">🖼️</button>
-          <button class="iab" id="btnVc" disabled title="Hold to record voice" onmousedown="startRec(event)" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
-          <div class="input-wrapper">
-            <input type="text" id="mi" placeholder="Type a message..." disabled maxlength="500" />
+          <!-- Reply Preview Bar -->
+          <div class="reply-preview-bar" id="rpb" style="display: none;">
+            <div class="rpb-left">
+              <span class="rpb-sender" id="rpbSender"></span>
+              <span class="rpb-content" id="rpbContent"></span>
+            </div>
+            <button class="rpb-close" onclick="cancelReply()">✕</button>
           </div>
-          <button id="sb" onclick="sendMsg()">↑</button>
+          
+          <div class="input-row">
+            <input type="file" id="fi" accept="image/*" onchange="sendImg(this)" />
+            <button class="iab" id="btnImg" onclick="document.getElementById('fi').click()" disabled title="Sign in to send images">🖼️</button>
+            <button class="iab" id="btnVc" disabled title="Hold to record voice" onmousedown="startRec(event)" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
+            <div class="input-wrapper">
+              <input type="text" id="mi" placeholder="Type a message..." disabled maxlength="500" />
+            </div>
+            <button id="sb" onclick="sendMsg()">↑</button>
+          </div>
         </div>
       </div>
 
@@ -771,6 +835,20 @@
       let commonInterestsCount = 0;
       let sharedInterestNames = [];
       let openerUsedInChat = false;
+      let strangerUsername = "";
+      let activeReply = null; // { msgId, senderName, content, type }
+
+      // Friend Chat context variables
+      const urlParams = new URLSearchParams(window.location.search);
+      const friendId = urlParams.get("friendId");
+      const friendshipId = urlParams.get("friendshipId");
+      const friendUsername = urlParams.get("friendUsername");
+      const friendPhoto = sessionStorage.getItem(`sc_friendPhoto_${friendshipId}`);
+      const isFriendChat = !!(friendId && friendshipId);
+      let partnerOnline = false;
+      if (isFriendChat) {
+        room = `f_${friendshipId}`;
+      }
 
       const $ = (id) => document.getElementById(id);
 
@@ -791,8 +869,12 @@
       function hidePartnerTyping() {
         document.getElementById("tbub")?.remove();
         if (state === "chatting") {
-          $("hstat").textContent = "● online";
-          $("hstat").style.color = "var(--gn)";
+          if (isFriendChat) {
+            updatePartnerOnlineStatus(partnerOnline);
+          } else {
+            $("hstat").textContent = "● online";
+            $("hstat").style.color = "var(--gn)";
+          }
         }
       }
 
@@ -864,6 +946,113 @@
             "Guest mode — sign up for images, voice & more!";
         }
         updateGF();
+
+        if (isFriendChat) {
+          setState("chatting");
+          // Hide gender filter card and left actions grid
+          const filterCard = document.querySelector(".fc");
+          if (filterCard) filterCard.style.display = "none";
+          const leftActions = document.querySelector(".left-panel .actions-grid");
+          if (leftActions) leftActions.style.display = "none";
+          
+          // Hide matchmaking-specific premium actions in right panel
+          const rightActions = document.querySelector(".right-panel .actions-grid");
+          if (rightActions) rightActions.style.display = "none";
+
+          // Set up chat header
+          setChatAvatar(
+            $("hav"),
+            friendUsername,
+            friendPhoto || null,
+            false
+          );
+          $("hname").textContent = friendUsername;
+          updatePartnerOnlineStatus(false); // Default to offline initially
+
+          // Display the partner card showing friend info and device storage status
+          $("pc").style.display = "block";
+          $("pname").textContent = friendUsername;
+          $("pm").innerHTML = `<span class="gtg" style="background:rgba(6,214,160,0.1);color:var(--gn);border:1px solid rgba(6,214,160,0.3)">✓ Friend</span>`;
+          $("pci").innerHTML = `<div style="font-size:12px;color:var(--t2)">Saved to device</div>`;
+          $("afBtn").style.display = "none";
+
+          // Enable inputs
+          $("mi").disabled = !isIn;
+          $("mi").placeholder = isIn ? "Type a message..." : "Sign in to chat...";
+          $("btnImg").disabled = !isIn;
+          $("btnVc").disabled = !isIn;
+
+          // Load chat history from localStorage
+          localStorage.setItem(`sc_friend_unread_${friendshipId}`, "0");
+          loadFriendChatHistory();
+        }
+      }
+
+      function updatePartnerOnlineStatus(online) {
+        if (!isFriendChat) return;
+        partnerOnline = online;
+        const stat = $("hstat");
+        if (stat) {
+          if (online) {
+            stat.textContent = "● online";
+            stat.style.color = "var(--gn)";
+          } else {
+            stat.textContent = "● offline";
+            stat.style.color = "var(--t3)";
+          }
+        }
+      }
+
+      function loadFriendChatHistory() {
+        const key = `sc_friend_msgs_${friendshipId}`;
+        let history = [];
+        try {
+          history = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (e) {
+          console.error("Error loading chat history:", e);
+        }
+        
+        clearBubs();
+        
+        history.forEach(msg => {
+          if (msg.type === "voice") {
+            addBub({ dataUrl: msg.content, mimeType: msg.mimeType, duration: msg.duration }, msg.isMe, msg.timestamp, "voice", msg.replyTo);
+          } else {
+            addBub(msg.content, msg.isMe, msg.timestamp, msg.type, msg.replyTo);
+          }
+        });
+      }
+
+      function saveFriendMessage(content, isMe, type, timestamp, mimeType = null, targetFriendshipId = null, duration = null, replyTo = null) {
+        const fId = targetFriendshipId || friendshipId;
+        if (!fId) return;
+        const key = `sc_friend_msgs_${fId}`;
+        let history = [];
+        try {
+          history = JSON.parse(localStorage.getItem(key) || "[]");
+        } catch (e) {
+          console.error("Error reading chat history:", e);
+        }
+
+        // Deduplication: check if a message with the same timestamp and sender (isMe) already exists
+        const exists = history.some(msg => msg.timestamp === timestamp && msg.isMe === isMe);
+        if (exists) return;
+
+        history.push({
+          content,
+          isMe,
+          timestamp,
+          type,
+          mimeType,
+          duration,
+          replyTo
+        });
+
+        try {
+          localStorage.setItem(key, JSON.stringify(history));
+        } catch (e) {
+          console.error("Error saving chat history:", e);
+        }
       }
 
       /* ══ GF ══ */
@@ -916,7 +1105,25 @@
           : { transports: ["websocket"] };
         sock = io(API, opts);
 
-        sock.on("connect", () => console.log("✅", sock.id));
+        sock.on("connect", () => {
+          console.log("✅", sock.id);
+          if (isFriendChat) {
+            sock.emit("join_friend_chat", { friendshipId }, (res) => {
+              if (res && res.success) {
+                updatePartnerOnlineStatus(res.partnerOnline);
+              } else {
+                console.error("join_friend_chat failure:", res?.message);
+                showToast("Could not join friend chat room", "err");
+              }
+            });
+          }
+        });
+
+        sock.on("partner_status", ({ online }) => {
+          if (isFriendChat) {
+            updatePartnerOnlineStatus(online);
+          }
+        });
         sock.on("connect_error", (e) => {
           console.error("❌", e.message);
           if (e.message === "Auth failed" || e.message === "User not found") {
@@ -981,6 +1188,8 @@
             partnerInterestsList = partnerInterests || [];
             commonInterestsCount = ci || 0;
             sharedInterestNames = sin || [];
+            strangerUsername = pn;
+            cancelReply();
 
             // Header
             $("hdIdle").style.display = "none";
@@ -1068,17 +1277,65 @@
           },
         );
 
-        sock.on("receive_message", ({ from, message, timestamp }) => {
+        sock.on("receive_message", ({ from, message, timestamp, fromUserId, roomId, replyTo }) => {
+          const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
+          if (roomId && roomId.startsWith("f_")) {
+            const incomingFid = roomId.substring(2);
+            if (!isFriendChat || incomingFid !== friendshipId) {
+              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo);
+              if (!isMe) {
+                const unreadKey = `sc_friend_unread_${incomingFid}`;
+                const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+                localStorage.setItem(unreadKey, current + 1);
+              }
+              return;
+            }
+          }
           hidePartnerTyping();
-          addBub(message, sock.id === from, timestamp, "text");
+          addBub(message, isMe, timestamp, "text", replyTo);
+          if (isFriendChat) {
+            saveFriendMessage(message, isMe, "text", timestamp, null, null, null, replyTo);
+          }
         });
-        sock.on("receive_image", ({ from, dataUrl, timestamp }) => {
+        sock.on("receive_image", ({ from, dataUrl, timestamp, fromUserId, roomId, replyTo }) => {
+          const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
+          if (roomId && roomId.startsWith("f_")) {
+            const incomingFid = roomId.substring(2);
+            if (!isFriendChat || incomingFid !== friendshipId) {
+              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo);
+              if (!isMe) {
+                const unreadKey = `sc_friend_unread_${incomingFid}`;
+                const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+                localStorage.setItem(unreadKey, current + 1);
+              }
+              return;
+            }
+          }
           hidePartnerTyping();
-          addBub(dataUrl, sock.id === from, timestamp, "image");
+          addBub(dataUrl, isMe, timestamp, "image", replyTo);
+          if (isFriendChat) {
+            saveFriendMessage(dataUrl, isMe, "image", timestamp, null, null, null, replyTo);
+          }
         });
-        sock.on("receive_voice", ({ from, dataUrl, mimeType, timestamp }) => {
+        sock.on("receive_voice", ({ from, dataUrl, mimeType, timestamp, fromUserId, roomId, duration, replyTo }) => {
+          const isMe = (fromUserId && user && fromUserId === user.id) || (sock && sock.id === from);
+          if (roomId && roomId.startsWith("f_")) {
+            const incomingFid = roomId.substring(2);
+            if (!isFriendChat || incomingFid !== friendshipId) {
+              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo);
+              if (!isMe) {
+                const unreadKey = `sc_friend_unread_${incomingFid}`;
+                const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
+                localStorage.setItem(unreadKey, current + 1);
+              }
+              return;
+            }
+          }
           hidePartnerTyping();
-          addBub({ dataUrl, mimeType }, sock.id === from, timestamp, "voice");
+          addBub({ dataUrl, mimeType, duration }, isMe, timestamp, "voice", replyTo);
+          if (isFriendChat) {
+            saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, null, duration, replyTo);
+          }
         });
 
         sock.on("partner_typing", ({ isTyping }) => {
@@ -1087,6 +1344,10 @@
         });
 
         sock.on("partner_disconnected", () => {
+          if (isFriendChat) {
+            updatePartnerOnlineStatus(false);
+            return;
+          }
           setState("disconnected");
           addSys("Stranger has disconnected.");
           hidePartnerTyping();
@@ -1425,7 +1686,12 @@
         const inp = $("mi"),
           msg = inp.value.trim();
         if (!msg || state !== "chatting" || !sock) return;
-        sock.emit("send_message", { message: msg, roomId: room });
+        const payload = { message: msg, roomId: room };
+        if (activeReply) {
+          payload.replyTo = activeReply;
+          cancelReply();
+        }
+        sock.emit("send_message", payload);
         inp.value = "";
         sock.emit("typing", { roomId: room, isTyping: false });
         updSend();
@@ -1477,7 +1743,12 @@
             showToast("Image still too large after compression", "err");
             return;
           }
-          sock?.emit("send_image", { dataUrl, roomId: room });
+          const payload = { dataUrl, roomId: room };
+          if (activeReply) {
+            payload.replyTo = activeReply;
+            cancelReply();
+          }
+          sock?.emit("send_image", payload);
         };
         img.onerror = () => {
           URL.revokeObjectURL(objUrl);
@@ -1488,6 +1759,7 @@
 
       /* ── Voice recording ── */
       let recStartTime = 0;
+      let recTimerInterval = null;
       async function startRec(e) {
         if (e) {
           e.preventDefault();
@@ -1507,12 +1779,88 @@
         if (state !== "chatting") return;
         if (mediaRec && mediaRec.state === "recording") return;
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({
+          let stream = await navigator.mediaDevices.getUserMedia({
             audio: true,
             video: false,
           });
+
+          try {
+            const activeTrack = stream.getAudioTracks()[0];
+            const activeLabel = (activeTrack?.label || "").toLowerCase();
+            
+            // Check if active microphone is already a headset/external mic
+            const isHeadset = ['headset', 'headphone', 'bluetooth', 'hands-free', 'handsfree', 'wireless', 'usb', 'external', 'mic'].some(kw => activeLabel.includes(kw));
+            
+            if (!isHeadset) {
+              // Active mic is not a headset. Let's see if we can find one connected
+              const devices = await navigator.mediaDevices.enumerateDevices();
+              const audioInputs = devices.filter(d => d.kind === 'audioinput');
+              
+              const keywords = ['headset', 'headphone', 'bluetooth', 'hands-free', 'handsfree', 'wireless', 'usb', 'external', 'mic'];
+              let preferredDevice = null;
+              
+              for (const kw of keywords) {
+                const found = audioInputs.find(d => d.label && d.label.toLowerCase().includes(kw));
+                if (found) {
+                  preferredDevice = found;
+                  break;
+                }
+              }
+              
+              if (preferredDevice && preferredDevice.deviceId) {
+                console.log("Switching from default mic to preferred headset/external mic:", preferredDevice.label);
+                try {
+                  const preferredStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                      deviceId: { exact: preferredDevice.deviceId },
+                      echoCancellation: { ideal: true },
+                      noiseSuppression: { ideal: true },
+                      autoGainControl: { ideal: true },
+                      channelCount: { ideal: 1 }
+                    },
+                    video: false
+                  });
+                  activeTrack?.stop();
+                  stream = preferredStream;
+                } catch (err) {
+                  console.warn("Failed to open preferred device, keeping default stream", err);
+                }
+              }
+            }
+
+            // Apply mono and quality constraints to the final active track
+            const finalTrack = stream.getAudioTracks()[0];
+            if (finalTrack && typeof finalTrack.applyConstraints === "function") {
+              await finalTrack.applyConstraints({
+                echoCancellation: { ideal: true },
+                noiseSuppression: { ideal: true },
+                autoGainControl: { ideal: true },
+                channelCount: { ideal: 1 }
+              }).catch(console.warn);
+            }
+          } catch (deviceErr) {
+            console.warn("Preferred device logic error:", deviceErr);
+          }
+
           audioCh = [];
           recStartTime = Date.now();
+
+          // Disable text input and update its placeholder to show recording duration
+          const mi = $("mi");
+          mi.disabled = true;
+          mi.value = "";
+          mi.placeholder = "Recording: 0:00";
+          
+          if (recTimerInterval) clearInterval(recTimerInterval);
+          recTimerInterval = setInterval(() => {
+            const elapsed = Date.now() - recStartTime;
+            const secs = Math.floor(elapsed / 1000);
+            const mins = Math.floor(secs / 60);
+            const remainingSecs = secs % 60;
+            const timeStr = `${mins}:${remainingSecs.toString().padStart(2, '0')}`;
+            mi.placeholder = `Recording: ${timeStr}`;
+          }, 1000);
+
           const mimes = [
             "audio/webm;codecs=opus",
             "audio/webm",
@@ -1534,14 +1882,22 @@
               showToast("Recording too short", "err");
               return;
             }
+            const durationSec = Math.max(1, Math.round((Date.now() - recStartTime) / 1000));
             const blob = new Blob(audioCh, { type: recMime });
             const fr = new FileReader();
-            fr.onload = (e2) =>
-              sock?.emit("send_voice", {
+            fr.onload = (e2) => {
+              const payload = {
                 dataUrl: e2.target.result,
                 mimeType: recMime,
                 roomId: room,
-              });
+                duration: durationSec,
+              };
+              if (activeReply) {
+                payload.replyTo = activeReply;
+                cancelReply();
+              }
+              sock?.emit("send_voice", payload);
+            };
             fr.readAsDataURL(blob);
           };
           mediaRec.start(100);
@@ -1553,6 +1909,10 @@
         }
       }
       function stopRec() {
+        if (recTimerInterval) {
+          clearInterval(recTimerInterval);
+          recTimerInterval = null;
+        }
         if (!mediaRec || mediaRec.state === "inactive") return;
         // Require at least 300ms of recording to avoid empty blobs
         const elapsed = Date.now() - recStartTime;
@@ -1565,6 +1925,12 @@
         }
         $("btnVc").classList.remove("rec");
         $("btnVc").textContent = "🎤";
+
+        // Restore input placeholder and disabled state based on state
+        const ok = state === "chatting";
+        const mi = $("mi");
+        mi.placeholder = ok ? "Type a message..." : "Start a chat first...";
+        mi.disabled = !ok;
       }
 
       function togRep() {
@@ -1582,6 +1948,19 @@
 
       /* ══ STATE ══ */
       function setState(s) {
+        if (isFriendChat) {
+          state = "chatting";
+          $("boxIdle").style.display = "none";
+          $("boxSearch").style.display = "none";
+          $("mi").disabled = !isIn;
+          $("mi").placeholder = isIn ? "Type a message..." : "Sign in to chat...";
+          $("btnImg").disabled = !isIn;
+          $("btnVc").disabled = !isIn;
+          $("hdIdle").style.display = "none";
+          $("hdChat").style.display = "flex";
+          updSend();
+          return;
+        }
         state = s;
         $("boxIdle").style.display = s === "idle" ? "flex" : "none";
         $("boxSearch").style.display = s === "searching" ? "flex" : "none";
@@ -1645,6 +2024,53 @@
 
       /* ══ BUBBLES ══ */
       // Global helpers so onclick inside bubbles works
+      window.initiateReply = (msgId, senderName, content, type) => {
+        activeReply = { msgId, senderName, content, type };
+        const rpb = $("rpb");
+        if (rpb) {
+          rpb.style.display = "flex";
+          $("rpbSender").textContent = `Replying to ${senderName}`;
+          let previewText = "";
+          if (type === "text") {
+            previewText = content;
+          } else if (type === "image") {
+            previewText = "📷 Image";
+          } else if (type === "voice") {
+            previewText = "🎤 Voice Message";
+          }
+          $("rpbContent").textContent = previewText;
+        }
+        const mi = $("mi");
+        if (mi && !mi.disabled) mi.focus();
+      };
+
+      window.cancelReply = () => {
+        activeReply = null;
+        const rpb = $("rpb");
+        if (rpb) rpb.style.display = "none";
+      };
+
+      window.handleReplyClick = (btn) => {
+        if (!btn) return;
+        const msgId = btn.dataset.msgId;
+        const sender = btn.dataset.sender;
+        const content = btn.dataset.content;
+        const type = btn.dataset.type;
+        initiateReply(msgId, sender, content, type);
+      };
+
+      window.scrollToMessage = (msgId) => {
+        const el = document.getElementById(msgId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          const bub = el.querySelector(".bub");
+          if (bub) {
+            bub.classList.add("reply-flash");
+            setTimeout(() => bub.classList.remove("reply-flash"), 1200);
+          }
+        }
+      };
+
       window.previewImg = (src) => {
         $("ipmsrc").src = src;
         $("ipm").classList.add("on");
@@ -1697,10 +2123,13 @@
         }
       };
 
-      function addBub(content, isMe, ts, type) {
+      function addBub(content, isMe, ts, type, replyTo = null) {
         document.getElementById("tbub")?.remove();
         const row = document.createElement("div");
         row.className = "mr " + (isMe ? "me" : "them");
+        const msgId = 'msg_' + (ts ? new Date(ts).getTime() : Date.now());
+        row.id = msgId;
+
         const t = ts
           ? new Date(ts).toLocaleTimeString([], {
               hour: "2-digit",
@@ -1716,8 +2145,18 @@
           inner = `<img src="${content}" loading="lazy" onclick="previewImg(this.src)"/><div class="btime">${t}</div>`;
         } else if (type === "voice") {
           // content is {dataUrl, mimeType}
-          const src = content.dataUrl || content;
+          const src = content.dataUrl || (typeof content === "string" ? content : "");
           const mime = content.mimeType || "audio/webm";
+          const duration = content.duration || null;
+          
+          let durText = "🎤";
+          if (duration) {
+            const dSecs = Math.floor(duration);
+            const dMins = Math.floor(dSecs / 60);
+            const dRemainingSecs = dSecs % 60;
+            durText = `${dMins}:${dRemainingSecs.toString().padStart(2, '0')}`;
+          }
+
           const btnId =
             "vb_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
           const bars = Array.from(
@@ -1730,7 +2169,7 @@
       <button class="vpb" id="${btnId}" data-src="${src.replace(/"/g, "&quot;")}" data-mime="${mime}"
         onclick="playVoice(this.dataset.src,this.dataset.mime,this)">▶</button>
       <div class="wv">${bars}</div>
-      <span class="vdur">🎤</span>
+      <span class="vdur">${durText}</span>
     </div><div class="btime">${t}</div>`;
         }
 
@@ -1744,7 +2183,35 @@
             themeClass = " " + activeTheme;
           }
         }
-        row.innerHTML = `<div class="bub ${side}${themeClass}"${inlineStyle}>${inner}</div>`;
+
+        // Construct reply button HTML
+        const senderName = isMe ? "You" : (isFriendChat ? friendUsername : (strangerUsername || "Stranger"));
+        const rawContent = (type === "text") ? content : "";
+        const escContent = (typeof rawContent === "string") ? rawContent : "";
+        const replyBtnHtml = `<button class="reply-btn" data-msg-id="${msgId}" data-sender="${esc(senderName)}" data-content="${esc(escContent)}" data-type="${type}" onclick="handleReplyClick(this)">↩</button>`;
+
+        // Construct reply preview inside bubble HTML
+        let replyPreviewHtml = "";
+        if (replyTo) {
+          let previewText = "";
+          if (replyTo.type === "text") {
+            previewText = replyTo.content;
+          } else if (replyTo.type === "image") {
+            previewText = "📷 Image";
+          } else if (replyTo.type === "voice") {
+            previewText = "🎤 Voice Message";
+          }
+          replyPreviewHtml = `
+            <div class="reply-preview-in-bubble" onclick="scrollToMessage('${replyTo.msgId}')">
+              <div class="reply-preview-sender">${esc(replyTo.senderName)}</div>
+              <div class="reply-preview-content">${esc(previewText)}</div>
+            </div>
+          `;
+        }
+
+        row.innerHTML = isMe
+          ? `${replyBtnHtml}<div class="bub ${side}${themeClass}"${inlineStyle}>${replyPreviewHtml}${inner}</div>`
+          : `<div class="bub ${side}${themeClass}"${inlineStyle}>${replyPreviewHtml}${inner}</div>${replyBtnHtml}`;
         $("msgs").appendChild(row);
         scrollB();
       }
