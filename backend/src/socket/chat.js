@@ -26,10 +26,6 @@ function genderOk(me, other) {
   return true;
 }
 
-const spotlightLevel = (me, q) =>
-  (me.spotlight && q.int.includes(me.spotlight)) ||
-  (q.spotlight && me.int.includes(q.spotlight));
-
 /** VIP only: city → state → country (with optional shared tags). */
 const locationLevels = (me) => [
   (q) =>
@@ -67,12 +63,11 @@ function findMatch(me) {
 
   const levels = me.premium
     ? [
-        (q) => spotlightLevel(me, q),
         ...locationLevels(me),
         ...tagLevels(me),
         () => true,
       ]
-    : [(q) => spotlightLevel(me, q), ...tagLevels(me), () => true];
+    : [...tagLevels(me), () => true];
 
   const mode = me.premium ? "location" : "interests";
   for (let lvl = 0; lvl < levels.length; lvl++) {
@@ -113,7 +108,7 @@ module.exports = (io) => {
       const { data: u } = await supabase
         .from("users")
         .select(
-          "id,username,gender,is_verified,is_premium,premium_expiry,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,spotlight_interest,spotlight_expiry,chat_theme,theme_expiry,profile_lock_expiry,aura_expiry,profile_photo",
+          "id,username,gender,is_verified,is_premium,premium_expiry,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,chat_theme,theme_expiry,profile_lock_expiry,aura_expiry,profile_photo",
         )
         .eq("id", id)
         .maybeSingle();
@@ -123,8 +118,6 @@ module.exports = (io) => {
       const now = new Date();
       const isBoosted =
         u.queue_boost_expiry && new Date(u.queue_boost_expiry) > now;
-      const isSpotlight =
-        u.spotlight_expiry && new Date(u.spotlight_expiry) > now;
       const isLocked =
         u.profile_lock_expiry && new Date(u.profile_lock_expiry) > now;
       const hasTheme = u.theme_expiry && new Date(u.theme_expiry) > now;
@@ -151,7 +144,7 @@ module.exports = (io) => {
         city: u.city || "",
         int: u.interests || [],
         boosted: isBoosted,
-        spotlight: isSpotlight ? u.spotlight_interest : null,
+        spotlight: null,
         locked: isLocked,
         theme: hasTheme ? u.chat_theme : "default",
         aura: hasAura,

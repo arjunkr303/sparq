@@ -223,20 +223,10 @@ router.post("/spend-coins", authMw, async (req, res) => {
       upd.reveal_likes_expiry = new Date(
         now.getTime() + 7 * 24 * 60 * 60 * 1000,
       ).toISOString();
-    } else if (itemId === "spotlight") {
-      upd.spotlight_interest =
-        extra?.interest || (req.user.interests && req.user.interests[0]) || "";
-      upd.spotlight_expiry = new Date(
-        now.getTime() + 24 * 60 * 60 * 1000,
-      ).toISOString();
     } else if (itemId === "aura") {
       upd.aura_expiry = new Date(
         now.getTime() + 7 * 24 * 60 * 60 * 1000,
       ).toISOString(); // 1 week
-    } else if (itemId === "citylock") {
-      upd.city_lock_expiry = new Date(
-        now.getTime() + 24 * 60 * 60 * 1000,
-      ).toISOString(); // 24 hours
     }
 
     const { data: u } = await supabase
@@ -273,10 +263,7 @@ router.post("/spend-coins", authMw, async (req, res) => {
     cleaned.chatTheme = u.chat_theme;
     cleaned.profileLockExpiry = u.profile_lock_expiry;
     cleaned.revealLikesExpiry = u.reveal_likes_expiry;
-    cleaned.spotlightExpiry = u.spotlight_expiry;
-    cleaned.spotlightInterest = u.spotlight_interest;
     cleaned.auraExpiry = u.aura_expiry;
-    cleaned.cityLockExpiry = u.city_lock_expiry;
 
     res.json({ user: cleaned, reward });
   } catch (err) {

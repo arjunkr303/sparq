@@ -210,10 +210,7 @@ router.post("/spin", authMw, async (req, res) => {
     cleaned.chatTheme = u.chat_theme;
     cleaned.profileLockExpiry = u.profile_lock_expiry;
     cleaned.revealLikesExpiry = u.reveal_likes_expiry;
-    cleaned.spotlightExpiry = u.spotlight_expiry;
-    cleaned.spotlightInterest = u.spotlight_interest;
     cleaned.auraExpiry = u.aura_expiry;
-    cleaned.cityLockExpiry = u.city_lock_expiry;
 
     let nextSpinsLeft = 0;
     if (isFree) {
