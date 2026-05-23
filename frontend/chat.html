@@ -2061,8 +2061,46 @@
             $("afBtn").textContent = "✓ Request Sent";
           }
         });
-        sock.on("incoming_friend_request", ({ fromUsername }) => {
+        sock.on("incoming_friend_request", ({ fromUsername, requestId }) => {
           showToast(`👋 ${fromUsername} sent you a friend request!`, "ok");
+          addFriendRequestMessage(fromUsername, requestId);
+        });
+
+        sock.on("respond_friend_result", ({ success, requestId, action, message }) => {
+          if (!success) {
+            showToast(message, "err");
+            return;
+          }
+          showToast(message, "ok");
+          const box = document.getElementById(`freq_${requestId}`);
+          if (box) {
+            if (action === "accept") {
+              box.innerHTML = `<span style="color: var(--gn); font-size: 12px; font-weight: 600;">✓ Friend request accepted!</span>`;
+              if ($("mBtnAddFriend")) {
+                $("mBtnAddFriend").textContent = "✓ Friend";
+                $("mBtnAddFriend").disabled = true;
+              }
+              if ($("afBtn")) {
+                $("afBtn").textContent = "✓ Friend";
+                $("afBtn").disabled = true;
+              }
+            } else {
+              box.innerHTML = `<span style="color: var(--t3); font-size: 12px;">Friend request declined.</span>`;
+            }
+          }
+        });
+
+        sock.on("friend_request_accepted", ({ friendUsername }) => {
+          showToast(`🎉 ${friendUsername} accepted your friend request!`, "ok");
+          addSys(`🎉 You and ${friendUsername} are now friends!`);
+          if ($("mBtnAddFriend")) {
+            $("mBtnAddFriend").textContent = "✓ Friend";
+            $("mBtnAddFriend").disabled = true;
+          }
+          if ($("afBtn")) {
+            $("afBtn").textContent = "✓ Friend";
+            $("afBtn").disabled = true;
+          }
         });
 
         // Premium Animations
@@ -3262,6 +3300,28 @@
         d.innerHTML = `<span>${esc(txt)}</span>`;
         $("msgs").appendChild(d);
         scrollB();
+      }
+
+      function addFriendRequestMessage(fromUsername, requestId) {
+        const d = document.createElement("div");
+        d.className = "sysmsg";
+        d.id = `freq_${requestId}`;
+        d.innerHTML = `
+          <div style="background: rgba(124, 92, 252, 0.08); border: 1px solid rgba(124, 92, 252, 0.25); border-radius: 12px; padding: 12px 16px; margin: 8px auto; max-width: 320px; text-align: center; backdrop-filter: blur(8px); box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+            <p style="margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--tx);">👋 ${esc(fromUsername)} sent you a friend request.</p>
+            <div style="display: flex; gap: 8px; justify-content: center;">
+              <button onclick="handleChatFriendRequest('${requestId}', 'accept')" style="background: var(--pr); color: #fff; border: none; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s;">Accept</button>
+              <button onclick="handleChatFriendRequest('${requestId}', 'reject')" style="background: rgba(255,255,255,0.06); color: var(--t2); border: 1px solid var(--bd); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">Decline</button>
+            </div>
+          </div>
+        `;
+        $("msgs").appendChild(d);
+        scrollB();
+      }
+
+      function handleChatFriendRequest(requestId, action) {
+        if (!sock) return;
+        sock.emit("respond_friend_request", { requestId, action });
       }
 
       /* ══ THEME SELECTOR ACTIONS ══ */

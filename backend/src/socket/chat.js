@@ -980,30 +980,102 @@ module.exports = (io) => {
           });
           return;
         }
-        await supabase
+        const { data: newFr } = await supabase
           .from("friendships")
           .insert({
             user_id: u.id,
             friend_id: targetUserId,
             status: "pending",
-          });
+          })
+          .select("id")
+          .maybeSingle();
+
+        const requestId = newFr?.id;
+
         socket.emit("friend_request_result", {
           success: true,
           message: "Friend request sent!",
+          requestId,
         });
         // notify partner if online
         const partnerSocket = [...io.sockets.sockets.values()].find(
           (s) => s.u?.id === targetUserId,
         );
-        if (partnerSocket)
+        if (partnerSocket) {
           partnerSocket.emit("incoming_friend_request", {
             fromUsername: u.name,
             fromUserId: u.id,
+            requestId,
           });
+        }
       } catch {
         socket.emit("friend_request_result", {
           success: false,
           message: "Error sending request",
+        });
+      }
+    });
+
+    // ── Respond to Friend request ──
+    socket.on("respond_friend_request", async ({ requestId, action }) => {
+      if (u.guest || !requestId || !u.id) return;
+      try {
+        const { data: fr } = await supabase
+          .from("friendships")
+          .select("*")
+          .eq("id", requestId)
+          .eq("friend_id", u.id)
+          .maybeSingle();
+        if (!fr) {
+          socket.emit("respond_friend_result", {
+            success: false,
+            message: "Friend request not found",
+          });
+          return;
+        }
+
+        if (action === "accept") {
+          await supabase
+            .from("friendships")
+            .update({ status: "accepted" })
+            .eq("id", requestId);
+
+          socket.emit("respond_friend_result", {
+            success: true,
+            requestId,
+            action: "accept",
+            message: "Friend added!",
+          });
+
+          // notify sender if online
+          const partnerSocket = [...io.sockets.sockets.values()].find(
+            (s) => s.u?.id === fr.user_id,
+          );
+          if (partnerSocket) {
+            partnerSocket.emit("friend_request_accepted", {
+              friendId: u.id,
+              friendUsername: u.name,
+              requestId,
+            });
+          }
+        } else {
+          await supabase
+            .from("friendships")
+            .delete()
+            .eq("id", requestId);
+
+          socket.emit("respond_friend_result", {
+            success: true,
+            requestId,
+            action: "reject",
+            message: "Request rejected.",
+          });
+        }
+      } catch (err) {
+        console.error("respond_friend_request error:", err);
+        socket.emit("respond_friend_result", {
+          success: false,
+          message: "Error responding to request",
         });
       }
     });
