@@ -103,3 +103,27 @@ DO $$ BEGIN
     CREATE POLICY "Service full access rematch" ON rematch_requests FOR ALL USING (TRUE);
   END IF;
 END $$;
+
+CREATE TABLE IF NOT EXISTS friend_messages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  friendship_id UUID NOT NULL REFERENCES friendships(id) ON DELETE CASCADE,
+  sender_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  type TEXT DEFAULT 'text' CHECK (type IN ('text', 'image', 'gif', 'voice')),
+  mime_type TEXT DEFAULT NULL,
+  duration INTEGER DEFAULT NULL,
+  reply_to JSONB DEFAULT NULL,
+  message_id TEXT UNIQUE NOT NULL,
+  seen BOOLEAN DEFAULT FALSE,
+  edited BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_friend_messages_friendship_id ON friend_messages(friendship_id);
+ALTER TABLE friend_messages ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='friend_messages' AND policyname='Service full access messages') THEN
+    CREATE POLICY "Service full access messages" ON friend_messages FOR ALL USING (TRUE);
+  END IF;
+END $$;
+

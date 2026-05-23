@@ -339,9 +339,66 @@ router.get("/friends", authMw, async (req, res) => {
         "id, status, user_id, friend_id, sender:users!friendships_user_id_fkey(id,username,is_verified,is_premium,profile_photo), receiver:users!friendships_friend_id_fkey(id,username,is_verified,is_premium,profile_photo)",
       )
       .or(`user_id.eq.${req.user.id},friend_id.eq.${req.user.id}`);
-    res.json({ friends: rows || [] });
+
+    // Fetch unread messages count for each friendship where recipient is the current user
+    const { data: unreads } = await supabase
+      .from("friend_messages")
+      .select("friendship_id")
+      .neq("sender_id", req.user.id)
+      .eq("seen", false);
+
+    const unreadMap = {};
+    if (unreads) {
+      unreads.forEach(u => {
+        unreadMap[u.friendship_id] = (unreadMap[u.friendship_id] || 0) + 1;
+      });
+    }
+
+    const friendsWithUnread = (rows || []).map(f => ({
+      ...f,
+      unreadCount: unreadMap[f.id] || 0
+    }));
+
+    res.json({ friends: friendsWithUnread });
   } catch (err) {
     console.error("Friends list error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ── friends: get messages ──
+router.get("/friends/messages", authMw, async (req, res) => {
+  try {
+    const { friendshipId } = req.query;
+    if (!friendshipId)
+      return res.status(400).json({ message: "Friendship ID is required" });
+
+    // Verify friendship exists and includes the current user
+    const { data: fr } = await supabase
+      .from("friendships")
+      .select("id, user_id, friend_id")
+      .eq("id", friendshipId)
+      .maybeSingle();
+
+    if (!fr)
+      return res.status(404).json({ message: "Friendship not found" });
+
+    if (fr.user_id !== req.user.id && fr.friend_id !== req.user.id)
+      return res.status(403).json({ message: "Unauthorized" });
+
+    // Fetch messages
+    const { data: msgs, error } = await supabase
+      .from("friend_messages")
+      .select("*")
+      .eq("friendship_id", friendshipId)
+      .order("created_at", { ascending: true });
+
+    if (error)
+      return res.status(500).json({ message: "Failed to fetch messages" });
+
+    res.json({ messages: msgs || [] });
+  } catch (err) {
+    console.error("Get messages error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

@@ -1514,10 +1514,10 @@ nav {
       <div class="card">
         <div class="avw">
           <!-- Profile photo with edit button -->
-          <div class="photo-wrap" onclick="$('photoInput').click()">
+          <div class="photo-wrap" onclick="viewProfilePhoto()">
             <div id="photoPlaceholder" class="photo-placeholder">?</div>
             <img id="photoImg" class="photo-av" src="" alt="" style="display:none"/>
-            <div class="photo-edit" title="Change photo">✏️</div>
+            <div class="photo-edit" title="Change photo" onclick="event.stopPropagation(); $('photoInput').click()">✏️</div>
           </div>
           <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(this)"/>
           <div>
@@ -2088,6 +2088,40 @@ function compressImage(src, maxW, maxH, quality) {
   });
 }
 
+function viewProfilePhoto() {
+  const img = $('photoImg');
+  const user = JSON.parse(localStorage.getItem('sc_user') || 'null');
+  
+  if (img && img.style.display !== 'none' && img.src) {
+    previewImg(img.src);
+  } else if (user && user.profilePhoto) {
+    previewImg(user.profilePhoto);
+  }
+}
+
+function previewImg(src) {
+  const ipm = $('ipm');
+  const ipmsrc = $('ipmsrc');
+  if (ipm && ipmsrc) {
+    ipmsrc.src = src;
+    ipm.style.display = 'flex';
+    setTimeout(() => {
+      ipmsrc.style.transform = 'scale(1)';
+    }, 10);
+  }
+}
+
+function closeImgPreview(e) {
+  const ipm = $('ipm');
+  const ipmsrc = $('ipmsrc');
+  if (ipm && (e.target === ipm || e.target.id === 'ipm-close')) {
+    if (ipmsrc) ipmsrc.style.transform = 'scale(0.92)';
+    setTimeout(() => {
+      ipm.style.display = 'none';
+    }, 150);
+  }
+}
+
 /* ── Verification ── */
 function openVM() { $('vMod').classList.add('on'); }
 function closeVM() {
@@ -2269,6 +2303,9 @@ function renderFriends() {
     // Calculate total unread
     let totalUnread = 0;
     acceptedFriends.forEach(f => {
+      if (f.unreadCount !== undefined) {
+        localStorage.setItem(`sc_friend_unread_${f.id}`, f.unreadCount);
+      }
       const unread = parseInt(localStorage.getItem(`sc_friend_unread_${f.id}`) || '0', 10);
       totalUnread += unread;
     });
@@ -2377,7 +2414,7 @@ function handleIncomingSocketMessage({ from, fromUserId, roomId, content, type, 
   const friendshipId = roomId.substring(2);
 
   const isMe = fromUserId === user.id;
-  const seenState = isMe; // self-sent messages (from other tabs) are already seen. incoming friend messages start unseen.
+  const seenState = false; // self-sent messages and incoming messages on dashboard start unseen.
   saveFriendMessage(friendshipId, content, isMe, type, timestamp, mimeType, duration, replyTo, messageId, seenState);
 
   if (!isMe) {
@@ -3075,6 +3112,12 @@ loadLuckyDrawStatus();
     <p class="reward-subtitle" id="rewardSubtitle">You won 25 Coins!</p>
     <button class="reward-close-btn" onclick="closeRewardModal()">Awesome!</button>
   </div>
+</div>
+
+<!-- Image Preview Modal -->
+<div id="ipm" onclick="closeImgPreview(event)" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); z-index: 8500; display: none; align-items: center; justify-content: center;">
+  <img id="ipmsrc" src="" alt="Preview" style="max-width: 90vw; max-height: 90vh; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); object-fit: contain; transform: scale(0.92); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);"/>
+  <button id="ipm-close" onclick="document.getElementById('ipm').style.display = 'none'" title="Close" style="position: fixed; top: 20px; right: 20px; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 8501; transition: all 0.2s;">✕</button>
 </div>
 </body>
 </html>

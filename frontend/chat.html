@@ -1134,7 +1134,7 @@
         }
       }
 
-      function loadFriendChatHistory() {
+      async function loadFriendChatHistory() {
         const key = `sc_friend_msgs_${friendshipId}`;
         let history = [];
         try {
@@ -1143,9 +1143,57 @@
           console.error("Error loading chat history:", e);
         }
         
+        // Render local history first for instant load
+        renderHistoryList(history);
+
+        // Fetch and sync from server
+        try {
+          const r = await fetch(`${API}/api/user/friends/messages?friendshipId=${friendshipId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (r.ok) {
+            const d = await r.json();
+            const serverMsgs = d.messages || [];
+            
+            // Sync server messages into local history
+            serverMsgs.forEach(sMsg => {
+              const isMe = sMsg.sender_id === user.id;
+              const localIndex = history.findIndex(m => m.messageId === sMsg.message_id);
+              if (localIndex !== -1) {
+                history[localIndex].seen = sMsg.seen;
+                history[localIndex].content = sMsg.content;
+                history[localIndex].edited = sMsg.edited || false;
+              } else {
+                history.push({
+                  content: sMsg.content,
+                  isMe,
+                  timestamp: sMsg.created_at,
+                  type: sMsg.type,
+                  mimeType: sMsg.mime_type,
+                  duration: sMsg.duration,
+                  replyTo: sMsg.reply_to,
+                  messageId: sMsg.message_id,
+                  seen: sMsg.seen
+                });
+              }
+            });
+            
+            // Sort by timestamp
+            history.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+            localStorage.setItem(key, JSON.stringify(history));
+            
+            // Re-render latest synced history
+            renderHistoryList(history);
+          }
+        } catch (err) {
+          console.error("Failed to sync messages from server:", err);
+        }
+      }
+
+      function renderHistoryList(historyList) {
         clearBubs();
         
-        history.forEach(msg => {
+        historyList.forEach(msg => {
           const status = msg.seen ? "seen" : "sent";
           if (msg.type === "voice") {
             addBub({ dataUrl: msg.content, mimeType: msg.mimeType, duration: msg.duration }, msg.isMe, msg.timestamp, "voice", msg.replyTo, msg.messageId, false, status);
@@ -1526,7 +1574,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo, messageId, isMe);
+              saveFriendMessage(message, isMe, "text", timestamp, null, incomingFid, null, replyTo, messageId, false);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1554,7 +1602,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo, messageId, isMe);
+              saveFriendMessage(dataUrl, isMe, "image", timestamp, null, incomingFid, null, replyTo, messageId, false);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1582,7 +1630,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(gifUrl, isMe, "gif", timestamp, null, incomingFid, null, replyTo, messageId, isMe);
+              saveFriendMessage(gifUrl, isMe, "gif", timestamp, null, incomingFid, null, replyTo, messageId, false);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);
@@ -1610,7 +1658,7 @@
           if (roomId && roomId.startsWith("f_")) {
             const incomingFid = roomId.substring(2);
             if (!isFriendChat || incomingFid !== friendshipId) {
-              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo, messageId, isMe);
+              saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, incomingFid, duration, replyTo, messageId, false);
               if (!isMe) {
                 const unreadKey = `sc_friend_unread_${incomingFid}`;
                 const current = parseInt(localStorage.getItem(unreadKey) || "0", 10);

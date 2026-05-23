@@ -449,7 +449,7 @@ module.exports = (io) => {
       }
     });
 
-    socket.on("send_message", ({ message, roomId, replyTo, messageId }) => {
+    socket.on("send_message", async ({ message, roomId, replyTo, messageId }) => {
       let isAllowed = false;
       if (chats.has(socket.id)) {
         const c = chats.get(socket.id);
@@ -465,6 +465,24 @@ module.exports = (io) => {
         msg = filter.clean(msg);
       } catch {}
       const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+
+      if (roomId && roomId.startsWith("f_")) {
+        const friendshipId = roomId.substring(2);
+        try {
+          await supabase.from("friend_messages").insert({
+            friendship_id: friendshipId,
+            sender_id: u.id,
+            content: msg,
+            type: "text",
+            reply_to: replyTo || null,
+            message_id: msgId,
+            seen: false
+          });
+        } catch (err) {
+          console.error("Error saving friend message:", err);
+        }
+      }
+
       io.to(roomId).emit("receive_message", {
         from: socket.id,
         fromUserId: u.id,
@@ -477,7 +495,7 @@ module.exports = (io) => {
     });
 
     // ── Image ──
-    socket.on("send_image", ({ dataUrl, roomId, replyTo, messageId }) => {
+    socket.on("send_image", async ({ dataUrl, roomId, replyTo, messageId }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send images" });
         return;
@@ -497,6 +515,24 @@ module.exports = (io) => {
         return;
       }
       const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+
+      if (roomId && roomId.startsWith("f_")) {
+        const friendshipId = roomId.substring(2);
+        try {
+          await supabase.from("friend_messages").insert({
+            friendship_id: friendshipId,
+            sender_id: u.id,
+            content: dataUrl,
+            type: "image",
+            reply_to: replyTo || null,
+            message_id: msgId,
+            seen: false
+          });
+        } catch (err) {
+          console.error("Error saving friend image:", err);
+        }
+      }
+
       io.to(roomId).emit("receive_image", {
         from: socket.id,
         fromUserId: u.id,
@@ -509,7 +545,7 @@ module.exports = (io) => {
     });
     
     // ── GIF ──
-    socket.on("send_gif", ({ gifUrl, roomId, replyTo, messageId }) => {
+    socket.on("send_gif", async ({ gifUrl, roomId, replyTo, messageId }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send GIFs" });
         return;
@@ -525,6 +561,24 @@ module.exports = (io) => {
 
       if (!gifUrl || typeof gifUrl !== 'string') return;
       const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+
+      if (roomId && roomId.startsWith("f_")) {
+        const friendshipId = roomId.substring(2);
+        try {
+          await supabase.from("friend_messages").insert({
+            friendship_id: friendshipId,
+            sender_id: u.id,
+            content: gifUrl,
+            type: "gif",
+            reply_to: replyTo || null,
+            message_id: msgId,
+            seen: false
+          });
+        } catch (err) {
+          console.error("Error saving friend gif:", err);
+        }
+      }
+
       io.to(roomId).emit("receive_gif", {
         from: socket.id,
         fromUserId: u.id,
@@ -537,7 +591,7 @@ module.exports = (io) => {
     });
 
     // ── Voice — send as proper audio blob ──
-    socket.on("send_voice", ({ dataUrl, roomId, mimeType, duration, replyTo, messageId }) => {
+    socket.on("send_voice", async ({ dataUrl, roomId, mimeType, duration, replyTo, messageId }) => {
       if (u.guest) {
         socket.emit("media_error", { msg: "Sign in to send voice" });
         return;
@@ -557,6 +611,26 @@ module.exports = (io) => {
         return;
       }
       const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
+
+      if (roomId && roomId.startsWith("f_")) {
+        const friendshipId = roomId.substring(2);
+        try {
+          await supabase.from("friend_messages").insert({
+            friendship_id: friendshipId,
+            sender_id: u.id,
+            content: dataUrl,
+            type: "voice",
+            mime_type: mimeType || "audio/webm",
+            duration: duration || null,
+            reply_to: replyTo || null,
+            message_id: msgId,
+            seen: false
+          });
+        } catch (err) {
+          console.error("Error saving friend voice:", err);
+        }
+      }
+
       io.to(roomId).emit("receive_voice", {
         from: socket.id,
         fromUserId: u.id,
@@ -571,7 +645,7 @@ module.exports = (io) => {
     });
 
     // ── Edit Message ──
-    socket.on("edit_message", ({ messageId, roomId, newMessage }) => {
+    socket.on("edit_message", async ({ messageId, roomId, newMessage }) => {
       let isAllowed = false;
       if (chats.has(socket.id)) {
         const c = chats.get(socket.id);
@@ -587,6 +661,16 @@ module.exports = (io) => {
         msg = filter.clean(msg);
       } catch {}
 
+      if (roomId && roomId.startsWith("f_")) {
+        try {
+          await supabase.from("friend_messages")
+            .update({ content: msg, edited: true })
+            .eq("message_id", messageId);
+        } catch (err) {
+          console.error("Error updating friend message:", err);
+        }
+      }
+
       io.to(roomId).emit("message_edited", {
         messageId,
         roomId,
@@ -595,7 +679,7 @@ module.exports = (io) => {
     });
 
     // ── Delete Message (Unsend) ──
-    socket.on("delete_message", ({ messageId, roomId }) => {
+    socket.on("delete_message", async ({ messageId, roomId }) => {
       let isAllowed = false;
       if (chats.has(socket.id)) {
         const c = chats.get(socket.id);
@@ -604,6 +688,16 @@ module.exports = (io) => {
         if (socket.rooms.has(roomId)) isAllowed = true;
       }
       if (!isAllowed) return;
+
+      if (roomId && roomId.startsWith("f_")) {
+        try {
+          await supabase.from("friend_messages")
+            .delete()
+            .eq("message_id", messageId);
+        } catch (err) {
+          console.error("Error deleting friend message:", err);
+        }
+      }
 
       io.to(roomId).emit("message_deleted", {
         messageId,
@@ -611,8 +705,8 @@ module.exports = (io) => {
       });
     });
 
-    // ── Message Seen Receipts ──
-    socket.on("message_seen", ({ messageId, roomId }) => {
+    // ── Message Seen Receipts (Delete on Seen) ──
+    socket.on("message_seen", async ({ messageId, roomId }) => {
       let isAllowed = false;
       if (chats.has(socket.id)) {
         const c = chats.get(socket.id);
@@ -621,11 +715,21 @@ module.exports = (io) => {
         if (socket.rooms.has(roomId)) isAllowed = true;
       }
       if (!isAllowed) return;
+
+      if (roomId && roomId.startsWith("f_")) {
+        try {
+          await supabase.from("friend_messages")
+            .delete()
+            .eq("message_id", messageId);
+        } catch (err) {
+          console.error("Error deleting seen message:", err);
+        }
+      }
 
       socket.to(roomId).emit("message_seen", { messageId, roomId });
     });
 
-    socket.on("chat_seen", ({ roomId }) => {
+    socket.on("chat_seen", async ({ roomId }) => {
       let isAllowed = false;
       if (chats.has(socket.id)) {
         const c = chats.get(socket.id);
@@ -634,6 +738,18 @@ module.exports = (io) => {
         if (socket.rooms.has(roomId)) isAllowed = true;
       }
       if (!isAllowed) return;
+
+      if (roomId && roomId.startsWith("f_")) {
+        const friendshipId = roomId.substring(2);
+        try {
+          await supabase.from("friend_messages")
+            .delete()
+            .eq("friendship_id", friendshipId)
+            .neq("sender_id", u.id);
+        } catch (err) {
+          console.error("Error deleting seen chat messages:", err);
+        }
+      }
 
       socket.to(roomId).emit("chat_seen", { roomId });
     });
