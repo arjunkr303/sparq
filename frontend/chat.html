@@ -50,6 +50,7 @@
       ::-webkit-scrollbar-thumb:hover { background: var(--pr); }
 
       /* Top Bar */
+      /* Top Bar */
       .top-nav {
         height: 56px;
         background: rgba(10, 10, 20, 0.7);
@@ -90,7 +91,7 @@
         letter-spacing: -0.5px;
       }
       
-      .top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+      .top-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
       .coin-pill {
         display: flex;
         align-items: center;
@@ -107,6 +108,85 @@
       }
       .coin-pill:hover { transform: scale(1.05); background: rgba(255, 209, 102, 0.15); }
       .coin-pill-icon { background: linear-gradient(135deg, #ffd166, #ff9f43); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+      /* Sleek Pills for chat top nav */
+      .chat-coins-pill {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(255, 209, 102, 0.08);
+        border: 1px solid rgba(255, 209, 102, 0.2);
+        padding: 5px 10px;
+        border-radius: 50px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--gd);
+        box-shadow: 0 2px 8px rgba(255, 209, 102, 0.05);
+      }
+      .nav-pill-btn {
+        background: var(--glass);
+        color: var(--t2);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 50px;
+        border: 1px solid var(--bd);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .nav-pill-btn:hover {
+        background: var(--glass2);
+        color: var(--tx);
+        border-color: var(--b2);
+      }
+      .guest-tag {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--t3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        background: rgba(255,255,255,0.03);
+        padding: 4px 8px;
+        border-radius: 6px;
+        border: 1px solid var(--bd);
+        display: inline-flex;
+        align-items: center;
+      }
+
+      /* Mobile Header Adaptations */
+      @media (max-width: 767px) {
+        .logo-text {
+          display: none;
+        }
+        .back-text {
+          display: none;
+        }
+        .back-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          padding: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 16px;
+        }
+        .top-nav {
+          padding: 0 12px;
+        }
+        .top-right {
+          gap: 6px;
+        }
+        .chat-coins-pill {
+          padding: 5px 8px;
+        }
+        .nav-pill-btn {
+          padding: 5px 10px;
+        }
+      }
       
       /* Layout Grid */
       .layout-grid {
@@ -532,6 +612,86 @@
       .mnav-btn.active { color: var(--pr); }
       .mnav-btn.active span { color: var(--tx); }
 
+      /* Quick Premium Actions Ribbon (Mobile Scrollable) */
+      .chat-premium-actions-bar {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(15, 15, 26, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--bd);
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+        -webkit-overflow-scrolling: touch;
+      }
+      .chat-premium-actions-bar::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome/Safari */
+      }
+      .prem-bar-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 99px;
+        font-size: 11.5px;
+        font-weight: 700;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--tx);
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .prem-bar-btn:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.08);
+        transform: scale(1.02);
+      }
+      .prem-bar-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      #mBtnSL { border-color: rgba(251, 191, 36, 0.4); background: rgba(251, 191, 36, 0.06); color: var(--gd); }
+      #mBtnRose { border-color: rgba(239, 69, 101, 0.4); background: rgba(239, 69, 101, 0.06); color: var(--rd); }
+      #mBtnCp { border-color: rgba(255, 100, 150, 0.4); background: rgba(255, 100, 150, 0.06); color: #ff6496; }
+      #mBtnOpener { border-color: rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.06); color: var(--ac); }
+      #mBtnRevealInt { border-color: rgba(99, 102, 241, 0.4); background: rgba(99, 102, 241, 0.06); color: #b4a0ff; }
+      #mBtnRM { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.06); color: var(--gn); }
+      #mBtnAddFriend { border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.1); color: var(--gn); }
+      .prem-bar-btn.danger { border-color: rgba(239, 69, 101, 0.2); background: transparent; color: var(--t3); }
+
+      /* Header Dropdown Card (Mobile Partner Profile) */
+      .hdr-dropdown-card {
+        position: absolute;
+        top: 60px; /* directly below header */
+        left: 16px;
+        right: 16px;
+        background: rgba(20, 20, 35, 0.96);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        border: 1px solid var(--bd);
+        border-radius: 16px;
+        padding: 16px;
+        z-index: 100;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        animation: slideDown 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        text-align: left;
+      }
+      @keyframes slideDown {
+        from { transform: translateY(-10px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+
+      @media (min-width: 768px) {
+        #hdChat { cursor: default !important; }
+        #hdrClickIcon { display: none !important; }
+        #hbadges { display: none !important; }
+        .chat-premium-actions-bar { display: none !important; }
+        .hdr-dropdown-card { display: none !important; }
+        #btnSkipMobile { display: none !important; }
+      }
+
       /* Responsiveness */
       @media (max-width: 1023px) {
         .layout-grid { grid-template-columns: 260px 1fr; }
@@ -622,8 +782,8 @@
     <!-- Top Nav -->
     <div class="top"> <!-- Keeping .top to satisfy JS, but styling it via top-nav -->
       <div class="top-nav" style="width:100%; height:100%; padding:0;">
-        <button class="back-btn bk" onclick="goBack()">← Back</button>
-        <span class="logo lm">◈ StrangerNear</span>
+        <button class="back-btn bk" onclick="goBack()">←<span class="back-text"> Back</span></button>
+        <span class="logo lm">◈<span class="logo-text"> StrangerNear</span></span>
         <div class="top-right tr" id="tr"></div>
       </div>
     </div>
@@ -675,15 +835,36 @@
           </div>
           
           <!-- Active Chat Header -->
-          <div class="hd-chat" id="hdChat">
+          <div class="hd-chat" id="hdChat" style="cursor: pointer; width: 100%;" onclick="toggleMobilePartnerCard()">
             <div class="chat-partner-avatar cav" id="hav">?</div>
-            <div class="chat-partner-info">
-              <div class="chat-partner-name cn" id="hname">—</div>
+            <div class="chat-partner-info" style="flex: 1;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <div class="chat-partner-name cn" id="hname">—</div>
+                <div class="badge-row pm" id="hbadges" style="display: flex; gap: 4px; flex-wrap: wrap;"></div>
+              </div>
               <div class="chat-partner-status cs2" id="hstat">● online</div>
             </div>
-            <!-- Toggle Right Panel (Tablet only) -->
-            <button id="btnInfoToggle" onclick="document.getElementById('rightPanel').classList.toggle('open')" style="display:none; margin-left:auto; background:var(--glass2); border:1px solid var(--bd); color:var(--tx); width:36px; height:36px; border-radius:10px; font-size:16px;">ℹ️</button>
+            <!-- Click indicator -->
+            <div style="margin-left: auto; font-size: 10px; opacity: 0.5;" id="hdrClickIcon">▼</div>
           </div>
+        </div>
+
+        <!-- Header Dropdown Card -->
+        <div class="hdr-dropdown-card" id="hdrDropdownCard" style="display: none;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--gd); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;"> Stranger Info</div>
+          <div id="mPartnerDetails" style="font-size: 12.5px; color: var(--tx); line-height: 1.55;">Loading...</div>
+        </div>
+
+        <!-- Mobile Premium Actions Ribbon -->
+        <div class="chat-premium-actions-bar" id="chatPremActionsBar">
+          <button class="prem-bar-btn" id="mBtnSL" onclick="sendPremiumAction('superlike', 8)">🌟 Super Like (8 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnRose" onclick="sendPremiumAction('rose', 3)">🌹 Send Rose (3 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnOpener" onclick="buyFirstMessageOpener()">💬 AI Opener (3 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnRevealInt" onclick="buyRevealInterests()">🎯 Reveal Interests (8 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnCp" onclick="sendPremiumAction('compliment', 5)">💌 Compliment (5 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnRM" onclick="sendRematchRequest()">🔁 Re-match (10 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnAddFriend" onclick="sendFriendReq()">➕ Add Friend</button>
+          <button class="prem-bar-btn danger" id="mBtnReport" onclick="togRep()">⚑ Report</button>
         </div>
 
         <!-- Messages Area -->
@@ -736,6 +917,7 @@
             <button class="iab" id="btnImg" onclick="document.getElementById('fi').click()" disabled title="Sign in to send images">🖼️</button>
             <button class="iab" id="btnVc" disabled title="Hold to record voice" onmousedown="startRec(event)" onmouseup="stopRec()" ontouchstart="startRec(event)" ontouchend="stopRec()">🎤</button>
             <button class="iab" id="btnGif" disabled title="Send a GIF" onclick="toggleGifPanel()">GIF</button>
+            <button class="iab" id="btnSkipMobile" title="Next Stranger" onclick="doSkip()" style="display: none;">⏭️</button>
             <div class="input-wrapper">
               <input type="text" id="mi" placeholder="Type a message..." disabled maxlength="500" />
             </div>
@@ -790,10 +972,6 @@
         <div style="font-size:22px">💬</div>
         <span>Chat</span>
       </button>
-      <button class="mnav-btn" onclick="setMobileTab('info')" id="mtab-info">
-        <div style="font-size:22px">👤</div>
-        <span>Partner</span>
-      </button>
     </div>
 
     <!-- Modals -->
@@ -832,6 +1010,33 @@
         <div class="mbtns">
           <button class="mbp" id="confirmDeleteBtn" onclick="confirmDeleteMsg()" style="background: linear-gradient(135deg, var(--rd), #d03050); box-shadow: 0 6px 16px rgba(239,69,101,0.3);">Unsend</button>
           <button class="mbs" onclick="closeDeleteConfModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom Coin Spend Confirmation Modal -->
+    <div class="mov" id="coinConfirmMod">
+      <div class="mb" style="border-color: rgba(255, 209, 102, 0.5);">
+        <div style="font-size: 42px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));" id="coinConfirmIcon">🪙</div>
+        <h2 id="coinConfirmTitle">Confirm Spend</h2>
+        <p id="coinConfirmMessage">Are you sure you want to spend coins?</p>
+        <div class="mbtns">
+          <button class="mbp" id="btnCoinConfirmYes" style="background: linear-gradient(135deg, var(--gd), #ff9f43); color: #000; box-shadow: 0 6px 16px rgba(255, 209, 102, 0.3); font-weight: 700;">Spend</button>
+          <button class="mbs" id="btnCoinConfirmNo">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Lost Modal -->
+    <div class="mov" id="connLostMod">
+      <div class="mb" style="border-color: var(--rd);">
+        <div style="font-size: 42px; margin-bottom: 12px; filter: drop-shadow(0 4px 10px rgba(239, 69, 101, 0.3));" id="connLostIcon">📶</div>
+        <h2>Connection Lost</h2>
+        <p>Your internet connection is gone. What would you like to do?</p>
+        <div class="mbtns" style="flex-direction: column; gap: 8px; width: 100%;">
+          <button class="mbp" onclick="closeConnLostModal()" style="width: 100%; margin: 0;">Wait for Reconnect</button>
+          <button class="mbs" id="btnConnLostAddFriend" onclick="triggerConnLostAddFriend()" style="width: 100%; margin: 0; background: rgba(6, 214, 160, 0.1); border-color: rgba(6, 214, 160, 0.3); color: var(--gn);">➕ Add Friend First</button>
+          <button class="mbs" onclick="triggerConnLostSkip()" style="width: 100%; margin: 0; border-color: var(--rd); color: var(--rd);">⏭️ Skip Chat</button>
         </div>
       </div>
     </div>
@@ -930,7 +1135,11 @@
       function setMobileTab(tab) {
         document.body.setAttribute('data-tab', tab);
         document.querySelectorAll('.mnav-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('mtab-' + tab).classList.add('active');
+        const activeBtn = document.getElementById('mtab-' + tab);
+        if (activeBtn) activeBtn.classList.add('active');
+        if (tab === 'chat' && room && sock) {
+          sock.emit("chat_seen", { roomId: room });
+        }
       }
       
 
@@ -965,6 +1174,7 @@
       let sharedInterestNames = [];
       let openerUsedInChat = false;
       let strangerUsername = "";
+      let partnerCountry = "", partnerState = "", partnerCity = "";
       let activeReply = null; // { msgId, senderName, content, type }
 
       // Friend Chat context variables
@@ -1065,13 +1275,13 @@
           $("mname").textContent = user.username;
           $("mbr").innerHTML = buildBadgeHTML(user);
           $("tr").innerHTML =
-            `<span id="chatCoins" style="color:var(--gd);font-weight:700;font-size:12px;margin-right:12px">🪙 ${user.coins || 0}</span><a href="dashboard.html" style="color:var(--t2);font-size:11px">Dashboard</a>`;
+            `<div class="chat-coins-pill" id="chatCoins">🪙 ${user.coins || 0}</div><a href="dashboard.html" class="nav-pill-btn">Dashboard</a>`;
           $("btnImg").disabled = $("btnVc").disabled = false;
         } else {
           $("mav").textContent = "👤";
           $("mname").textContent = "Guest";
           $("tr").innerHTML =
-            '<span class="gtag">Guest</span><a class="sul" href="register.html">Sign Up</a>';
+            '<span class="guest-tag">Guest</span><a class="nav-pill-btn" href="register.html">Sign Up</a>';
           $("idleSub").textContent =
             "Guest mode — sign up for images, voice & more!";
         }
@@ -1097,6 +1307,12 @@
             false
           );
           $("hname").textContent = friendUsername;
+          if ($("hbadges")) {
+            $("hbadges").innerHTML = `<span class="bm bv">✦ Friend</span>`;
+          }
+          if ($("mPartnerDetails")) {
+            $("mPartnerDetails").innerHTML = `<div>👥 <strong>Status:</strong> Friend ✓</div><div style="margin-top: 4px; color: var(--t3);">Saved to device</div>`;
+          }
           updatePartnerOnlineStatus(false); // Default to offline initially
 
           // Display the partner card showing friend info and device storage status
@@ -1397,6 +1613,11 @@
 
         sock.on("connect", () => {
           console.log("✅", sock.id);
+          const wasModalOpen = $("connLostMod") && $("connLostMod").classList.contains("on");
+          closeConnLostModal();
+          if (wasModalOpen) {
+            showToast("Reconnected successfully!", "ok");
+          }
           if (isFriendChat) {
             sock.emit("join_friend_chat", { friendshipId }, (res) => {
               if (res && res.success) {
@@ -1423,6 +1644,13 @@
             localStorage.removeItem("sc_user");
             localStorage.removeItem("sc_guest");
             location.href = "login.html";
+          }
+        });
+
+        sock.on("disconnect", (reason) => {
+          console.warn("🔌 Socket disconnected:", reason);
+          if (state === "chatting" || state === "searching") {
+            showConnLostModal();
           }
         });
 
@@ -1468,10 +1696,16 @@
             partnerInterests,
             partnerAura,
             partnerProfilePhoto,
+            country,
+            state,
+            city,
           }) => {
             room = rid;
             rpSent = false;
             partnerUserId = puid || null;
+            partnerCountry = country || "";
+            partnerState = state || "";
+            partnerCity = city || "";
             partnerTheme = ptheme || "default";
             ourTheme = user?.chatTheme || "default"; // fallback if we want to theme our own bubbles
 
@@ -1493,6 +1727,17 @@
               partnerAura,
             );
             $("hname").textContent = pn;
+            if ($("hbadges")) {
+              $("hbadges").innerHTML = buildBadgeHTML({
+                name: pn,
+                verified: pv,
+                vip: pvip,
+                vipAnnual: pvipa,
+                dev: pd,
+                admin: padm,
+                adminTitle: pat,
+              });
+            }
             $("hstat").textContent = "● online";
             $("hstat").style.color = "var(--gn)";
 
@@ -1524,44 +1769,68 @@
             });
             $("pm").innerHTML = mh;
 
+            let detailsHtml = "";
             if (plock) {
-              $("pci").innerHTML =
-                `<span style="color:var(--rd);font-weight:600">🔒 Profile Locked</span>`;
+              detailsHtml = `<span style="color:var(--rd);font-weight:600">🔒 Profile Locked</span>`;
+              $("pci").innerHTML = detailsHtml;
             } else {
+              let locStr = [partnerCountry, partnerState, partnerCity].filter(Boolean).join(", ");
+              if (locStr) {
+                detailsHtml += `<div style="margin-bottom: 8px;">📍 <strong>Location:</strong> ${esc(locStr)}</div>`;
+              }
               if (isIn && partnerInterestsList.length > 0) {
-                $("pci").innerHTML = `
-          <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
-            <span style="font-size:12px;color:var(--t2)">🎯 Interests Hidden</span>
-            <button onclick="buyRevealInterests()" class="bp" style="padding:2px 10px;font-size:10px;border-radius:50px;font-weight:600;background:linear-gradient(135deg,var(--ac),var(--pr))">Reveal (8 🪙)</button>
-          </div>
-        `;
+                const hiddenHtml = `
+                  <div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap">
+                    <span style="font-size:12px;color:var(--t2)">🎯 Interests Hidden</span>
+                    <button onclick="buyRevealInterests()" class="bp" style="padding:2px 10px;font-size:10px;border-radius:50px;font-weight:600;background:linear-gradient(135deg,var(--ac),var(--pr))">Reveal (8 🪙)</button>
+                  </div>
+                `;
+                $("pci").innerHTML = hiddenHtml;
+                detailsHtml += `
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                    <span>🎯 <strong>Interests:</strong> Hidden</span>
+                    <button onclick="buyRevealInterests()" class="bp" style="padding:2px 10px;font-size:10px;border-radius:50px;font-weight:600;background:linear-gradient(135deg,var(--ac),var(--pr))">Reveal (8 🪙)</button>
+                  </div>
+                `;
               } else {
-                $("pci").textContent =
-                  ci > 0 ? `🎯 ${ci} shared interest${ci > 1 ? "s" : ""}` : " ";
+                const listStr = sharedInterestNames.length > 0 ? sharedInterestNames.join(", ") : "None";
+                $("pci").textContent = ci > 0 ? `🎯 ${ci} shared interest${ci > 1 ? "s" : ""}` : " ";
+                detailsHtml += `<div>🎯 <strong>Interests:</strong> ${ci > 0 ? `${ci} shared (${esc(listStr)})` : "None"}</div>`;
               }
             }
+            if ($("mPartnerDetails")) $("mPartnerDetails").innerHTML = detailsHtml;
 
             // Add friend button — reflect existing friendship state
             if (isIn && puid) {
               $("afBtn").style.display = "block";
+              if ($("mBtnAddFriend")) $("mBtnAddFriend").style.display = "inline-flex";
+              
+              let label = "➕ Add Friend";
+              let disabled = false;
               if (fst === "friends") {
-                $("afBtn").textContent = "✓ Already Friends";
-                $("afBtn").disabled = true;
+                label = "✓ Already Friends";
+                disabled = true;
               } else if (fst === "pending") {
-                $("afBtn").textContent = "✓ Request Sent";
-                $("afBtn").disabled = true;
+                label = "✓ Request Sent";
+                disabled = true;
               } else if (fst === "incoming") {
-                $("afBtn").textContent = "👋 Accept Request";
-                $("afBtn").disabled = false;
-              } else {
-                $("afBtn").textContent = "➕ Add Friend";
-                $("afBtn").disabled = false;
+                label = "👋 Accept Request";
+                disabled = false;
+              }
+              
+              $("afBtn").textContent = label;
+              $("afBtn").disabled = disabled;
+              if ($("mBtnAddFriend")) {
+                $("mBtnAddFriend").textContent = label;
+                $("mBtnAddFriend").disabled = disabled;
               }
             } else {
               $("afBtn").style.display = "none";
+              if ($("mBtnAddFriend")) $("mBtnAddFriend").style.display = "none";
             }
 
             setState("chatting");
+            setMobileTab("chat");
             addSys(
               `Now chatting with ${pn}${ci > 0 ? ` — ${ci} shared interest${ci > 1 ? "s" : ""}` : ""}`,
             );
@@ -1593,7 +1862,7 @@
           if (isFriendChat) {
             saveFriendMessage(message, isMe, "text", timestamp, null, null, null, replyTo, messageId, !isMe);
           }
-          if (isFriendChat && !isMe) {
+          if (!isMe && isChatTabActiveAndVisible()) {
             sock.emit("message_seen", { messageId, roomId: room });
           }
         });
@@ -1621,7 +1890,7 @@
           if (isFriendChat) {
             saveFriendMessage(dataUrl, isMe, "image", timestamp, null, null, null, replyTo, messageId, !isMe);
           }
-          if (isFriendChat && !isMe) {
+          if (!isMe && isChatTabActiveAndVisible()) {
             sock.emit("message_seen", { messageId, roomId: room });
           }
         });
@@ -1649,7 +1918,7 @@
           if (isFriendChat) {
             saveFriendMessage(gifUrl, isMe, "gif", timestamp, null, null, null, replyTo, messageId, !isMe);
           }
-          if (isFriendChat && !isMe) {
+          if (!isMe && isChatTabActiveAndVisible()) {
             sock.emit("message_seen", { messageId, roomId: room });
           }
         });
@@ -1677,7 +1946,7 @@
           if (isFriendChat) {
             saveFriendMessage(dataUrl, isMe, "voice", timestamp, mimeType, null, duration, replyTo, messageId, !isMe);
           }
-          if (isFriendChat && !isMe) {
+          if (!isMe && isChatTabActiveAndVisible()) {
             sock.emit("message_seen", { messageId, roomId: room });
           }
         });
@@ -1807,6 +2076,7 @@
         sock.on("opener_used", () => {
           openerUsedInChat = true;
           if ($("btnOpener")) $("btnOpener").style.display = "none";
+          if ($("mBtnOpener")) $("mBtnOpener").style.display = "none";
         });
 
         sock.on("receive_compliment", () => {
@@ -1871,8 +2141,14 @@
 
         sock.on("rematch_declined", ({ message }) => {
           showToast(message || "Re-match request declined.", "err");
-          $("btnRM").textContent = "🔁 Request Re-match (10 🪙)";
-          $("btnRM").disabled = false;
+          if ($("btnRM")) {
+            $("btnRM").textContent = "🔁 Request Re-match (10 🪙)";
+            $("btnRM").disabled = false;
+          }
+          if ($("mBtnRM")) {
+            $("mBtnRM").textContent = "🔁 Re-match (10 🪙)";
+            $("mBtnRM").disabled = false;
+          }
         });
 
         // ── Undo Skip waiting queue events ──
@@ -1977,14 +2253,20 @@
               targetUserId: partnerUserId,
               roomId: room,
             });
-            if (itemId === "superlike") $("btnSL").disabled = true;
-            if (itemId === "compliment") $("btnCp").disabled = true;
+            if (itemId === "superlike") {
+              if ($("btnSL")) $("btnSL").disabled = true;
+              if ($("mBtnSL")) $("mBtnSL").disabled = true;
+            }
+            if (itemId === "compliment") {
+              if ($("btnCp")) $("btnCp").disabled = true;
+              if ($("mBtnCp")) $("mBtnCp").disabled = true;
+            }
           })
           .catch(() => showToast("Failed to send", "err"));
       }
 
       /* ══ REMATCH ACTION ══ */
-      function sendRematchRequest() {
+      async function sendRematchRequest() {
         if (!isIn || !partnerUserId) return;
         const cost = 10;
         const coins = user?.coins || 0;
@@ -1992,10 +2274,23 @@
           showToast(`Not enough coins! (Need ${cost}🪙)`, "err");
           return;
         }
-        if (!confirm(`Spend 🪙${cost} coins to request a re-match?`)) return;
+        
+        const ok = await showCoinConfirm({
+          icon: "🔁",
+          title: "Request Re-match?",
+          message: `Spend 🪙${cost} coins to match with this stranger again?`,
+          yesText: `Spend ${cost} 🪙`
+        });
+        if (!ok) return;
 
-        $("btnRM").disabled = true;
-        $("btnRM").textContent = "Sending Request...";
+        if ($("btnRM")) {
+          $("btnRM").disabled = true;
+          $("btnRM").textContent = "Sending Request...";
+        }
+        if ($("mBtnRM")) {
+          $("mBtnRM").disabled = true;
+          $("mBtnRM").textContent = "Sending...";
+        }
 
         fetch(`${API}/api/user/spend-coins`, {
           method: "POST",
@@ -2021,12 +2316,19 @@
               targetUserId: partnerUserId,
               roomId: room,
             });
-            $("btnRM").textContent = "✓ Request Sent";
+            if ($("btnRM")) $("btnRM").textContent = "✓ Request Sent";
+            if ($("mBtnRM")) $("mBtnRM").textContent = "✓ Request Sent";
           })
           .catch(() => {
             showToast("Failed to send rematch request", "err");
-            $("btnRM").disabled = false;
-            $("btnRM").textContent = "🔁 Request Re-match (10 🪙)";
+            if ($("btnRM")) {
+              $("btnRM").disabled = false;
+              $("btnRM").textContent = "🔁 Request Re-match (10 🪙)";
+            }
+            if ($("mBtnRM")) {
+              $("mBtnRM").disabled = false;
+              $("mBtnRM").textContent = "🔁 Re-match (10 🪙)";
+            }
           });
       }
 
@@ -2539,6 +2841,8 @@
           $("btnVc").disabled = !isIn;
           $("hdIdle").style.display = "none";
           $("hdChat").style.display = "flex";
+          if ($("chatPremActionsBar")) $("chatPremActionsBar").style.display = "none";
+          if ($("btnSkipMobile")) $("btnSkipMobile").style.display = "none";
           updSend();
           return;
         }
@@ -2601,6 +2905,52 @@
         }
         $("btnS").textContent =
           s === "disconnected" ? "Find New Stranger" : "Start Chat";
+
+        // Mobile Ribbon & Dropdown updates
+        const ribbon = $("chatPremActionsBar");
+        const mDrop = $("hdrDropdownCard");
+        const mArrow = $("hdrClickIcon");
+        const mSkip = $("btnSkipMobile");
+        if (mSkip) {
+          mSkip.style.display = (s === "chatting") ? "flex" : "none";
+        }
+        if (ribbon) {
+          if (s === "chatting") {
+            ribbon.style.display = "flex";
+            const mSL = $("mBtnSL"), mCp = $("mBtnCp"), mRose = $("mBtnRose"), mOpener = $("mBtnOpener"), mRevealInt = $("mBtnRevealInt"), mRM = $("mBtnRM"), mAddFriend = $("mBtnAddFriend"), mReport = $("mBtnReport");
+            const canPremium = isIn && partnerUserId;
+            if (mSL) { mSL.style.display = canPremium ? "inline-flex" : "none"; mSL.disabled = false; }
+            if (mCp) { mCp.style.display = canPremium ? "inline-flex" : "none"; mCp.disabled = false; }
+            if (mRose) { mRose.style.display = canPremium ? "inline-flex" : "none"; mRose.disabled = false; }
+            if (mOpener) { mOpener.style.display = (canPremium && !openerUsedInChat) ? "inline-flex" : "none"; mOpener.disabled = false; }
+            if (mRevealInt) { mRevealInt.style.display = (canPremium && !interestsRevealed) ? "inline-flex" : "none"; mRevealInt.disabled = false; }
+            if (mRM) mRM.style.display = "none";
+            if (mAddFriend) mAddFriend.style.display = canPremium ? "inline-flex" : "none";
+            if (mReport) mReport.style.display = (canPremium && !rpSent) ? "inline-flex" : "none";
+          } else if (s === "disconnected") {
+            ribbon.style.display = "flex";
+            const mSL = $("mBtnSL"), mCp = $("mBtnCp"), mRose = $("mBtnRose"), mOpener = $("mBtnOpener"), mRevealInt = $("mBtnRevealInt"), mRM = $("mBtnRM"), mAddFriend = $("mBtnAddFriend"), mReport = $("mBtnReport");
+            if (mSL) mSL.style.display = "none";
+            if (mCp) mCp.style.display = "none";
+            if (mRose) mRose.style.display = "none";
+            if (mOpener) mOpener.style.display = "none";
+            if (mRevealInt) mRevealInt.style.display = "none";
+            if (mAddFriend) mAddFriend.style.display = "none";
+            if (mRM) {
+              mRM.style.display = (isIn && partnerUserId) ? "inline-flex" : "none";
+              mRM.disabled = false;
+              mRM.textContent = "🔁 Re-match (10 🪙)";
+            }
+            if (mReport) mReport.style.display = (isIn && partnerUserId && !rpSent) ? "inline-flex" : "none";
+          } else {
+            ribbon.style.display = "none";
+          }
+        }
+        if (s !== "chatting" && s !== "disconnected") {
+          if (mDrop) mDrop.style.display = "none";
+          if (mArrow) mArrow.textContent = "▼";
+        }
+
         updSend();
       }
 
@@ -3004,7 +3354,7 @@
         img.src = objUrl;
       }
 
-      function confirmThemePurchase() {
+      async function confirmThemePurchase() {
         if (!selectedThemeColor) return;
 
         let finalThemeValue = selectedThemeColor;
@@ -3024,8 +3374,14 @@
           );
           return;
         }
-        if (!confirm(`Spend 🪙${themePurchaseCost} coins on this theme?`))
-          return;
+        
+        const ok = await showCoinConfirm({
+          icon: "🎭",
+          title: "Unlock Custom Theme?",
+          message: `Spend 🪙${themePurchaseCost} coins to unlock this custom chat theme for 7 days?`,
+          yesText: `Spend ${themePurchaseCost} 🪙`
+        });
+        if (!ok) return;
 
         fetch(`${API}/api/user/spend-coins`, {
           method: "POST",
@@ -3125,6 +3481,83 @@
         el._t = setTimeout(() => (el.style.display = "none"), 3000);
       }
 
+      function showCoinConfirm({ icon = "🪙", title = "Spend Coins", message = "Confirm purchase?", yesText = "Spend", noText = "Cancel" }) {
+        return new Promise((resolve) => {
+          $("coinConfirmIcon").textContent = icon;
+          $("coinConfirmTitle").textContent = title;
+          $("coinConfirmMessage").textContent = message;
+          $("btnCoinConfirmYes").textContent = yesText;
+          $("btnCoinConfirmNo").textContent = noText;
+
+          const modal = $("coinConfirmMod");
+          modal.classList.add("on");
+
+          const cleanup = (result) => {
+            modal.classList.remove("on");
+            $("btnCoinConfirmYes").onclick = null;
+            $("btnCoinConfirmNo").onclick = null;
+            resolve(result);
+          };
+
+          $("btnCoinConfirmYes").onclick = () => cleanup(true);
+          $("btnCoinConfirmNo").onclick = () => cleanup(false);
+          modal.onclick = (e) => {
+            if (e.target === modal) cleanup(false);
+          };
+        });
+      }
+
+      function showConnLostModal() {
+        const mod = $("connLostMod");
+        if (mod) {
+          const addFriendBtn = $("btnConnLostAddFriend");
+          if (addFriendBtn) {
+            addFriendBtn.style.display = (isIn && partnerUserId) ? "block" : "none";
+          }
+          mod.classList.add("on");
+        }
+      }
+
+      function closeConnLostModal() {
+        const mod = $("connLostMod");
+        if (mod) mod.classList.remove("on");
+      }
+
+      function triggerConnLostAddFriend() {
+        sendFriendReq();
+        closeConnLostModal();
+      }
+
+      function triggerConnLostSkip() {
+        closeConnLostModal();
+        if (state === "chatting") {
+          doSkip();
+        } else if (state === "searching") {
+          doCancel();
+        }
+      }
+
+      function isChatTabActiveAndVisible() {
+        const isTabActive = (window.innerWidth >= 768) || (document.body.getAttribute("data-tab") === "chat");
+        const isPageVisible = document.visibilityState === "visible" && document.hasFocus();
+        return isTabActive && isPageVisible;
+      }
+
+      function triggerChatSeen() {
+        if (state === "chatting" && room && sock && isChatTabActiveAndVisible()) {
+          sock.emit("chat_seen", { roomId: room });
+        }
+      }
+
+      document.addEventListener("visibilitychange", triggerChatSeen);
+      window.addEventListener("focus", triggerChatSeen);
+
+      window.addEventListener("offline", () => {
+        if (state === "chatting" || state === "searching") {
+          showConnLostModal();
+        }
+      });
+
       function updateChatCoins() {
         const coinsEl = $("chatCoins");
         if (coinsEl) {
@@ -3215,7 +3648,7 @@
         return pick(generic);
       }
 
-      function buyFirstMessageOpener() {
+      async function buyFirstMessageOpener() {
         if (!isIn || !partnerUserId || !room) return;
         if (openerUsedInChat) {
           showToast("AI opener already used in this chat", "err");
@@ -3227,8 +3660,14 @@
           showToast(`Not enough coins! (Need ${cost}🪙)`, "err");
           return;
         }
-        if (!confirm(`Spend 🪙${cost} coins to generate an AI icebreaker?`))
-          return;
+        
+        const ok = await showCoinConfirm({
+          icon: "💬",
+          title: "AI Icebreaker",
+          message: `Spend 🪙${cost} coins to generate an AI icebreaker for this chat?`,
+          yesText: `Spend ${cost} 🪙`
+        });
+        if (!ok) return;
 
         fetch(`${API}/api/user/spend-coins`, {
           method: "POST",
@@ -3247,8 +3686,10 @@
             if (!r.ok) {
               if (r.status === 409) openerUsedInChat = true;
               showToast(d.message || "Failed to generate opener", "err");
-              if (openerUsedInChat && $("btnOpener"))
-                $("btnOpener").style.display = "none";
+              if (openerUsedInChat) {
+                if ($("btnOpener")) $("btnOpener").style.display = "none";
+                if ($("mBtnOpener")) $("mBtnOpener").style.display = "none";
+              }
               return;
             }
             if (d.user) {
@@ -3267,11 +3708,12 @@
             updSend();
             showToast("AI Icebreaker generated! Click send ↑", "ok");
             if ($("btnOpener")) $("btnOpener").style.display = "none";
+            if ($("mBtnOpener")) $("mBtnOpener").style.display = "none";
           })
           .catch(() => showToast("Failed to generate opener", "err"));
       }
 
-      function buyRevealInterests() {
+      async function buyRevealInterests() {
         if (!isIn || !partnerUserId) return;
         if (interestsRevealed) {
           showToast("Interests already revealed!", "ok");
@@ -3283,10 +3725,14 @@
           showToast(`Not enough coins! (Need ${cost}🪙)`, "err");
           return;
         }
-        if (
-          !confirm(`Spend 🪙${cost} coins to reveal this stranger's interests?`)
-        )
-          return;
+        
+        const ok = await showCoinConfirm({
+          icon: "🎯",
+          title: "Reveal Interests?",
+          message: `Spend 🪙${cost} coins to reveal this stranger's interests?`,
+          yesText: `Spend ${cost} 🪙`
+        });
+        if (!ok) return;
 
         fetch(`${API}/api/user/spend-coins`, {
           method: "POST",
@@ -3320,8 +3766,32 @@
 
             // Hide the sidebar button
             if ($("btnRevealInt")) $("btnRevealInt").style.display = "none";
+            if ($("mBtnRevealInt")) $("mBtnRevealInt").style.display = "none";
+
+            // Update mobile partner details dropdown
+            let detailsHtml = "";
+            let locStr = [partnerCountry, partnerState, partnerCity].filter(Boolean).join(", ");
+            if (locStr) {
+              detailsHtml += `<div style="margin-bottom: 8px;">📍 <strong>Location:</strong> ${esc(locStr)}</div>`;
+            }
+            detailsHtml += `<div>🎯 <strong>Interests:</strong> ${esc(listStr)}</div>`;
+            if ($("mPartnerDetails")) $("mPartnerDetails").innerHTML = detailsHtml;
           })
           .catch(() => showToast("Failed to reveal interests", "err"));
+      }
+
+      function toggleMobilePartnerCard() {
+        if (window.innerWidth >= 768) return;
+        const card = $("hdrDropdownCard");
+        const icon = $("hdrClickIcon");
+        if (!card || !icon) return;
+        if (card.style.display === "none") {
+          card.style.display = "block";
+          icon.textContent = "▲";
+        } else {
+          card.style.display = "none";
+          icon.textContent = "▼";
+        }
       }
 
       setup();

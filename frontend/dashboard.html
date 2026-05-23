@@ -1243,6 +1243,15 @@ nav {
   border-color: rgba(251, 191, 36, 0.25);
 }
 
+.nav-prem-link {
+  color: var(--gd);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 .coins-balance {
   display: inline-block;
   padding: 4px 10px;
@@ -1428,6 +1437,7 @@ nav {
 @media (max-width: 480px) {
   .ni {
     height: 56px;
+    padding: 0 12px;
   }
   .page {
     padding-top: 80px;
@@ -1458,20 +1468,40 @@ nav {
   .pbanner button {
     width: 100%;
   }
+
+  /* Responsive header overrides */
+  .logo-text {
+    display: none;
+  }
+  .prem-text {
+    display: none;
+  }
+  .chat-arrow {
+    display: none;
+  }
+  .bp {
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 6px;
+  }
+  .nav-coins-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
 }
 </style>
 </head>
 <body>
 <nav>
   <div class="ni">
-    <div class="logo"><span>◈</span><span>StrangerNear</span></div>
+    <div class="logo"><span>◈</span><span class="logo-text">StrangerNear</span></div>
     <div style="display:flex;gap:12px;align-items:center">
       <div id="navCoinsPill" class="nav-coins-pill" style="display: none;" onclick="location.href='premium.html#coins'">
         <span>🪙</span>
         <span id="navCoins">0</span>
       </div>
-      <a href="premium.html" style="color:var(--gd);font-size:13px;font-weight:600">✦ Premium</a>
-      <a href="chat.html" id="navChatBtn"><button class="bp">Start Chat →</button></a>
+      <a href="premium.html" class="nav-prem-link">✦ <span class="prem-text">Premium</span></a>
+      <a href="chat.html" id="navChatBtn"><button class="bp">Start Chat<span class="chat-arrow"> →</span></button></a>
     </div>
   </div>
 </nav>
