@@ -3,12 +3,27 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>StrangerNear — Meet Real People Near You</title>
-<meta name="description" content="Chat with real people from your city, state, or anywhere in the world. Safe, verified, and always interesting. Start free on StrangerNear."/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Sparq — Anonymous Chat with Strangers Near You</title>
+<meta name="description" content="Chat anonymously with strangers from your city, state, or anywhere in the world. Safe, verified, and free stranger chat."/>
+<meta name="keywords" content="stranger chat, chat with strangers, anonymous chat, random chat, meet new people, omegle alternative"/>
+<meta name="robots" content="index, follow"/>
+<meta property="og:title" content="Sparq — Chat with Strangers Near You"/>
+<meta property="og:description" content="Safe anonymous chat with people from your city. Free, verified strangers."/>
+<meta property="og:url" content="https://sparq.vercel.app"/>
+<meta property="og:type" content="website"/>
+<link rel="canonical" href="https://sparq.vercel.app"/>
+
+
+
 <style>
+@font-face {
+  font-family: 'League Spartan';
+  src: url('./fonts/variable/WOFF2/LeagueSpartan-VF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ═══════════════════════════════════════════════
    DESIGN TOKENS
 ═══════════════════════════════════════════════ */
@@ -55,14 +70,15 @@ html { scroll-behavior:smooth; font-size:16px; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  font-weight: 400;
 }
-h1,h2,h3,h4 { font-family:'Outfit',sans-serif; font-weight:800; line-height:1.12; }
+h1,h2,h3,h4 { font-family:'League Spartan',sans-serif; font-weight: 700; line-height:1.12; }
 a { color:inherit; text-decoration:none; }
-button { font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; outline:none; }
+button { font-family:'League Spartan',sans-serif; cursor:pointer; border:none; outline:none; }
 img { display:block; max-width:100%; }
 
 /* ═══════════════════════════════════════════════
@@ -167,8 +183,8 @@ nav {
   display: flex;
   align-items: center;
   gap: 10px;
-  font-family: 'Outfit', sans-serif;
-  font-weight: 900;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 700;
   font-size: 22px;
   letter-spacing: -0.03em;
 }
@@ -331,6 +347,7 @@ nav {
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
   gap: 6px;
   transition: var(--t);
   position: relative;
@@ -343,9 +360,9 @@ nav {
   background:var(--border-2);
 }
 .stat-number {
-  font-family:'Outfit',sans-serif;
+  font-family:'League Spartan',sans-serif;
   font-size: 32px;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: -0.03em;
   background: linear-gradient(135deg, var(--violet-3), #fff);
   -webkit-background-clip: text;
@@ -365,9 +382,10 @@ nav {
   color: var(--text-3);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-align: center;
 }
 .stat-live-indicator {
-  display:flex; align-items:center; gap:5px;
+  display:flex; align-items:center; justify-content:center; gap:5px;
   font-size:11px; color:var(--cyan); font-weight:600;
   letter-spacing:0.06em;
 }
@@ -435,9 +453,9 @@ nav {
 .step-card:hover { border-color:var(--border-2); transform:translateY(-4px); background:var(--surface-2); }
 .step-card:hover::before { opacity:1; }
 .step-number {
-  font-family:'Outfit',sans-serif;
+  font-family:'League Spartan',sans-serif;
   font-size: 72px;
-  font-weight: 900;
+  font-weight: 700;
   color: var(--violet);
   opacity: 0.15;
   line-height: 1;
@@ -551,7 +569,7 @@ nav {
 }
 .trust-icon { font-size: 28px; margin-bottom: 10px; }
 .trust-label { font-size: 13px; color: var(--text-3); font-weight: 500; }
-.trust-value { font-family:'Outfit',sans-serif; font-size:22px; font-weight:800; color:var(--violet-3); margin-top:4px; }
+.trust-value { font-family:'League Spartan',sans-serif; font-size:22px; font-weight: 700; color:var(--violet-3); margin-top:4px; }
 
 /* ═══════════════════════════════════════════════
    CTA SECTION
@@ -604,8 +622,8 @@ footer {
   gap: 16px;
 }
 .footer-logo {
-  font-family:'Outfit',sans-serif;
-  font-weight:900;
+  font-family:'League Spartan',sans-serif;
+  font-weight: 700;
   font-size:18px;
   color:var(--violet-3);
   display:flex;align-items:center;gap:8px;
@@ -678,7 +696,7 @@ footer {
     <div class="nav-inner">
       <div class="logo">
         <div class="logo-icon">◈</div>
-        <span class="logo-text">StrangerNear</span>
+        <span class="logo-text">Sparq</span>
       </div>
       <div class="nav-links">
         <a href="#how-it-works" class="nav-link">How it Works</a>
@@ -924,7 +942,7 @@ footer {
   <div class="footer-inner">
     <div class="footer-logo">
       <div class="footer-logo-icon">◈</div>
-      StrangerNear
+      Sparq
     </div>
     <div class="footer-links">
       <a href="privacy.html">Privacy</a>
@@ -932,7 +950,7 @@ footer {
       <a href="refund.html">Refund Policy</a>
       <a href="contact.html">Contact</a>
     </div>
-    <p class="footer-copy">© 2025 StrangerNear · All rights reserved</p>
+    <p class="footer-copy">© 2026 Sparq · All rights reserved</p>
   </div>
 </footer>
 

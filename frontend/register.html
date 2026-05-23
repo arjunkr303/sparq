@@ -3,12 +3,20 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Create Account — StrangerNear</title>
-<meta name="description" content="Join StrangerNear for free. Meet real people from your city, state, or anywhere in the world. Create your account in minutes."/>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Create Account — Sparq</title>
+<meta name="description" content="Join Sparq for free. Meet real people from your city, state, or anywhere in the world. Create your account in minutes."/>
+
+
+
 <style>
+@font-face {
+  font-family: 'League Spartan';
+  src: url('./fonts/variable/WOFF2/LeagueSpartan-VF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ═══════════════════════════════════════════════
    DESIGN TOKENS
 ═══════════════════════════════════════════════ */
@@ -56,7 +64,7 @@ html { font-size:16px; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -64,11 +72,12 @@ body {
   padding: 28px 16px;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  font-weight: 400;
 }
-h1,h2,h3,h4 { font-family:'Outfit',sans-serif; font-weight:800; line-height:1.15; }
+h1,h2,h3,h4 { font-family:'League Spartan',sans-serif; font-weight: 700; line-height:1.15; }
 a { text-decoration:none; color:inherit; }
-button { font-family:'Space Grotesk',sans-serif; cursor:pointer; border:none; outline:none; }
-input, select { font-family:'Space Grotesk',sans-serif; }
+button { font-family:'League Spartan',sans-serif; cursor:pointer; border:none; outline:none; }
+input, select { font-family:'League Spartan',sans-serif; }
 
 /* ── NOISE OVERLAY ── */
 body::before {
@@ -244,7 +253,7 @@ body::before {
 }
 
 .step-label {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-size: 15px;
   font-weight: 700;
   color: var(--text-2);
@@ -525,7 +534,7 @@ select:disabled { opacity: 0.35; cursor: not-allowed; }
       <div class="card-header">
         <div class="logo-icon">◈</div>
         <h1>Create Account</h1>
-        <p>Join StrangerNear free — takes 2 minutes</p>
+        <p>Join Sparq free — takes 2 minutes</p>
       </div>
 
       <!-- Progress -->

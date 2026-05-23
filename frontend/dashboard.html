@@ -2,11 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Dashboard — StrangerNear</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<title>Dashboard — Sparq</title>
+
 <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"></script>
 <style>
+@font-face {
+  font-family: 'League Spartan';
+  src: url('./fonts/variable/WOFF2/LeagueSpartan-VF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ═══════════════════════════════ DESIGN SYSTEM & TOKENS ═══════════════════════════════ */
 :root {
   --bg: #09090b;          /* Deep dark slate */
@@ -44,16 +52,17 @@ body {
   background-image: radial-gradient(circle at 50% 0%, #111119 0%, #09090b 100%);
   background-attachment: fixed;
   color: var(--tx);
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'League Spartan', -apple-system, BlinkMacSystemFont, sans-serif;
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   position: relative;
   overflow-x: hidden;
+  font-weight: 400;
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -0.02em;
@@ -119,8 +128,8 @@ nav {
 }
 
 .logo {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
+  font-family: 'League Spartan', sans-serif;
+  font-weight: 700;
   font-size: 18px;
   display: flex;
   align-items: center;
@@ -346,7 +355,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-size: 26px;
   font-weight: 700;
   color: #ffffff;
@@ -383,7 +392,7 @@ nav {
 }
 
 .un {
-  font-family: 'Syne', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 4px;
@@ -878,7 +887,7 @@ nav {
 }
 
 .fname {
-  font-family: 'Syne', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-size: 13px;
   font-weight: 600;
   color: #ffffff;
@@ -1083,7 +1092,7 @@ nav {
 }
 
 .draw-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 2px;
@@ -1350,7 +1359,7 @@ nav {
 }
 
 .reward-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'League Spartan', sans-serif;
   font-weight: 700;
   font-size: 20px;
   color: var(--gd);
@@ -1494,7 +1503,7 @@ nav {
 <body>
 <nav>
   <div class="ni">
-    <div class="logo"><span>◈</span><span class="logo-text">StrangerNear</span></div>
+    <div class="logo"><span>◈</span><span class="logo-text">Sparq</span></div>
     <div style="display:flex;gap:12px;align-items:center">
       <div id="navCoinsPill" class="nav-coins-pill" style="display: none;" onclick="location.href='premium.html#coins'">
         <span>🪙</span>
@@ -1686,7 +1695,7 @@ nav {
     <div class="grid">
       <!-- Slot Machine Card -->
       <div class="card" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <h2 class="ct" style="margin-bottom:16px; font-family:'Syne',sans-serif;">💎 Lucky Draw</h2>
+        <h2 class="ct" style="margin-bottom:16px; font-family:'League Spartan',sans-serif;">💎 Lucky Draw</h2>
         
         <div class="cabinet-container">
           <div class="cabinet" id="slotCabinet">
@@ -1725,7 +1734,7 @@ nav {
       
       <!-- Rules and Odds Card -->
       <div class="card">
-        <h2 class="ct" style="margin-bottom:16px; font-family:'Syne',sans-serif;">📋 Rules & Prizes</h2>
+        <h2 class="ct" style="margin-bottom:16px; font-family:'League Spartan',sans-serif;">📋 Rules & Prizes</h2>
         <p style="color:var(--t2); font-size:13px; line-height:1.6; margin-bottom:16px;">
           Try your luck to win premium rewards! Free daily draws are granted based on your subscription tier:
         </p>
@@ -1754,7 +1763,7 @@ nav {
           <span class="sec-val" style="color:var(--pr2)">10 Coins each</span>
         </div>
         
-        <h3 style="font-size:14px; font-family:'Syne',sans-serif; margin-top:20px; margin-bottom:10px; color:#ffd166;">🏆 Winning Odds & Items</h3>
+        <h3 style="font-size:14px; font-family:'League Spartan',sans-serif; margin-top:20px; margin-bottom:10px; color:#ffd166;">🏆 Winning Odds & Items</h3>
         
         <div class="sec-row" id="row-jackpot">
           <div class="sec-lbl">💎 💎 💎 Jackpot</div>
@@ -1841,8 +1850,14 @@ function onES() { popCity($('eCi'),$('eC').value,$('eS').value,''); }
 
 /* ── badges ── */
 function buildBadges(u) {
+  if (u.dev || DEV.includes(u.username)) {
+    return '<span class="bm bdev" style="background:linear-gradient(135deg,rgba(124,92,252,.3),rgba(0,229,255,.2));color:#b4a0ff;border:1px solid rgba(124,92,252,.5)">⚡ Dev</span>' +
+           '<span class="bm badm">🛡️ Admin</span>' +
+           '<span class="bm bvipa" style="background:linear-gradient(135deg,rgba(255,215,0,.35),rgba(255,140,0,.25));color:#ffe066;border:1px solid rgba(255,215,0,.65)">👑 VIP Annual</span>' +
+           '<span class="bm bvip">👑 VIP</span>' +
+           '<span class="bm bv">✦ Verified</span>';
+  }
   let h = '';
-  if (DEV.includes(u.username)) { h += '<span class="bm bdev" style="background:linear-gradient(135deg,rgba(124,92,252,.3),rgba(0,229,255,.2));color:#b4a0ff;border:1px solid rgba(124,92,252,.5)">⚡ Dev</span>'; }
   if (u.isAdmin)     h += '<span class="bm badm">🛡️ Admin</span>';
   if (u.adminTitle)  h += `<span class="bm bani">✦ ${u.adminTitle}</span>`;
   
@@ -2757,7 +2772,7 @@ class Coin {
     ctx.stroke();
     
     ctx.fillStyle = '#b8860b';
-    ctx.font = `bold ${this.radius * 0.8}px 'Syne', sans-serif`;
+    ctx.font = `bold ${this.radius * 0.8}px 'League Spartan', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('$', 0, 0);

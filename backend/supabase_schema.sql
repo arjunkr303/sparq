@@ -1,4 +1,4 @@
--- StrangerNear v7 — Run in Supabase SQL Editor
+-- Sparq v7 — Run in Supabase SQL Editor
 
 CREATE TABLE IF NOT EXISTS users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,

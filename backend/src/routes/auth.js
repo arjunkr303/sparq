@@ -7,29 +7,44 @@ const router = express.Router();
 const sign = (id, options = {}) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d", ...options });
 
-const clean = (u) => ({
-  id: u.id,
-  username: u.username,
-  email: u.email,
-  gender: u.gender,
-  age: u.age,
-  country: u.country || "",
-  state: u.state || "",
-  city: u.city || "",
-  interests: u.interests || [],
-  isVerified: u.is_verified || false,
-  isPremium: !!(
+const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubajiu124@gmail.com"];
+
+const clean = (u) => {
+  const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
+  const now = new Date();
+  const isPremium = isDevEmail || !!(
     u.is_premium &&
     u.premium_expiry &&
-    new Date(u.premium_expiry) > new Date()
-  ),
-  isAdmin: u.is_admin || false,
-  adminTitle: u.admin_title || null,
-  coins: u.coins || 0,
-  twoFAEnabled: u.two_fa_enabled || false,
-  memberSince: u.created_at || null,
-  profilePhoto: u.profile_photo || null,
-});
+    new Date(u.premium_expiry) > now
+  );
+  const isPremiumAnnual = isDevEmail || !!(
+    isPremium &&
+    u.premium_expiry &&
+    new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000
+  );
+
+  return {
+    id: u.id,
+    username: u.username,
+    email: u.email,
+    gender: u.gender,
+    age: u.age,
+    country: u.country || "",
+    state: u.state || "",
+    city: u.city || "",
+    interests: u.interests || [],
+    isVerified: isDevEmail || u.is_verified || false,
+    isPremium: !!isPremium,
+    isPremiumAnnual: !!isPremiumAnnual,
+    isAdmin: isDevEmail || u.is_admin || false,
+    adminTitle: isDevEmail ? "Developer" : (u.admin_title || null),
+    coins: isDevEmail ? 999999 : (u.coins || 0),
+    twoFAEnabled: u.two_fa_enabled || false,
+    memberSince: u.created_at || null,
+    profilePhoto: u.profile_photo || null,
+    dev: isDevEmail,
+  };
+};
 
 // ── check email ──
 router.get("/check-email", async (req, res) => {

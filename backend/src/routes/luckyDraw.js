@@ -3,12 +3,21 @@ const supabase = require("../supabase");
 const authMw = require("../middleware/auth");
 const router = express.Router();
 
+const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubajiu124@gmail.com"];
+
 const clean = (u) => {
+  const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
   const now = new Date();
-  const isPremiumAnnual =
+  const isPremium = isDevEmail || !!(
     u.is_premium &&
     u.premium_expiry &&
-    new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000;
+    new Date(u.premium_expiry) > now
+  );
+  const isPremiumAnnual = isDevEmail || !!(
+    isPremium &&
+    u.premium_expiry &&
+    new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000
+  );
   return {
     id: u.id,
     username: u.username,
@@ -19,23 +28,20 @@ const clean = (u) => {
     state: u.state || "",
     city: u.city || "",
     interests: u.interests || [],
-    isVerified: u.is_verified || false,
-    isPremium: !!(
-      u.is_premium &&
-      u.premium_expiry &&
-      new Date(u.premium_expiry) > now
-    ),
+    isVerified: isDevEmail || u.is_verified || false,
+    isPremium: !!isPremium,
     isPremiumAnnual: !!isPremiumAnnual,
-    isAdmin: u.is_admin || false,
-    adminTitle: u.admin_title || null,
-    coins: u.coins || 0,
+    isAdmin: isDevEmail || u.is_admin || false,
+    adminTitle: isDevEmail ? "Developer" : (u.admin_title || null),
+    coins: isDevEmail ? 999999 : (u.coins || 0),
     twoFAEnabled: u.two_fa_enabled || false,
     memberSince: u.created_at || null,
     profilePhoto: u.profile_photo || null,
-    trustScore: u.trust_score || 100,
-    reportCount: u.report_count || 0,
-    premiumExpiry: u.premium_expiry || null,
-    auraExpiry: u.aura_expiry || null,
+    trustScore: isDevEmail ? 100 : (u.trust_score || 100),
+    reportCount: isDevEmail ? 0 : (u.report_count || 0),
+    premiumExpiry: isDevEmail ? "2099-12-31T23:59:59.000Z" : (u.premium_expiry || null),
+    auraExpiry: isDevEmail ? "2099-12-31T23:59:59.000Z" : (u.aura_expiry || null),
+    dev: isDevEmail,
   };
 };
 

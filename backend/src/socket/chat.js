@@ -11,6 +11,7 @@ const reports = new Map();
 const pendingUndoQueue = new Map();
 
 const DEV_NAMES = ["KING", "king"];
+const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubajiu124@gmail.com"];
 const ADMIN_NAMES = []; // populated from DB at runtime
 
 const norm = (s) => (s || "").trim().toLowerCase();
@@ -108,37 +109,37 @@ module.exports = (io) => {
       const { data: u } = await supabase
         .from("users")
         .select(
-          "id,username,gender,is_verified,is_premium,premium_expiry,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,chat_theme,theme_expiry,profile_lock_expiry,aura_expiry,profile_photo",
+          "id,username,email,gender,is_verified,is_premium,premium_expiry,is_admin,admin_title,country,state,city,interests,is_banned,queue_boost_expiry,chat_theme,theme_expiry,profile_lock_expiry,aura_expiry,profile_photo",
         )
         .eq("id", id)
         .maybeSingle();
       if (!u) return next(new Error("User not found"));
       if (u.is_banned) return next(new Error("Banned"));
 
+      const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
       const now = new Date();
       const isBoosted =
-        u.queue_boost_expiry && new Date(u.queue_boost_expiry) > now;
+        isDevEmail || (u.queue_boost_expiry && new Date(u.queue_boost_expiry) > now);
       const isLocked =
-        u.profile_lock_expiry && new Date(u.profile_lock_expiry) > now;
-      const hasTheme = u.theme_expiry && new Date(u.theme_expiry) > now;
+        isDevEmail || (u.profile_lock_expiry && new Date(u.profile_lock_expiry) > now);
+      const hasTheme = isDevEmail || (u.theme_expiry && new Date(u.theme_expiry) > now);
       const isPremium =
-        u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now;
+        isDevEmail || (u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now);
       const isPremiumAnnual =
-        isPremium &&
-        new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000;
-      const hasAura = u.aura_expiry && new Date(u.aura_expiry) > now;
+        isDevEmail || (isPremium && new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000);
+      const hasAura = isDevEmail || (u.aura_expiry && new Date(u.aura_expiry) > now);
 
       socket.u = {
         id: u.id,
         guest: false,
         name: u.username,
         gender: u.gender || "other",
-        verified: u.is_verified,
+        verified: isDevEmail || u.is_verified,
         premium: !!isPremium,
         premiumAnnual: !!isPremiumAnnual,
-        dev: DEV_NAMES.includes(u.username),
-        admin: u.is_admin || false,
-        adminTitle: u.admin_title || null,
+        dev: isDevEmail || DEV_NAMES.includes(u.username),
+        admin: isDevEmail || u.is_admin || false,
+        adminTitle: isDevEmail ? "Developer" : (u.admin_title || null),
         country: u.country || "",
         state: u.state || "",
         city: u.city || "",
@@ -146,7 +147,7 @@ module.exports = (io) => {
         boosted: isBoosted,
         spotlight: null,
         locked: isLocked,
-        theme: hasTheme ? u.chat_theme : "default",
+        theme: isDevEmail ? (u.chat_theme || "premium") : (hasTheme ? u.chat_theme : "default"),
         aura: hasAura,
         profilePhoto: u.profile_photo || null,
       };
