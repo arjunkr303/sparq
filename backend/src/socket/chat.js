@@ -11,7 +11,7 @@ const reports = new Map();
 const pendingUndoQueue = new Map();
 
 const DEV_NAMES = ["KING", "king"];
-const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubajiu124@gmail.com"];
+const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubaiju124@gmail.com"];
 const ADMIN_NAMES = []; // populated from DB at runtime
 
 const norm = (s) => (s || "").trim().toLowerCase();
@@ -64,10 +64,10 @@ function findMatch(me) {
 
   const levels = me.premium
     ? [
-        ...locationLevels(me),
-        ...tagLevels(me),
-        () => true,
-      ]
+      ...locationLevels(me),
+      ...tagLevels(me),
+      () => true,
+    ]
     : [...tagLevels(me), () => true];
 
   const mode = me.premium ? "location" : "interests";
@@ -464,7 +464,7 @@ module.exports = (io) => {
       if (!msg || msg.length > 500) return;
       try {
         msg = filter.clean(msg);
-      } catch {}
+      } catch { }
       const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
 
       if (roomId && roomId.startsWith("f_")) {
@@ -544,7 +544,7 @@ module.exports = (io) => {
         messageId: msgId,
       });
     });
-    
+
     // ── GIF ──
     socket.on("send_gif", async ({ gifUrl, roomId, replyTo, messageId }) => {
       if (u.guest) {
@@ -660,7 +660,7 @@ module.exports = (io) => {
       if (!msg || msg.length > 500) return;
       try {
         msg = filter.clean(msg);
-      } catch {}
+      } catch { }
 
       if (roomId && roomId.startsWith("f_")) {
         try {

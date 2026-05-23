@@ -3,7 +3,7 @@ const supabase = require("../supabase");
 const authMw = require("../middleware/auth");
 const router = express.Router();
 
-const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubajiu124@gmail.com"];
+const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubaiju124@gmail.com"];
 
 const clean = (u) => {
   const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
@@ -52,7 +52,7 @@ router.get("/status", authMw, async (req, res) => {
     }
     const now = new Date();
     const todayStr = now.toISOString().split("T")[0];
-    
+
     let freeSpinsLeft = 0;
     let spinsUsed = 0;
     const isPremium = !!(
@@ -96,7 +96,7 @@ router.post("/spin", authMw, async (req, res) => {
     }
     const now = new Date();
     const todayStr = now.toISOString().split("T")[0];
-    
+
     let freeSpinsLeft = 0;
     let spinsUsed = 0;
     const isPremium = !!(
@@ -185,7 +185,7 @@ router.post("/spin", authMw, async (req, res) => {
     } else if (rand < 0.999) {
       // 0.9% chance: Win 7 Days VIP
       reward = { type: "vip", amount: 7, label: "Win 7 Days of VIP Status! 👑" };
-      const newExpiry = isPremium 
+      const newExpiry = isPremium
         ? new Date(new Date(req.user.premium_expiry).getTime() + 7 * 24 * 60 * 60 * 1000)
         : new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
       upd.is_premium = true;

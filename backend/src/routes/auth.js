@@ -7,7 +7,7 @@ const router = express.Router();
 const sign = (id, options = {}) =>
   jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "30d", ...options });
 
-const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubajiu124@gmail.com"];
+const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubaiju124@gmail.com"];
 
 const clean = (u) => {
   const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
