@@ -154,30 +154,30 @@ router.post("/spin", authMw, async (req, res) => {
       reward = { type: "coins", amount: 5, label: "Win 5 Coins back! 🪙" };
       upd.coins = (upd.coins !== undefined ? upd.coins : req.user.coins) + 5;
       targetStops = [4, 5, 4];
-    } else if (rand < 0.65) {
-      // 30% chance: Better luck next time
+    } else if (rand < 0.81) {
+      // 46% chance: Better luck next time
       reward = { type: "nothing", amount: 0, label: "Better luck next time! 😢" };
       targetStops = [5, 6, 7];
-    } else if (rand < 0.80) {
-      // 15% chance: Win 15 coins
+    } else if (rand < 0.91) {
+      // 10% chance: Win 15 coins
       reward = { type: "coins", amount: 15, label: "Win 15 Coins! 🪙" };
       upd.coins = (upd.coins !== undefined ? upd.coins : req.user.coins) + 15;
       targetStops = [4, 4, 4];
-    } else if (rand < 0.90) {
-      // 10% chance: Win 25 coins
+    } else if (rand < 0.96) {
+      // 5% chance: Win 25 coins
       reward = { type: "coins", amount: 25, label: "Win 25 Coins! 🪙" };
       upd.coins = (upd.coins !== undefined ? upd.coins : req.user.coins) + 25;
       targetStops = [3, 3, 3];
-    } else if (rand < 0.95) {
-      // 5% chance: Win 7 Days Chat Theme
+    } else if (rand < 0.99) {
+      // 3% chance: Win 7 Days Chat Theme
       const themes = ["rose", "passion", "sunset", "serenade", "premium", "purple"];
       const chosenTheme = themes[Math.floor(Math.random() * themes.length)];
       reward = { type: "theme", amount: 7, label: `Win 7 Days of ${chosenTheme.toUpperCase()} Chat Theme! 🎭`, value: chosenTheme };
       upd.chat_theme = chosenTheme;
       upd.theme_expiry = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
       targetStops = [2, 2, 2];
-    } else if (rand < 0.99) {
-      // 4% chance: Win 7 Days VIP
+    } else if (rand < 0.999) {
+      // 0.9% chance: Win 7 Days VIP
       reward = { type: "vip", amount: 7, label: "Win 7 Days of VIP Status! 👑" };
       const newExpiry = isPremium 
         ? new Date(new Date(req.user.premium_expiry).getTime() + 7 * 24 * 60 * 60 * 1000)
@@ -186,7 +186,7 @@ router.post("/spin", authMw, async (req, res) => {
       upd.premium_expiry = newExpiry.toISOString();
       targetStops = [1, 1, 1];
     } else {
-      // 1% chance: Jackpot 100 coins
+      // 0.1% chance: Jackpot 100 coins
       reward = { type: "coins", amount: 100, label: "💥 JACKPOT! Win 100 Coins! 🪙" };
       upd.coins = (upd.coins !== undefined ? upd.coins : req.user.coins) + 100;
       targetStops = [0, 0, 0];

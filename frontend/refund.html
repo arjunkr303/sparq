@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Refund & Cancellation Policy — StrangerNear</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:          #060610;
+    --bg-2:        #0b0b1e;
+    --surface:     rgba(255,255,255,0.04);
+    --surface-2:   rgba(255,255,255,0.07);
+    --glass:       rgba(15,14,35,0.72);
+    --border:      rgba(139,117,255,0.14);
+    --border-2:    rgba(139,117,255,0.28);
+    --violet:      #7c5cfc;
+    --violet-2:    #9b7ffe;
+    --violet-3:    #b89fff;
+    --cyan:        #22d3ee;
+    --text:        #f0edff;
+    --text-2:      #a99fd4;
+    --text-3:      #6b6390;
+    --r-md:        18px;
+    --r-pill:      999px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  h1,h2,h3 { font-family:'Outfit',sans-serif; font-weight:800; }
+  a { color:inherit; text-decoration:none; }
+  
+  /* Navigation */
+  nav {
+    background: rgba(6,6,16,0.72);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.03em;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--violet), var(--cyan));
+    border-radius: 10px;
+    display: flex; align-items:center; justify-content:center;
+    font-size: 18px;
+  }
+  .logo-text { background:linear-gradient(135deg,#fff,var(--violet-3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .btn-ghost {
+    background: rgba(255,255,255,0.05);
+    color: var(--text-2);
+    padding: 8px 20px;
+    border-radius: var(--r-pill);
+    font-weight: 600;
+    font-size: 14px;
+    border: 1px solid var(--border-2);
+    transition: all 0.2s;
+  }
+  .btn-ghost:hover {
+    background: rgba(139,117,255,0.1);
+    color: var(--violet-3);
+    border-color: var(--violet);
+  }
+
+  /* Content Wrapper */
+  .container {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 0 24px;
+  }
+  .doc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 40px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  h1 {
+    font-size: 32px;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #fff, var(--violet-3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: 32px;
+    margin-bottom: 12px;
+    color: var(--cyan);
+  }
+  p {
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  ul {
+    margin-bottom: 16px;
+    padding-left: 20px;
+    color: var(--text-2);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  li {
+    margin-bottom: 8px;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    margin-top: 80px;
+    background: rgba(6,6,16,0.72);
+  }
+  .footer-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+  }
+  .footer-logo-icon {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--violet), var(--cyan));
+    border-radius: 8px;
+    display: flex; align-items:center; justify-content:center;
+    font-size: 14px;
+    color: #fff;
+  }
+  .footer-links {
+    display: flex;
+    gap: 20px;
+  }
+  .footer-links a {
+    color: var(--text-2);
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover {
+    color: #fff;
+  }
+  .footer-copy {
+    width: 100%;
+    text-align: center;
+    color: var(--text-3);
+    font-size: 12px;
+    margin-top: 20px;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .container {
+      margin: 30px auto;
+      padding: 0 16px;
+    }
+    .doc-card {
+      padding: 24px 16px;
+    }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 18px;
+      margin-top: 24px;
+    }
+    p, ul, li {
+      font-size: 14px;
+    }
+    .nav-inner {
+      padding: 0 16px;
+    }
+    .footer-inner {
+      padding: 0 16px;
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+    }
+    .footer-links {
+      justify-content: center;
+      gap: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-icon">◈</div>
+      <span class="logo-text">StrangerNear</span>
+    </a>
+    <a href="index.html"><button class="btn-ghost">Home</button></a>
+  </div>
+</nav>
+
+<!-- Content -->
+<div class="container">
+  <div class="doc-card">
+    <h1>Refund & Cancellation Policy</h1>
+    <p>Last updated: May 23, 2026</p>
+    <p>At StrangerNear, we want to ensure you have a transparent experience when purchasing virtual currency and membership items on our platform.</p>
+
+    <h2>1. General Refund Terms</h2>
+    <p>Since coins and VIP membership upgrades are instantly provisioned digital goods and consumable virtual services, all transactions are generally **non-refundable** once completed. We do not provide refunds or credits for any partially used coins or expired VIP memberships.</p>
+
+    <h2>2. Transaction Issues & Missing Coins</h2>
+    <p>If you made a payment but did not receive your coins, or if you were charged multiple times for a single purchase due to a billing issue:</p>
+    <ul>
+      <li>Please contact our support team at **support@strangenear.com** within **48 hours** of the transaction.</li>
+      <li>Include your payment transaction ID, purchase receipt, registered email address, and username.</li>
+      <li>Once verified, we will either manually credit the virtual coins to your profile or initiate a refund through our payment processor (typically takes 5–7 business days to credit back to your payment method).</li>
+    </ul>
+
+    <h2>3. Subscriptions & Cancellation</h2>
+    <p>If you purchased a subscription rank (e.g. VIP Monthly or VIP Annual):</p>
+    <ul>
+      <li>You can cancel your subscription renewal at any time through your Profile Dashboard under billing options.</li>
+      <li>Upon cancellation, your VIP status and all associated premium privileges will remain active until the end of your current pre-paid billing cycle. No renewal charges will be made.</li>
+      <li>We do not offer pro-rated refunds for cancellations made mid-billing cycle.</li>
+    </ul>
+
+    <h2>4. Terminated Accounts</h2>
+    <p>If your account is suspended or permanently terminated due to a violation of our <a href="terms.html" style="color: var(--cyan); text-decoration: underline;">Terms & Conditions</a> (including harassment, bot usage, or sending inappropriate content):</p>
+    <ul>
+      <li>You will forfeit all remaining coins and active VIP status associated with your account.</li>
+      <li>StrangerNear is under no obligation to refund any virtual currencies or unused subscription periods for banned accounts.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <div class="footer-logo-icon">◈</div>
+      StrangerNear
+    </div>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy</a>
+      <a href="terms.html">Terms</a>
+      <a href="refund.html">Refund Policy</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <p class="footer-copy">© 2025 StrangerNear · All rights reserved</p>
+  </div>
+</footer>
+
+</body>
+</html>

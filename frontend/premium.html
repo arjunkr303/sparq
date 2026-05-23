@@ -954,10 +954,33 @@ nav.scrolled { background: rgba(7,7,15,.95); }
   .hero-stats { gap: 10px; }
   .stat-pill { font-size: 12px; padding: 8px 14px; }
 }
-@media (max-width: 440px) {
+@media (max-width: 480px) {
   .badge-grid { grid-template-columns: 1fr 1fr; }
   .coins-packs { grid-template-columns: 1fr 1fr; }
   .hero-cta { flex-direction: column; align-items: center; }
+
+  /* Responsive header overrides */
+  .logo-text {
+    display: none;
+  }
+  .chat-arrow {
+    display: none;
+  }
+  .btn-ghost {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  .btn-primary {
+    padding: 7px 14px;
+    font-size: 11px;
+  }
+  .nav-coins-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .nav-actions {
+    gap: 6px;
+  }
 }
 </style>
 </head>
@@ -969,7 +992,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 <!-- ═══ NAV ═══ -->
 <nav id="navbar">
   <div class="nav-logo">
-    <span class="dot">◈</span><span>StrangerNear</span>
+    <span class="dot">◈</span><span class="logo-text">StrangerNear</span>
   </div>
   <div class="nav-actions">
     <div id="navCoinsPill" class="nav-coins-pill" style="display: none;" onclick="location.href='#coins'">
@@ -977,7 +1000,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
       <span id="navCoins">0</span>
     </div>
     <a href="dashboard.html"><button class="btn-ghost">Dashboard</button></a>
-    <a href="chat.html"><button class="btn-primary">Start Chat →</button></a>
+    <a href="chat.html"><button class="btn-primary">Start Chat<span class="chat-arrow"> →</span></button></a>
   </div>
 </nav>
 
