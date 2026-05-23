@@ -1412,7 +1412,9 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 <!-- ═══════════════════════════════ SCRIPTS ═══════════════════════════════ -->
 <script>
 /* ══ CONFIG ══ */
-const API = 'http://127.0.0.1:5000';
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:5000'
+  : 'https://sparq-ou9g.onrender.com';
 const RAZORPAY_KEY = 'rzp_test_XXXXXXXXXXXX';
 const token = localStorage.getItem('sc_token');
 let user  = JSON.parse(localStorage.getItem('sc_user') || 'null');

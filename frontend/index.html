@@ -1055,7 +1055,10 @@ footer {
 (function() {
   const el = document.getElementById('onlineCount');
   const badge = document.getElementById('heroBadgeText');
-  const API = 'http://localhost:5000/api/stats';
+  const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://sparq-ou9g.onrender.com';
+  const API = `${API_BASE}/api/stats`;
 
   function animateCount(target) {
     const duration = 1200;

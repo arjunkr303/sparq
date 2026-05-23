@@ -1799,7 +1799,9 @@ nav {
 </div>
 
 <script>
-const API = 'http://127.0.0.1:5000';
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:5000'
+  : 'https://sparq-ou9g.onrender.com';
 const DEV = ['KING','king'];
 
 const INTEREST_CATS = {
