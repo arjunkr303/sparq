@@ -127,3 +127,24 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN DEFAULT FALSE;
+
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  token TEXT UNIQUE NOT NULL,
+  verified BOOLEAN DEFAULT FALSE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_verification_tokens_token ON email_verification_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_verification_tokens_email ON email_verification_tokens(email);
+ALTER TABLE email_verification_tokens ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='email_verification_tokens' AND policyname='Service full access verification') THEN
+    CREATE POLICY "Service full access verification" ON email_verification_tokens FOR ALL USING (TRUE);
+  END IF;
+END $$;
+
+

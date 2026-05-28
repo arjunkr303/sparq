@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Email Confirmed — Sparq</title>
+
+<style>
+@font-face {
+  font-family: 'League Spartan';
+  src: url('./fonts/variable/WOFF2/LeagueSpartan-VF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg:          #060610;
+  --bg-2:        #0b0b1e;
+  --surface:     rgba(255,255,255,0.04);
+  --surface-2:   rgba(255,255,255,0.07);
+  --border:      rgba(139,117,255,0.14);
+  --border-2:    rgba(139,117,255,0.28);
+  --violet:      #7c5cfc;
+  --violet-2:    #9b7ffe;
+  --violet-3:    #b89fff;
+  --cyan:        #22d3ee;
+  --text:        #f0edff;
+  --text-2:      #a99fd4;
+  --text-3:      #6b6390;
+  --r-md:        18px;
+  --r-pill:      999px;
+  --glow-v:      rgba(124,92,252,0.18);
+  --glow-c:      rgba(34,211,238,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'League Spartan', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Background Blobs */
+.bg-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: -1;
+  opacity: 0.65;
+  pointer-events: none;
+}
+.bg-blob-1 {
+  width: 45vw; height: 45vw;
+  background: radial-gradient(circle, var(--glow-v) 0%, transparent 70%);
+  top: -10%; left: -10%;
+  animation: float-1 20s infinite alternate ease-in-out;
+}
+.bg-blob-2 {
+  width: 40vw; height: 40vw;
+  background: radial-gradient(circle, var(--glow-c) 0%, transparent 70%);
+  bottom: -10%; right: -10%;
+  animation: float-2 18s infinite alternate ease-in-out;
+}
+
+@keyframes float-1 {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(40px, 30px) scale(1.1); }
+}
+@keyframes float-2 {
+  0%   { transform: translate(0,0) scale(1); }
+  100% { transform: translate(-30px, -40px) scale(1.05); }
+}
+
+/* Landing Card */
+.card-wrap {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+  perspective: 1000px;
+  animation: card-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(24px) rotateX(-5deg); }
+  to   { opacity: 1; transform: translateY(0) rotateX(0); }
+}
+
+.card {
+  position: relative;
+  background: rgba(15, 14, 35, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 48px 40px;
+  backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 
+              inset 0 0 0 1px rgba(255,255,255,0.02);
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Glowing Border Pulse */
+.card::after {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--border), var(--border-2), var(--border));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Decorative Icon Header */
+.header-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, rgba(124,92,252,0.12), rgba(34,211,238,0.12));
+  border: 1px solid var(--border-2);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  font-size: 32px;
+  color: var(--cyan);
+  box-shadow: 0 8px 24px rgba(124,92,252,0.15);
+  animation: success-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes success-pop {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #ffffff 30%, var(--violet-3) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+p {
+  font-size: 15px;
+  color: var(--text-2);
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.highlight {
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+/* Action Button */
+.btn-primary {
+  display: inline-block;
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(135deg, var(--violet), #5e3de8);
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 0 28px var(--glow-v), 0 4px 16px rgba(0,0,0,0.3);
+  transition: all 0.25s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 44px var(--glow-v), 0 8px 28px rgba(0,0,0,0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px);
+}
+
+/* Redirection timer status */
+.redirect-text {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 24px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Background particle canvas */
+#bg-canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -2;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<!-- Animated Particle Background -->
+<canvas id="bg-canvas"></canvas>
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+
+<div class="card-wrap">
+  <div class="card">
+    <div class="header-icon" style="background: rgba(34,211,238,0.08); border-color: rgba(34,211,238,0.25); color: var(--cyan);">✓</div>
+    <h1>Email Verified!</h1>
+    <p>Success! Your email address has been confirmed. You can now return to the <span class="highlight">signup window</span> to complete your registration.</p>
+    
+    <button onclick="window.close()" class="btn-primary">Close This Window</button>
+    
+    <div class="redirect-text" id="redirectStatus">Closing this tab in 3s...</div>
+  </div>
+</div>
+
+<script>
+  // Automatic Tab Closing with browser fallback
+  let countdown = 3;
+  const statusEl = document.getElementById("redirectStatus");
+  
+  const interval = setInterval(() => {
+    countdown--;
+    statusEl.textContent = `Closing this tab in ${countdown}s...`;
+    if (countdown <= 0) {
+      clearInterval(interval);
+      window.close();
+      // Browser security fallback (if window.close() is blocked)
+      statusEl.innerHTML = "<span style='color: var(--cyan); font-weight: 600;'>Verification Complete.</span> You can safely close this window now.";
+    }
+  }, 1000);
+
+  /* Canvas Particle Animation */
+  (function () {
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, particles = [];
+    const COLORS = ['rgba(124,92,252,', 'rgba(34,211,238,', 'rgba(244,114,182,'];
+
+    function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+
+    function mkParticle() {
+      const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return { x: Math.random() * W, y: Math.random() * H, r: Math.random() * 1.5 + 0.4,
+               dx: (Math.random() - 0.5) * 0.2, dy: (Math.random() - 0.5) * 0.2,
+               o: Math.random() * 0.35 + 0.1, color: c };
+    }
+
+    function init() { resize(); particles = Array.from({ length: 40 }, mkParticle); }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < 110) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = particles[i].color + (0.05 * (1 - d / 110)) + ')';
+            ctx.lineWidth = 0.5; ctx.stroke();
+          }
+        }
+      }
+      particles.forEach(p => {
+        p.x += p.dx; p.y += p.dy;
+        if (p.x < 0 || p.x > W) p.dx *= -1;
+        if (p.y < 0 || p.y > H) p.dy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + p.o + ')'; ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+
+    window.addEventListener('resize', init);
+    init(); draw();
+  })();
+</script>
+</body>
+</html>

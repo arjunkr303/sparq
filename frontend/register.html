@@ -365,7 +365,7 @@ select:disabled { opacity: 0.35; cursor: not-allowed; }
 .dice-btn:hover { background: rgba(124,92,252,0.22); transform: rotate(20deg); }
 
 /* ── GENDER BUTTONS ── */
-.gender-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+.gender-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; }
 .gender-btn {
   padding: 12px 8px;
   border-radius: var(--r-md);
@@ -508,7 +508,7 @@ select:disabled { opacity: 0.35; cursor: not-allowed; }
 /* ── RESPONSIVE ── */
 @media (max-width: 560px) {
   .card { padding: 28px 20px; }
-  .gender-grid { grid-template-columns: repeat(3,1fr); }
+  .gender-grid { grid-template-columns: repeat(2,1fr); }
 }
 </style>
 </head>
@@ -566,10 +566,15 @@ select:disabled { opacity: 0.35; cursor: not-allowed; }
 
         <div class="field">
           <label class="field-label" for="email">Email Address</label>
-          <div class="iw">
-            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" oninput="chkEmail()"/>
+          <div class="urow">
+            <div style="flex: 1;">
+              <div class="iw">
+                <input type="email" id="email" placeholder="you@example.com" autocomplete="email" oninput="chkEmail()"/>
+              </div>
+              <div class="hint" id="emailHint"></div>
+            </div>
+            <button id="btnVerifyEmail" class="dice-btn" style="font-size: 13px; font-weight: 600; font-family: 'League Spartan', sans-serif;" disabled onclick="requestVerificationLink(event)">Verify</button>
           </div>
-          <div class="hint" id="emailHint"></div>
         </div>
 
         <div class="field">
@@ -618,9 +623,6 @@ select:disabled { opacity: 0.35; cursor: not-allowed; }
             </button>
             <button class="gender-btn" id="gb-female" onclick="setGender('female',this)">
               <span class="g-icon">♀</span> Female
-            </button>
-            <button class="gender-btn" id="gb-other" onclick="setGender('other',this)">
-              <span class="g-icon">⚧</span> Other
             </button>
           </div>
         </div>
@@ -702,6 +704,8 @@ const INTEREST_CATS = {
 const LOC = {'India':{'Andhra Pradesh':['Visakhapatnam','Vijayawada','Guntur','Tirupati','Kurnool','Nellore'],'Arunachal Pradesh':['Itanagar','Naharlagun'],'Assam':['Guwahati','Silchar','Dibrugarh','Jorhat'],'Bihar':['Patna','Gaya','Bhagalpur','Muzaffarpur'],'Chhattisgarh':['Raipur','Bhilai','Bilaspur'],'Goa':['Panaji','Margao','Vasco da Gama'],'Gujarat':['Ahmedabad','Surat','Vadodara','Rajkot','Bhavnagar'],'Haryana':['Faridabad','Gurugram','Panipat','Ambala','Hisar'],'Himachal Pradesh':['Shimla','Manali','Dharamshala','Kullu'],'Jharkhand':['Ranchi','Jamshedpur','Dhanbad'],'Karnataka':['Bengaluru','Mysuru','Hubli','Mangaluru','Belagavi'],'Kerala':['Thiruvananthapuram','Kochi','Kozhikode','Thrissur','Kollam','Palakkad','Kannur','Alappuzha','Malappuram','Kottayam','Idukki','Wayanad','Pathanamthitta','Kasaragod'],'Madhya Pradesh':['Bhopal','Indore','Jabalpur','Gwalior','Ujjain'],'Maharashtra':['Mumbai','Pune','Nagpur','Nashik','Aurangabad','Solapur','Thane'],'Manipur':['Imphal','Churachandpur'],'Meghalaya':['Shillong','Tura'],'Mizoram':['Aizawl','Lunglei'],'Nagaland':['Kohima','Dimapur'],'Odisha':['Bhubaneswar','Cuttack','Rourkela','Sambalpur'],'Punjab':['Ludhiana','Amritsar','Jalandhar','Patiala','Bathinda'],'Rajasthan':['Jaipur','Jodhpur','Udaipur','Kota','Bikaner','Ajmer'],'Sikkim':['Gangtok','Namchi'],'Tamil Nadu':['Chennai','Coimbatore','Madurai','Tiruchirappalli','Salem','Tirunelveli','Vellore','Erode'],'Telangana':['Hyderabad','Warangal','Nizamabad','Khammam','Karimnagar'],'Tripura':['Agartala','Udaipur'],'Uttar Pradesh':['Lucknow','Kanpur','Agra','Varanasi','Meerut','Allahabad','Ghaziabad','Noida'],'Uttarakhand':['Dehradun','Haridwar','Roorkee','Haldwani'],'West Bengal':['Kolkata','Howrah','Durgapur','Asansol','Siliguri','Bardhaman'],'Delhi':['New Delhi','North Delhi','South Delhi','East Delhi','West Delhi','Central Delhi'],'Jammu & Kashmir':['Srinagar','Jammu','Anantnag','Baramulla'],'Ladakh':['Leh','Kargil']},'United States':{'California':['Los Angeles','San Francisco','San Diego','San Jose','Sacramento','Oakland','Fresno'],'Texas':['Houston','Dallas','Austin','San Antonio','Fort Worth','El Paso'],'Florida':['Miami','Orlando','Tampa','Jacksonville','St. Petersburg'],'New York':['New York City','Buffalo','Rochester','Yonkers','Syracuse'],'Illinois':['Chicago','Aurora','Rockford','Joliet','Naperville'],'Pennsylvania':['Philadelphia','Pittsburgh','Allentown','Erie'],'Ohio':['Columbus','Cleveland','Cincinnati','Toledo'],'Georgia':['Atlanta','Augusta','Columbus','Savannah'],'North Carolina':['Charlotte','Raleigh','Greensboro','Durham'],'Michigan':['Detroit','Grand Rapids','Warren','Ann Arbor'],'Washington':['Seattle','Spokane','Tacoma','Vancouver'],'Arizona':['Phoenix','Tucson','Mesa','Chandler','Scottsdale'],'Massachusetts':['Boston','Worcester','Springfield','Cambridge'],'Colorado':['Denver','Colorado Springs','Aurora','Fort Collins'],'Tennessee':['Nashville','Memphis','Knoxville','Chattanooga']},'United Kingdom':{'England':['London','Manchester','Birmingham','Leeds','Sheffield','Liverpool','Bristol','Newcastle','Nottingham','Leicester'],'Scotland':['Edinburgh','Glasgow','Aberdeen','Dundee','Inverness'],'Wales':['Cardiff','Swansea','Newport','Wrexham'],'Northern Ireland':['Belfast','Londonderry','Lisburn']},'Canada':{'Ontario':['Toronto','Ottawa','Mississauga','Brampton','Hamilton','London'],'Quebec':['Montreal','Quebec City','Laval','Gatineau'],'British Columbia':['Vancouver','Surrey','Burnaby','Richmond','Victoria'],'Alberta':['Calgary','Edmonton','Red Deer','Lethbridge'],'Manitoba':['Winnipeg','Brandon'],'Saskatchewan':['Saskatoon','Regina'],'Nova Scotia':['Halifax','Dartmouth']},'Australia':{'New South Wales':['Sydney','Newcastle','Wollongong','Central Coast'],'Victoria':['Melbourne','Geelong','Ballarat','Bendigo'],'Queensland':['Brisbane','Gold Coast','Sunshine Coast','Townsville','Cairns'],'Western Australia':['Perth','Fremantle','Bunbury'],'South Australia':['Adelaide','Mount Gambier'],'Tasmania':['Hobart','Launceston']},'Germany':{'Bavaria':['Munich','Nuremberg','Augsburg','Regensburg'],'Berlin':['Berlin'],'Hamburg':['Hamburg'],'Hesse':['Frankfurt','Wiesbaden','Kassel','Darmstadt'],'Baden-Württemberg':['Stuttgart','Mannheim','Karlsruhe','Freiburg'],'North Rhine-Westphalia':['Cologne','Düsseldorf','Dortmund','Essen','Bonn']},'France':{'Île-de-France':['Paris','Boulogne-Billancourt','Versailles'],'PACA':['Marseille','Nice','Toulon','Cannes'],'Auvergne-Rhône-Alpes':['Lyon','Grenoble','Saint-Étienne'],'Occitanie':['Toulouse','Montpellier','Nîmes']},'Brazil':{'São Paulo':['São Paulo','Campinas','Santos','Ribeirão Preto'],'Rio de Janeiro':['Rio de Janeiro','Niterói','Duque de Caxias'],'Minas Gerais':['Belo Horizonte','Uberlândia','Juiz de Fora'],'Bahia':['Salvador','Feira de Santana'],'Paraná':['Curitiba','Londrina','Maringá']},'Japan':{'Tokyo':['Shinjuku','Shibuya','Minato','Chiyoda','Setagaya','Nerima'],'Osaka':['Osaka','Sakai','Higashiosaka'],'Kanagawa':['Yokohama','Kawasaki','Sagamihara'],'Aichi':['Nagoya','Toyota','Okazaki'],'Hokkaido':['Sapporo','Asahikawa','Hakodate'],'Kyoto':['Kyoto','Uji'],'Fukuoka':['Fukuoka','Kitakyushu','Kurume']},'Other':{'Other':['Other City']}};
 
 let gender = '', selInt = [];
+let emailVerified = false;
+let verificationInterval = null;
 
 /* ── Build Interest Tags ── */
 function buildTagBox() {
@@ -776,6 +780,8 @@ let eT, uT;
 function chkEmail() {
   const v = document.getElementById('email').value.trim();
   const h = document.getElementById('emailHint');
+  const btn = document.getElementById('btnVerifyEmail');
+  btn.disabled = true; // Default to disabled while typing or on invalid
   if (!v) { h.textContent = ''; h.className = 'hint'; return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
     h.textContent = 'Invalid email format'; h.className = 'hint err'; return;
@@ -785,10 +791,81 @@ function chkEmail() {
     try {
       const r = await fetch(`${API}/api/auth/check-email?email=${encodeURIComponent(v)}`);
       const d = await r.json();
-      h.textContent = d.taken ? '✗ Email already taken' : '✓ Available';
-      h.className = 'hint ' + (d.taken ? 'err' : 'ok');
+      if (d.isDisposable) {
+        h.textContent = 'Please use a permanent email address';
+        h.className = 'hint err';
+      } else {
+        h.textContent = d.taken ? 'Email already taken' : '✓ Available';
+        h.className = 'hint ' + (d.taken ? 'err' : 'ok');
+        if (!d.taken && !d.isDisposable && !emailVerified) {
+          btn.disabled = false; // Enable verify button since email is clean and available
+        }
+      }
     } catch { h.textContent = ''; h.className = 'hint'; }
   }, 600);
+}
+
+async function requestVerificationLink(e) {
+  if (e) e.preventDefault();
+  const emailInput = document.getElementById('email');
+  const email = emailInput.value.trim();
+  const btn = document.getElementById('btnVerifyEmail');
+  const hint = document.getElementById('emailHint');
+  
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  hint.textContent = 'Sending verification link…';
+  hint.className = 'hint inf';
+  
+  try {
+    const r = await fetch(`${API}/api/auth/send-verification-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      hint.textContent = d.message || 'Failed to send link.';
+      hint.className = 'hint err';
+      btn.textContent = 'Verify';
+      btn.disabled = false;
+      return;
+    }
+    
+    emailInput.disabled = true; // Lock the input so they can't change it during verification
+    btn.textContent = 'Sent';
+    hint.textContent = 'Verification link sent! Please check your email to verify...';
+    hint.className = 'hint inf';
+    
+    // Start polling
+    if (verificationInterval) clearInterval(verificationInterval);
+    verificationInterval = setInterval(async () => {
+      try {
+        const statusRes = await fetch(`${API}/api/auth/check-verification?email=${encodeURIComponent(email)}`);
+        const statusData = await statusRes.json();
+        if (statusData.verified) {
+          clearInterval(verificationInterval);
+          emailVerified = true;
+          hint.textContent = '✓ Email verified successfully! 🎉';
+          hint.className = 'hint ok';
+          btn.textContent = 'Verified';
+          btn.disabled = true;
+          btn.style.borderColor = 'var(--cyan)';
+          btn.style.color = 'var(--cyan)';
+          btn.style.background = 'rgba(34,211,238,0.08)';
+        }
+      } catch (pollErr) {
+        console.error('Polling error:', pollErr);
+      }
+    }, 2500);
+    
+  } catch (err) {
+    console.error(err);
+    hint.textContent = 'Error connecting to server.';
+    hint.className = 'hint err';
+    btn.textContent = 'Verify';
+    btn.disabled = false;
+  }
 }
 
 function chkUname() {
@@ -802,7 +879,7 @@ function chkUname() {
     try {
       const r = await fetch(`${API}/api/auth/check-username?username=${encodeURIComponent(v)}`);
       const d = await r.json();
-      h.textContent = d.taken ? '✗ Username taken' : '✓ Available';
+      h.textContent = d.taken ? 'Username taken' : '✓ Available';
       h.className = 'hint ' + (d.taken ? 'err' : 'ok');
     } catch { h.textContent = ''; h.className = 'hint'; }
   }, 600);
@@ -822,7 +899,7 @@ function chkPass2() {
   const p = document.getElementById('pass').value;
   const h = document.getElementById('pass2Hint');
   if (!v) { h.textContent = ''; h.className = 'hint'; return; }
-  if (v !== p) { h.textContent = '✗ Passwords do not match'; h.className = 'hint err'; }
+  if (v !== p) { h.textContent = 'Passwords do not match'; h.className = 'hint err'; }
   else { h.textContent = '✓ Passwords match'; h.className = 'hint ok'; }
 }
 
@@ -885,6 +962,11 @@ function next1() {
   const pass  = document.getElementById('pass').value;
   const pass2 = document.getElementById('pass2').value;
   if (!email || !uname || !pass || !pass2) return showErr('All fields are required.');
+  
+  if (!emailVerified) {
+    return showErr('Please verify your email address first.');
+  }
+
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr('Enter a valid email address.');
   if (uname.length < 3) return showErr('Username must be at least 3 characters.');
   if (!/^[a-zA-Z0-9_]+$/.test(uname)) return showErr('Username can only contain letters, numbers, and underscores.');

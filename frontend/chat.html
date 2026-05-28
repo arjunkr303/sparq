@@ -2641,6 +2641,9 @@
               if (preferredDevice && preferredDevice.deviceId) {
                 console.log("Switching from default mic to preferred headset/external mic:", preferredDevice.label);
                 try {
+                  // Stop the default track first to release the hardware/software lock
+                  activeTrack?.stop();
+
                   const preferredStream = await navigator.mediaDevices.getUserMedia({
                     audio: {
                       deviceId: { exact: preferredDevice.deviceId },
@@ -2651,10 +2654,18 @@
                     },
                     video: false
                   });
-                  activeTrack?.stop();
                   stream = preferredStream;
                 } catch (err) {
-                  console.warn("Failed to open preferred device, keeping default stream", err);
+                  console.warn("Failed to open preferred device, attempting to restore default stream", err);
+                  try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                      audio: true,
+                      video: false
+                    });
+                  } catch (reAcquireErr) {
+                    console.error("Failed to restore default stream", reAcquireErr);
+                    throw reAcquireErr;
+                  }
                 }
               }
             }
