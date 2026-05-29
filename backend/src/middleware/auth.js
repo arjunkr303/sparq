@@ -15,6 +15,12 @@ module.exports = async (req, res, next) => {
       .eq("id", id)
       .maybeSingle();
     if (!u) return res.status(401).json({ message: "User not found" });
+    
+    // Force VIP / Premium for all users
+    u.is_premium = true;
+    u.premium_expiry = "2099-12-31T23:59:59.000Z";
+    u.is_verified = true;
+    
     req.user = u;
     next();
   } catch {

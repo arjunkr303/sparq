@@ -10,16 +10,14 @@ const DEV_EMAILS = ["arjunsreechakram@gmail.com", "jithubaiju124@gmail.com"];
 const clean = (u) => {
   const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
   const now = new Date();
-  const isPremium = isDevEmail || !!(
-    u.is_premium &&
-    u.premium_expiry &&
-    new Date(u.premium_expiry) > now
-  );
-  const isPremiumAnnual = isDevEmail || !!(
-    isPremium &&
-    u.premium_expiry &&
-    new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000
-  );
+  
+  // Force premium / VIP for everyone
+  u.is_premium = true;
+  u.premium_expiry = "2099-12-31T23:59:59.000Z";
+  u.is_verified = true;
+
+  const isPremium = true;
+  const isPremiumAnnual = true;
   return {
     id: u.id,
     username: u.username,

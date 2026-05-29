@@ -147,4 +147,25 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+CREATE TABLE IF NOT EXISTS pending_orders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  order_id TEXT UNIQUE NOT NULL,
+  username TEXT NOT NULL,
+  email TEXT NOT NULL,
+  item_purchased TEXT NOT NULL,
+  amount NUMERIC NOT NULL,
+  transaction_id TEXT NOT NULL,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'done', 'rejected')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS and define a Service full access policy for security
+ALTER TABLE pending_orders ENABLE ROW LEVEL SECURITY;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename='pending_orders' AND policyname='Service full access orders') THEN
+    CREATE POLICY "Service full access orders" ON pending_orders FOR ALL USING (TRUE);
+  END IF;
+END $$;
+
+
 

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Manual UPI Payment — Sparq</title>
+<meta name="description" content="Verify and process your Sparq premium order secure and fast."/>
+<style>
+@font-face {
+  font-family: 'League Spartan';
+  src: url('./fonts/variable/WOFF2/LeagueSpartan-VF.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ═══════════════════════════════ DESIGN TOKENS ═══════════════════════════════ */
+:root {
+  --bg:   #07070f;
+  --bg2:  #0d0d1a;
+  --bg3:  #121220;
+  --bd:   rgba(120,90,255,.14);
+  --b2:   rgba(120,90,255,.30);
+  --pr:   #7c5cfc;
+  --pr2:  #9b7ffe;
+  --ac:   #00e5ff;
+  --gd:   #ffd166;
+  --gn:   #06d6a0;
+  --rd:   #ef4565;
+  --tx:   #f0eeff;
+  --t2:   #a89fd8;
+  --t3:   #6b638f;
+  --glass: rgba(255,255,255,.04);
+}
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg);
+  color: var(--tx);
+  font-family: 'League Spartan', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-x: hidden;
+}
+
+/* Background gradient glows */
+.glow-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 15%, rgba(124, 92, 252, 0.08), transparent 50%),
+              radial-gradient(circle at 10% 80%, rgba(0, 229, 255, 0.03), transparent 40%);
+}
+
+.payment-container {
+  max-width: 480px;
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--bd);
+  border-radius: 28px;
+  padding: 32px;
+  box-shadow: 0 30px 70px rgba(0,0,0,.6), 0 0 0 1px var(--bd);
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(20px);
+  text-align: center;
+  transition: all 0.4s ease;
+}
+
+.logo {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--tx);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.logo .dot { color: var(--pr2); }
+
+.step-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--pr2);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.order-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+.order-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.order-row:last-child { margin-bottom: 0; }
+.order-lbl { color: var(--t2); font-size: 13.5px; }
+.order-val { font-weight: 700; font-size: 14.5px; }
+.order-val.amount { color: var(--gd); font-size: 18px; }
+
+/* QR Code */
+.qr-container {
+  background: #090912;
+  border: 1px solid var(--bd);
+  border-radius: 20px;
+  padding: 18px;
+  display: inline-block;
+  margin-bottom: 20px;
+  box-shadow: inset 0 0 20px rgba(124, 92, 252, 0.05);
+  position: relative;
+}
+.qr-container img {
+  display: block;
+  width: 190px;
+  height: 190px;
+  border-radius: 8px;
+}
+.qr-loading {
+  position: absolute;
+  inset: 0;
+  background: #090912;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--t2);
+  border-radius: 20px;
+}
+
+.upi-details {
+  background: var(--glass);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.upi-text {
+  text-align: left;
+}
+.upi-title {
+  font-size: 11px;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+.upi-id {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--tx);
+}
+.copy-btn {
+  background: var(--pr);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.copy-btn:hover { background: var(--pr2); transform: scale(1.03); }
+
+/* Form Input */
+.form-group {
+  margin-bottom: 24px;
+  text-align: left;
+}
+.form-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--t2);
+  margin-bottom: 8px;
+}
+.form-input {
+  width: 100%;
+  background: #090912;
+  border: 1.5px solid var(--bd);
+  border-radius: 14px;
+  padding: 14px 18px;
+  color: var(--tx);
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.25s;
+}
+.form-input:focus {
+  border-color: var(--pr2);
+  box-shadow: 0 0 15px rgba(124, 92, 252, 0.15);
+}
+.form-input::placeholder { color: var(--t3); }
+
+.pay-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--pr), var(--pr2));
+  color: #fff;
+  border: none;
+  padding: 14px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(124, 92, 252, 0.3);
+  transition: all 0.3s;
+}
+.pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(124, 92, 252, 0.45);
+}
+.pay-btn:disabled {
+  background: var(--t4);
+  color: var(--t3);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Success Card */
+.success-card {
+  display: none;
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.success-icon {
+  font-size: 56px;
+  margin-bottom: 20px;
+  animation: bounce 1s infinite alternate;
+}
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-8px); }
+}
+
+.success-title {
+  font-family: 'League Spartan', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--gn);
+  margin-bottom: 12px;
+}
+.success-msg {
+  font-size: 14.5px;
+  color: var(--t2);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+.home-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 13.5px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+.home-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--b2);
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--bg3);
+  border: 1px solid var(--bd);
+  color: var(--tx);
+  padding: 12px 24px;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  z-index: 1000;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.err { border-color: rgba(239, 69, 101, 0.35); color: var(--rd); }
+
+</style>
+</head>
+<body>
+
+<div class="glow-bg"></div>
+
+<div class="payment-container" id="mainCard">
+  <div class="logo">
+    <span class="dot">◈</span><span>Sparq Checkout</span>
+  </div>
+
+  <div class="step-label">1. Scan &amp; Pay</div>
+
+  <div class="order-box">
+    <div class="order-row">
+      <span class="order-lbl">Purchase Item</span>
+      <span class="order-val" id="itemName">Loading...</span>
+    </div>
+    <div class="order-row">
+      <span class="order-lbl">Order ID</span>
+      <span class="order-val" id="orderId">Loading...</span>
+    </div>
+    <div class="order-row">
+      <span class="order-lbl">Total Amount</span>
+      <span class="order-val amount" id="amountDisplay">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Dynamic QR Code -->
+  <div class="qr-container">
+    <div class="qr-loading" id="qrLoading">Generating QR...</div>
+    <img id="qrImage" src="" alt="Payment QR Code" style="display: none;" onload="document.getElementById('qrLoading').style.display='none';this.style.display='block';"/>
+  </div>
+
+  <div class="upi-details">
+    <div class="upi-text">
+      <div class="upi-title">UPI Address</div>
+      <div class="upi-id" id="upiId">sparq@slc</div>
+    </div>
+    <button class="copy-btn" onclick="copyUPI()">Copy ID</button>
+  </div>
+
+  <div class="step-label">2. Enter Transaction Details</div>
+  
+  <div class="form-group">
+    <label class="form-label" for="txnId">12-Digit UPI Transaction ID / Ref No.</label>
+    <input class="form-input" type="text" id="txnId" maxlength="12" placeholder="e.g. 407612345678" oninput="this.value = this.value.replace(/[^0-9]/g, '')"/>
+  </div>
+
+  <button class="pay-btn" id="submitBtn" onclick="submitPayment()">I have paid</button>
+</div>
+
+<!-- Success Confirmation Card -->
+<div class="payment-container success-card" id="successCard">
+  <div class="success-icon">🎉</div>
+  <h2 class="success-title">Order Received!</h2>
+  <p class="success-msg" id="successMsg">
+    Your order has been received successfully! Your benefits will be credited manually by our verification team within 30 minutes.
+  </p>
+  <button class="home-btn" onclick="location.href='dashboard.html'">Back to Dashboard</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const itemId = params.get('item');
+const rawAmount = params.get('amount') || '0.00';
+const itemName = params.get('name') || 'Item';
+
+// Load User & Token from localStorage
+const token = localStorage.getItem('sc_token');
+const user = JSON.parse(localStorage.getItem('sc_user') || 'null');
+
+if (!token || !user) {
+  location.href = 'login.html';
+}
+
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://127.0.0.1:5000'
+  : 'https://sparq-ou9g.onrender.com';
+
+// Auto-generate premium Order ID (e.g. SPQ-48291)
+const orderNum = Math.floor(10000 + Math.random() * 90000);
+const orderId = `SPQ-${orderNum}`;
+
+document.getElementById('itemName').textContent = itemName;
+document.getElementById('orderId').textContent = orderId;
+document.getElementById('amountDisplay').textContent = `₹${parseFloat(rawAmount).toFixed(2)}`;
+
+// Fallback values in case fetching from backend fails
+let merchantUpiId = 'sparq@okaxis';
+let merchantUpiName = 'Sparq Chat';
+
+// Function to rebuild UPI payment URL and QR Code
+function renderUPIInfo(upiId, upiName) {
+  document.getElementById('upiId').textContent = upiId;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(upiName)}&am=${encodeURIComponent(rawAmount)}&tr=${encodeURIComponent(orderId)}&tn=${encodeURIComponent(orderId)}`;
+  const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=7c5cfc&bgcolor=090912&data=${encodeURIComponent(upiUri)}`;
+  document.getElementById('qrImage').src = qrApiUrl;
+}
+
+// Render dynamic configuration with fallback immediately
+renderUPIInfo(merchantUpiId, merchantUpiName);
+
+// Fetch dynamic merchant UPI ID from backend .env configurations
+fetch(`${API}/api/payment/upi-config`, {
+  headers: { 'Authorization': `Bearer ${token}` }
+})
+.then(res => res.json())
+.then(data => {
+  if (data && data.upiId) {
+    merchantUpiId = data.upiId;
+    merchantUpiName = data.upiName;
+    renderUPIInfo(merchantUpiId, merchantUpiName);
+  }
+})
+.catch(err => console.error('Error fetching merchant configuration:', err));
+
+function showToast(msg, type = 'ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = 'toast ' + type; }, 3500);
+}
+
+function copyUPI() {
+  const upiText = document.getElementById('upiId').textContent;
+  navigator.clipboard.writeText(upiText).then(() => {
+    showToast('📋 UPI Address copied successfully!');
+  }).catch(() => {
+    showToast('Failed to copy UPI Address', 'err');
+  });
+}
+
+function submitPayment() {
+  const txnId = document.getElementById('txnId').value.trim();
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (!txnId) {
+    showToast('⚠️ Please enter the 12-digit transaction ID', 'err');
+    return;
+  }
+  if (txnId.length !== 12) {
+    showToast('⚠️ Transaction ID must be exactly 12 digits', 'err');
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Submitting order...';
+
+  // Send payload to backend
+  fetch(`${API}/api/payment/submit-upi-payment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      orderId,
+      itemId,
+      amount: parseFloat(rawAmount),
+      itemName,
+      transactionId: txnId
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      document.getElementById('mainCard').style.display = 'none';
+      document.getElementById('successMsg').innerHTML = `Order <strong>${orderId}</strong> received!<br>Your VIP benefits or coins will be verified and activated within 30 minutes.`;
+      document.getElementById('successCard').style.display = 'block';
+    } else {
+      showToast(data.message || 'Submission failed. Try again.', 'err');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'I have paid';
+    }
+  })
+  .catch(err => {
+    console.error('Submit error:', err);
+    showToast('Server error. Please check your internet and try again.', 'err');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'I have paid';
+  });
+}
+</script>
+
+</body>
+</html>

@@ -116,6 +116,11 @@ module.exports = (io) => {
       if (!u) return next(new Error("User not found"));
       if (u.is_banned) return next(new Error("Banned"));
 
+      // Force VIP / Premium for all users
+      u.is_premium = true;
+      u.premium_expiry = "2099-12-31T23:59:59.000Z";
+      u.is_verified = true;
+
       const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
       const now = new Date();
       const isBoosted =
