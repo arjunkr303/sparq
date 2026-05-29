@@ -83,13 +83,8 @@ const clean = (u) => {
   const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
   const now = new Date();
   
-  // Force premium / VIP for everyone
-  u.is_premium = true;
-  u.premium_expiry = "2099-12-31T23:59:59.000Z";
-  u.is_verified = true;
-
-  const isPremium = true;
-  const isPremiumAnnual = true;
+  const isPremium = isDevEmail || !!(u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now) || u.admin_title === 'vip_monthly' || u.admin_title === 'vip_annual';
+  const isPremiumAnnual = isDevEmail || u.admin_title === 'vip_annual';
 
   return {
     id: u.id,
@@ -111,6 +106,7 @@ const clean = (u) => {
     memberSince: u.created_at || null,
     profilePhoto: u.profile_photo || null,
     dev: isDevEmail,
+    cityLockExpiry: u.city_lock_expiry || null,
   };
 };
 

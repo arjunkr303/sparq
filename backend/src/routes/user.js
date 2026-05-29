@@ -11,13 +11,8 @@ const clean = (u) => {
   const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
   const now = new Date();
   
-  // Force premium / VIP for everyone
-  u.is_premium = true;
-  u.premium_expiry = "2099-12-31T23:59:59.000Z";
-  u.is_verified = true;
-
-  const isPremium = true;
-  const isPremiumAnnual = true;
+  const isPremium = isDevEmail || !!(u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now) || u.admin_title === 'vip_monthly' || u.admin_title === 'vip_annual';
+  const isPremiumAnnual = isDevEmail || u.admin_title === 'vip_annual';
   return {
     id: u.id,
     username: u.username,
@@ -44,6 +39,7 @@ const clean = (u) => {
     chatTheme: isDevEmail ? (u.chat_theme || "premium") : (u.chat_theme || 'default'),
     themeExpiry: isDevEmail ? "2099-12-31T23:59:59.000Z" : (u.theme_expiry || null),
     dev: isDevEmail,
+    cityLockExpiry: u.city_lock_expiry || null,
   };
 };
 
@@ -288,6 +284,58 @@ router.post("/spend-coins", authMw, async (req, res) => {
     res.json({ user: cleaned, reward });
   } catch (err) {
     console.error("Spend coins error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ── claim monthly coins ──
+router.post("/claim-monthly-coins", authMw, async (req, res) => {
+  try {
+    const isPremiumAnnual = req.user.admin_title === 'vip_annual';
+    const isPremiumMonthly = req.user.admin_title === 'vip_monthly';
+    const isPremium = isPremiumAnnual || isPremiumMonthly;
+    
+    if (!isPremium) {
+      return res.status(403).json({ message: "⚠️ Only active VIP members can claim monthly coins!" });
+    }
+
+    const now = new Date();
+    // Use u.city_lock_expiry to store the last monthly claim timestamp
+    if (req.user.city_lock_expiry) {
+      const lastClaim = new Date(req.user.city_lock_expiry);
+      const diffMs = now - lastClaim;
+      const daysSince = diffMs / (1000 * 60 * 60 * 24);
+      if (daysSince < 30) {
+        const daysLeft = Math.ceil(30 - daysSince);
+        return res.status(400).json({ 
+          message: `⏰ You have already claimed your coins for this month! Try again in ${daysLeft} days.` 
+        });
+      }
+    }
+
+    const rewardCoins = isPremiumAnnual ? 200 : 100;
+    const { data: u, error } = await supabase
+      .from("users")
+      .update({
+        coins: (req.user.coins || 0) + rewardCoins,
+        city_lock_expiry: now.toISOString() // Record the claim timestamp in city_lock_expiry column
+      })
+      .eq("id", req.user.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Monthly claim db update error:", error);
+      return res.status(500).json({ message: "Database update failed" });
+    }
+
+    res.json({
+      success: true,
+      message: `🎉 Successfully claimed your ${rewardCoins} monthly coins! 🪙`,
+      user: clean(u)
+    });
+  } catch (err) {
+    console.error("Claim monthly coins error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });

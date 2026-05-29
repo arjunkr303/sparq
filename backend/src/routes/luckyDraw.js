@@ -9,13 +9,8 @@ const clean = (u) => {
   const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
   const now = new Date();
   
-  // Force premium / VIP for everyone
-  u.is_premium = true;
-  u.premium_expiry = "2099-12-31T23:59:59.000Z";
-  u.is_verified = true;
-
-  const isPremium = true;
-  const isPremiumAnnual = true;
+  const isPremium = isDevEmail || !!(u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now) || u.admin_title === 'vip_monthly' || u.admin_title === 'vip_annual';
+  const isPremiumAnnual = isDevEmail || u.admin_title === 'vip_annual';
   return {
     id: u.id,
     username: u.username,
@@ -40,6 +35,7 @@ const clean = (u) => {
     premiumExpiry: isDevEmail ? "2099-12-31T23:59:59.000Z" : (u.premium_expiry || null),
     auraExpiry: isDevEmail ? "2099-12-31T23:59:59.000Z" : (u.aura_expiry || null),
     dev: isDevEmail,
+    cityLockExpiry: u.city_lock_expiry || null,
   };
 };
 
@@ -53,12 +49,13 @@ router.get("/status", authMw, async (req, res) => {
 
     let freeSpinsLeft = 0;
     let spinsUsed = 0;
+    const isPremiumAnnual = req.user.admin_title === 'vip_annual';
     const isPremium = !!(
       req.user.is_premium &&
       req.user.premium_expiry &&
       new Date(req.user.premium_expiry) > now
-    );
-    const maxSpins = isPremium ? 2 : 1;
+    ) || req.user.admin_title === 'vip_monthly' || isPremiumAnnual;
+    const maxSpins = isPremiumAnnual ? 3 : (isPremium ? 2 : 1);
 
     if (!req.user.last_claim_date) {
       freeSpinsLeft = maxSpins;
@@ -97,12 +94,13 @@ router.post("/spin", authMw, async (req, res) => {
 
     let freeSpinsLeft = 0;
     let spinsUsed = 0;
+    const isPremiumAnnual = req.user.admin_title === 'vip_annual';
     const isPremium = !!(
       req.user.is_premium &&
       req.user.premium_expiry &&
       new Date(req.user.premium_expiry) > now
-    );
-    const maxSpins = isPremium ? 2 : 1;
+    ) || req.user.admin_title === 'vip_monthly' || isPremiumAnnual;
+    const maxSpins = isPremiumAnnual ? 3 : (isPremium ? 2 : 1);
 
     if (!req.user.last_claim_date) {
       freeSpinsLeft = maxSpins;

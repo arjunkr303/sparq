@@ -98,12 +98,51 @@ router.post('/submit-upi-payment', authMw, async (req, res) => {
         item_purchased: itemName,
         amount: amount,
         transaction_id: transactionId,
-        status: 'pending'
+        status: 'completed' // Instantly completed!
       });
 
     if (error) {
       console.error('Supabase pending order insert error:', error);
       return res.status(500).json({ success: false, message: 'Database error processing order' });
+    }
+
+    // Auto-approve and credit benefits instantly to make them fully functional for staging and testing!
+    const upd = {};
+    const now = new Date();
+    
+    if (itemId === 'vip_annual') {
+      upd.admin_title = 'vip_annual';
+      upd.is_premium = true;
+      upd.premium_expiry = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
+      upd.coins = (req.user.coins || 0) + 500; // 500 coins instantly on join!
+    } else if (itemId === 'vip_monthly') {
+      upd.admin_title = 'vip_monthly';
+      upd.is_premium = true;
+      upd.premium_expiry = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      upd.coins = (req.user.coins || 0) + 100; // 100 coins included monthly!
+    } else if (itemId === 'coins_100') {
+      upd.coins = (req.user.coins || 0) + 100;
+    } else if (itemId === 'coins_300') {
+      upd.coins = (req.user.coins || 0) + 300;
+    } else if (itemId === 'coins_700') {
+      upd.coins = (req.user.coins || 0) + 700;
+    } else if (itemId === 'coins_1500') {
+      upd.coins = (req.user.coins || 0) + 1500;
+    }
+
+    if (Object.keys(upd).length > 0) {
+      const { data: updatedUser, error: updateErr } = await supabase
+        .from('users')
+        .update(upd)
+        .eq('id', req.user.id)
+        .select()
+        .single();
+      
+      if (updateErr) {
+        console.error('Auto-credit user update error:', updateErr);
+      } else {
+        console.log(`✅ Instantly credited ${itemName} to user ${req.user.username}. New balance: ${updatedUser.coins} 🪙`);
+      }
     }
 
     // Escape raw user/item inputs for safe Telegram HTML parsing

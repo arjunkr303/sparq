@@ -10,15 +10,13 @@ module.exports = async (req, res, next) => {
     const { data: u } = await supabase
       .from("users")
       .select(
-        "id,username,email,gender,age,country,state,city,interests,is_verified,is_premium,premium_expiry,is_admin,admin_title,coins,trust_score,report_count,is_banned,two_fa_enabled,created_at,profile_photo,last_claim_date,aura_expiry,chat_theme,theme_expiry",
+        "id,username,email,gender,age,country,state,city,interests,is_verified,is_premium,premium_expiry,is_admin,admin_title,coins,trust_score,report_count,is_banned,two_fa_enabled,created_at,profile_photo,last_claim_date,aura_expiry,chat_theme,theme_expiry,city_lock_expiry",
       )
       .eq("id", id)
       .maybeSingle();
     if (!u) return res.status(401).json({ message: "User not found" });
     
-    // Force VIP / Premium for all users
-    u.is_premium = true;
-    u.premium_expiry = "2099-12-31T23:59:59.000Z";
+    // Enable dynamic VIP / Premium status while keeping verified check simple
     u.is_verified = true;
     
     req.user = u;

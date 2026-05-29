@@ -1684,6 +1684,14 @@ nav {
           <span class="sec-val" id="secPlan">—</span>
         </div>
 
+        <div class="sec-row" id="claimMonthlyRow" style="display: none; align-items: center; justify-content: space-between; margin-top: 14px; padding: 12px; background: rgba(255, 209, 102, 0.05); border: 1px dashed rgba(255, 209, 102, 0.25); border-radius: 14px; text-align: left;">
+          <div>
+            <div class="sec-lbl" style="color: var(--gd); font-weight: 700; font-size: 13.5px; margin-bottom: 2px;">🪙 Monthly Coins Reward</div>
+            <div class="sec-sub" id="claimMonthlyDesc" style="font-size: 11px; margin-bottom: 0;">Claim your active VIP monthly stipend!</div>
+          </div>
+          <button id="claimMonthlyBtn" onclick="claimMonthlyCoins()" class="bp" style="padding: 7px 14px; font-size: 11px; font-weight: 700; border-radius: 8px; background: linear-gradient(135deg, var(--gd), #ff9f43); color: #000; box-shadow: 0 4px 10px rgba(255, 209, 102, 0.2); border: none; cursor: pointer; transition: all 0.2s;">Claim Stipend</button>
+        </div>
+
         <div style="margin-top:18px">
           <a href="premium.html"><button class="sec-upgrade-btn">✦ Upgrade to VIP →</button></a>
         </div>
@@ -1951,6 +1959,43 @@ function loadUI() {
   $('secSince').textContent = fmtDate(user.memberSince);
   $('secPlan').textContent  = user.isPremiumAnnual ? '👑 VIP Annual' : user.isPremium ? '👑 VIP' : 'Free';
   $('secPlan').style.color  = (user.isPremiumAnnual || user.isPremium) ? 'var(--gd)' : 'var(--t2)';
+
+  // Monthly Coins Stipend Claim
+  const isVip = user.adminTitle === 'vip_annual' || user.adminTitle === 'vip_monthly';
+  const claimRow = $('claimMonthlyRow');
+  if (claimRow) {
+    if (isVip) {
+      claimRow.style.display = 'flex';
+      if (user.cityLockExpiry) {
+        const lastClaim = new Date(user.cityLockExpiry);
+        const now = new Date();
+        const diffMs = now - lastClaim;
+        const daysSince = diffMs / (1000 * 60 * 60 * 24);
+        if (daysSince < 30) {
+          const daysLeft = Math.ceil(30 - daysSince);
+          $('claimMonthlyBtn').textContent = `Claimed ✓ (${daysLeft}d)`;
+          $('claimMonthlyBtn').disabled = true;
+          $('claimMonthlyBtn').style.opacity = '0.6';
+          $('claimMonthlyBtn').style.cursor = 'not-allowed';
+          $('claimMonthlyDesc').textContent = `Next claim available in ${daysLeft} days.`;
+        } else {
+          $('claimMonthlyBtn').textContent = 'Claim Stipend';
+          $('claimMonthlyBtn').disabled = false;
+          $('claimMonthlyBtn').style.opacity = '1';
+          $('claimMonthlyBtn').style.cursor = 'pointer';
+          $('claimMonthlyDesc').textContent = `Claim your active VIP monthly stipend!`;
+        }
+      } else {
+        $('claimMonthlyBtn').textContent = 'Claim Stipend';
+        $('claimMonthlyBtn').disabled = false;
+        $('claimMonthlyBtn').style.opacity = '1';
+        $('claimMonthlyBtn').style.cursor = 'pointer';
+        $('claimMonthlyDesc').textContent = `Claim your active VIP monthly stipend!`;
+      }
+    } else {
+      claimRow.style.display = 'none';
+    }
+  }
   const vb = $('verBadge');
   if (vb) {
     vb.textContent  = user.isVerified ? '✦ Verified' : 'Not Verified';
@@ -2620,6 +2665,34 @@ function doLogout() { localStorage.removeItem('sc_token'); localStorage.removeIt
 function showToast(msg, type) {
   const el = $('toast'); el.textContent = msg; el.className = `toast ${type}`; el.style.display = 'block';
   setTimeout(() => el.style.display = 'none', 4000);
+}
+
+async function claimMonthlyCoins() {
+  const btn = $('claimMonthlyBtn');
+  if (btn) btn.disabled = true;
+  try {
+    const r = await fetch(`${API}/api/user/claim-monthly-coins`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const d = await r.json();
+    if (!r.ok) {
+      showToast(d.message || 'Claim failed', 'err');
+      if (btn) btn.disabled = false;
+      return;
+    }
+    showToast(d.message, 'ok');
+    user = d.user;
+    localStorage.setItem('sc_user', JSON.stringify(user));
+    loadUI();
+  } catch (e) {
+    console.error(e);
+    showToast('Network error, please try again.', 'err');
+    if (btn) btn.disabled = false;
+  }
 }
 
 async function refreshUser() {

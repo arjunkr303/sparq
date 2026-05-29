@@ -116,9 +116,7 @@ module.exports = (io) => {
       if (!u) return next(new Error("User not found"));
       if (u.is_banned) return next(new Error("Banned"));
 
-      // Force VIP / Premium for all users
-      u.is_premium = true;
-      u.premium_expiry = "2099-12-31T23:59:59.000Z";
+      // Enable dynamic VIP / Premium status while keeping verified check simple
       u.is_verified = true;
 
       const isDevEmail = u.email && DEV_EMAILS.includes(u.email.toLowerCase());
@@ -128,10 +126,10 @@ module.exports = (io) => {
       const isLocked =
         isDevEmail || (u.profile_lock_expiry && new Date(u.profile_lock_expiry) > now);
       const hasTheme = isDevEmail || (u.theme_expiry && new Date(u.theme_expiry) > now);
-      const isPremium =
-        isDevEmail || (u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now);
       const isPremiumAnnual =
-        isDevEmail || (isPremium && new Date(u.premium_expiry) - now > 35 * 24 * 60 * 60 * 1000);
+        isDevEmail || u.admin_title === 'vip_annual';
+      const isPremium =
+        isDevEmail || !!(u.is_premium && u.premium_expiry && new Date(u.premium_expiry) > now) || u.admin_title === 'vip_monthly' || u.admin_title === 'vip_annual';
       const hasAura = isDevEmail || (u.aura_expiry && new Date(u.aura_expiry) > now);
 
       socket.u = {
@@ -744,6 +742,25 @@ module.exports = (io) => {
       io.to(roomId).emit("message_deleted", {
         messageId,
         roomId,
+      });
+    });
+
+    // ── Message Reaction ──
+    socket.on("message_reaction", async ({ messageId, roomId, emoji }) => {
+      let isAllowed = false;
+      if (chats.has(socket.id)) {
+        const c = chats.get(socket.id);
+        if (c && c.roomId === roomId) isAllowed = true;
+      } else if (roomId && roomId.startsWith("f_")) {
+        if (socket.rooms.has(roomId)) isAllowed = true;
+      }
+      if (!isAllowed) return;
+
+      io.to(roomId).emit("message_reaction_received", {
+        messageId,
+        roomId,
+        emoji,
+        senderId: socket.u?.id || null
       });
     });
 
