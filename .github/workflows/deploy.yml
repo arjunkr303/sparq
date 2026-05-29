@@ -1,0 +1,21 @@
+name: Deploy Backend to Render
+
+# Trigger the workflow on push to the main branch
+on:
+  push:
+    branches:
+      - main  # Change this to 'master' if your default branch uses that name
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code (optional, but good practice if you want to add tests later)
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Trigger Render Deployment via Webhook
+      - name: Deploy to Render
+        run: |
+          curl -fX POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
