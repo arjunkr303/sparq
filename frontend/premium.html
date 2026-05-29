@@ -6,7 +6,6 @@
 <title>Premium — Sparq</title>
 <meta name="description" content="Upgrade to Sparq Premium. Unlock VIP badges, priority matching, exclusive coin shop items and more."/>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
 @font-face {
   font-family: 'League Spartan';
@@ -1135,8 +1134,8 @@ nav.scrolled { background: rgba(7,7,15,.95); }
           <div class="feature-item"><span class="check">✓</span> Exclusive 👑 VIP badge</div>
           <div class="feature-item"><span class="check">✓</span> 100 coins/month included</div>
         </div>
-        <button class="plan-btn vip-btn" onclick="payRazorpay('vip_monthly',24900,'VIP Monthly')">Upgrade to VIP →</button>
-        <div class="rzp-row">Powered by <strong>Razorpay</strong> · UPI · Cards · Netbanking</div>
+        <button class="plan-btn vip-btn" onclick="payUPI('vip_monthly',24900,'VIP Monthly')">Upgrade to VIP →</button>
+        <div class="rzp-row">Instant Activation · Powered by UPI</div>
       </div>
 
       <!-- VIP Annual -->
@@ -1151,8 +1150,8 @@ nav.scrolled { background: rgba(7,7,15,.95); }
           <div class="feature-item"><span class="check">✓</span> 200 bonus coins on signup</div>
           <div class="feature-item"><span class="check">✓</span> Exclusive Annual supporter badge</div>
         </div>
-        <button class="plan-btn gold-btn" onclick="payRazorpay('vip_annual',199900,'VIP Annual')">Get Annual Deal →</button>
-        <div class="rzp-row">Powered by <strong style="color:var(--gd)">Razorpay</strong></div>
+        <button class="plan-btn gold-btn" onclick="payUPI('vip_annual',199900,'VIP Annual')">Get Annual Deal →</button>
+        <div class="rzp-row">Instant Activation · Secure UPI Transfer</div>
       </div>
 
     </div>
@@ -1173,7 +1172,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
         <div class="coin-label">Starter</div>
         <div class="coin-price">₹29</div>
         <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Low barrier, impulse buy</div>
-        <button class="coin-btn outline" onclick="payRazorpay('coins_100',2900,'100 Coins')">Buy Pack</button>
+        <button class="coin-btn outline" onclick="payUPI('coins_100',2900,'100 Coins')">Buy Pack</button>
       </div>
       <div class="coin-pack popular reveal reveal-d2">
         <div class="coin-pop-badge">Popular ⭐</div>
@@ -1181,21 +1180,21 @@ nav.scrolled { background: rgba(7,7,15,.95); }
         <div class="coin-label">Popular</div>
         <div class="coin-price">₹79</div>
         <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Best value label drives this</div>
-        <button class="coin-btn solid" onclick="payRazorpay('coins_300',7900,'300 Coins')">Buy Pack</button>
+        <button class="coin-btn solid" onclick="payUPI('coins_300',7900,'300 Coins')">Buy Pack</button>
       </div>
       <div class="coin-pack reveal reveal-d3">
         <div class="coin-amount"><span>🪙</span><span>700</span></div>
         <div class="coin-label">Value</div>
         <div class="coin-price">₹149</div>
         <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Feels like a deal vs starter</div>
-        <button class="coin-btn outline" onclick="payRazorpay('coins_700',14900,'700 Coins')">Buy Pack</button>
+        <button class="coin-btn outline" onclick="payUPI('coins_700',14900,'700 Coins')">Buy Pack</button>
       </div>
       <div class="coin-pack reveal reveal-d4">
         <div class="coin-amount"><span>🪙</span><span>1500</span></div>
         <div class="coin-label">Mega</div>
         <div class="coin-price">₹279</div>
         <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Power users / gifters</div>
-        <button class="coin-btn solid" onclick="payRazorpay('coins_1500',27900,'1500 Coins')">Best Value</button>
+        <button class="coin-btn solid" onclick="payUPI('coins_1500',27900,'1500 Coins')">Best Value</button>
       </div>
       <div class="coin-pack reveal reveal-d5" style="border-color: rgba(6,214,160,.35); background: rgba(6,214,160,.02);">
         <div class="coin-pop-badge" style="background: linear-gradient(135deg, #06d6a0, #00e5ff); color: #0a0a14;">Gift</div>
@@ -1203,7 +1202,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
         <div class="coin-label">Gift Card</div>
         <div class="coin-price">₹99</div>
         <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Buy for a friend — viral growth</div>
-        <button class="coin-btn outline" style="border-color: rgba(6,214,160,.4); color: #06d6a0;" onclick="payRazorpay('coins_500',9900,'500 Coins Gift Card')">Gift Pack</button>
+        <button class="coin-btn outline" style="border-color: rgba(6,214,160,.4); color: #06d6a0;" onclick="payUPI('coins_500',9900,'500 Coins Gift Card')">Gift Pack</button>
       </div>
     </div>
 
@@ -1349,8 +1348,8 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 
 <!-- ═══ DISCLAIMER ═══ -->
 <p class="disclaimer">
-  * All payments are processed securely by Razorpay.<br>
-  Supports UPI, Paytm, Cards &amp; Netbanking. Prices are in INR. Coins are non-refundable.
+  * All payments are processed securely via UPI Transfer.<br>
+  Supports GPay, PhonePe, Paytm &amp; all major UPI apps. Prices are in INR. Coins are non-refundable.
 </p>
 
 <!-- ═══ TOAST ═══ -->
@@ -1437,7 +1436,6 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://127.0.0.1:5000'
   : 'https://sparq-ou9g.onrender.com';
-const RAZORPAY_KEY = 'rzp_test_XXXXXXXXXXXX';
 const token = localStorage.getItem('sc_token');
 let user  = JSON.parse(localStorage.getItem('sc_user') || 'null');
 if (!token) {
@@ -1588,7 +1586,7 @@ function showToast(msg, type = 'ok') {
 }
 
 /* ══ MANUAL UPI PAYMENT REDIRECTION ══ */
-function payRazorpay(itemId, amountPaise, itemName) {
+function payUPI(itemId, amountPaise, itemName) {
   const amount = (amountPaise / 100).toFixed(2);
   location.href = `payment.html?item=${encodeURIComponent(itemId)}&amount=${encodeURIComponent(amount)}&name=${encodeURIComponent(itemName)}`;
 }
