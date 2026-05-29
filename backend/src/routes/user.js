@@ -156,7 +156,7 @@ router.post("/spend-coins", authMw, async (req, res) => {
       return res.status(400).json({ message: "Not enough coins" });
 
     if (
-      ["superlike", "compliment", "rematch", "rose"].includes(itemId) &&
+      ["superlike", "compliment", "rematch", "rose", "tip"].includes(itemId) &&
       !extra?.targetUserId
     ) {
       return res
@@ -233,6 +233,22 @@ router.post("/spend-coins", authMw, async (req, res) => {
       ).toISOString(); // 1 week
     }
 
+    if (itemId === "tip" && extra?.targetUserId) {
+      const { data: recipient } = await supabase
+        .from("users")
+        .select("coins")
+        .eq("id", extra.targetUserId)
+        .maybeSingle();
+
+      if (recipient) {
+        const newRecipientCoins = (recipient.coins || 0) + amount;
+        await supabase
+          .from("users")
+          .update({ coins: newRecipientCoins })
+          .eq("id", extra.targetUserId);
+      }
+    }
+
     const { data: u } = await supabase
       .from("users")
       .update(upd)
@@ -240,9 +256,9 @@ router.post("/spend-coins", authMw, async (req, res) => {
       .select()
       .single();
 
-    // Log interactions for superlike, compliment, or rematch if target is provided
+    // Log interactions for superlike, compliment, rematch, rose, or tip if target is provided
     if (
-      ["superlike", "compliment", "rematch", "rose"].includes(itemId) &&
+      ["superlike", "compliment", "rematch", "rose", "tip"].includes(itemId) &&
       extra?.targetUserId
     ) {
       if (itemId === "rematch") {

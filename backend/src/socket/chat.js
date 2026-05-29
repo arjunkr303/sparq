@@ -465,6 +465,15 @@ module.exports = (io) => {
       }
       if (!isAllowed) return;
 
+      if (roomId && !roomId.startsWith("f_")) {
+        tryClaim(roomId);
+        const c = chats.get(socket.id);
+        if (c && c.partnerId) {
+          io.to(c.partnerId).emit("opener_used");
+          socket.emit("opener_used");
+        }
+      }
+
       let msg = message?.trim();
       if (!msg || msg.length > 500) return;
       try {
@@ -514,6 +523,15 @@ module.exports = (io) => {
         if (socket.rooms.has(roomId)) isAllowed = true;
       }
       if (!isAllowed) return;
+
+      if (roomId && !roomId.startsWith("f_")) {
+        tryClaim(roomId);
+        const c = chats.get(socket.id);
+        if (c && c.partnerId) {
+          io.to(c.partnerId).emit("opener_used");
+          socket.emit("opener_used");
+        }
+      }
 
       if (!dataUrl?.startsWith("data:image/")) return;
       if (dataUrl.length > 5 * 1024 * 1024) {
@@ -565,6 +583,15 @@ module.exports = (io) => {
       }
       if (!isAllowed) return;
 
+      if (roomId && !roomId.startsWith("f_")) {
+        tryClaim(roomId);
+        const c = chats.get(socket.id);
+        if (c && c.partnerId) {
+          io.to(c.partnerId).emit("opener_used");
+          socket.emit("opener_used");
+        }
+      }
+
       if (!gifUrl || typeof gifUrl !== 'string') return;
       const msgId = messageId || ("msg_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9));
 
@@ -610,6 +637,15 @@ module.exports = (io) => {
         if (socket.rooms.has(roomId)) isAllowed = true;
       }
       if (!isAllowed) return;
+
+      if (roomId && !roomId.startsWith("f_")) {
+        tryClaim(roomId);
+        const c = chats.get(socket.id);
+        if (c && c.partnerId) {
+          io.to(c.partnerId).emit("opener_used");
+          socket.emit("opener_used");
+        }
+      }
 
       if (!dataUrl?.startsWith("data:audio/")) return;
       if (dataUrl.length > 4 * 1024 * 1024) {
@@ -1139,6 +1175,12 @@ module.exports = (io) => {
       const c = chats.get(socket.id);
       if (!c || c.roomId !== roomId) return;
       io.to(c.partnerId).emit("receive_rose");
+    });
+
+    socket.on("send_tip", ({ targetUserId, roomId, amount }) => {
+      const c = chats.get(socket.id);
+      if (!c || c.roomId !== roomId) return;
+      io.to(c.partnerId).emit("receive_tip", { amount });
     });
 
     socket.on("update_theme", ({ themeColor }) => {

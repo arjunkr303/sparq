@@ -286,21 +286,38 @@
       .btn-secondary { background: var(--bg3); color: var(--tx); border: 1px solid var(--bd); }
       .btn-secondary:hover { background: var(--glass2); border-color: var(--b2); transform: translateY(-1px); }
       
-      .btn-danger { background: rgba(239, 69, 101, 0.1); color: var(--rd); border: 1px solid rgba(239, 69, 101, 0.2); }
-      .btn-danger:hover { background: rgba(239, 69, 101, 0.2); }
+      .btn-danger {
+        background: rgba(239, 69, 101, 0.08);
+        color: var(--rd);
+        border: 1.5px solid rgba(239, 69, 101, 0.25);
+        box-shadow: 0 4px 12px rgba(239, 69, 101, 0.05);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+      .btn-danger:hover {
+        background: rgba(239, 69, 101, 0.15);
+        border-color: var(--rd);
+        box-shadow: 0 6px 20px rgba(239, 69, 101, 0.25);
+        transform: translateY(-2px);
+      }
+      .btn-danger:active {
+        transform: translateY(0);
+      }
       
       /* Premium Buttons */
-      .btn-prem-gold { background: rgba(255, 209, 102, 0.1); border: 1px solid rgba(255, 209, 102, 0.3); color: var(--gd); }
-      .btn-prem-gold:hover { background: rgba(255, 209, 102, 0.15); box-shadow: 0 0 15px rgba(255,209,102,0.1); }
+      .btn-prem-gold { background: rgba(255, 209, 102, 0.08); border: 1.5px solid rgba(255, 209, 102, 0.25); color: var(--gd); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+      .btn-prem-gold:hover { background: rgba(255, 209, 102, 0.18); border-color: rgba(255, 209, 102, 0.6); box-shadow: 0 0 20px rgba(255,209,102,0.3); transform: translateY(-2px); }
       
-      .btn-prem-pink { background: rgba(255, 100, 150, 0.1); border: 1px solid rgba(255, 100, 150, 0.3); color: #ff6496; }
-      .btn-prem-pink:hover { background: rgba(255, 100, 150, 0.15); box-shadow: 0 0 15px rgba(255,100,150,0.1); }
+      .btn-prem-pink { background: rgba(255, 100, 150, 0.08); border: 1.5px solid rgba(255, 100, 150, 0.25); color: #ff6496; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+      .btn-prem-pink:hover { background: rgba(255, 100, 150, 0.18); border-color: rgba(255, 100, 150, 0.6); box-shadow: 0 0 20px rgba(255,100,150,0.3); transform: translateY(-2px); }
       
-      .btn-prem-rose { background: rgba(255, 100, 120, 0.1); border: 1px solid rgba(255, 100, 120, 0.3); color: #ff6478; }
-      .btn-prem-rose:hover { background: rgba(255, 100, 120, 0.15); box-shadow: 0 0 15px rgba(255,100,120,0.1); }
+      .btn-prem-rose { background: rgba(255, 100, 120, 0.08); border: 1.5px solid rgba(255, 100, 120, 0.25); color: #ff6478; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+      .btn-prem-rose:hover { background: rgba(255, 100, 120, 0.18); border-color: rgba(255, 100, 120, 0.6); box-shadow: 0 0 20px rgba(255,100,120,0.3); transform: translateY(-2px); }
       
-      .btn-prem-cyan { background: rgba(0, 229, 255, 0.1); border: 1px solid rgba(0, 229, 255, 0.3); color: var(--ac); }
-      .btn-prem-cyan:hover { background: rgba(0, 229, 255, 0.15); box-shadow: 0 0 15px rgba(0,229,255,0.1); }
+      .btn-prem-cyan { background: rgba(0, 229, 255, 0.08); border: 1.5px solid rgba(0, 229, 255, 0.25); color: var(--ac); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+      .btn-prem-cyan:hover { background: rgba(0, 229, 255, 0.18); border-color: rgba(0, 229, 255, 0.6); box-shadow: 0 0 20px rgba(0,229,255,0.3); transform: translateY(-2px); }
+      
+      .btn-prem-green { background: rgba(6, 214, 160, 0.08); border: 1.5px solid rgba(6, 214, 160, 0.25); color: var(--gn); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+      .btn-prem-green:hover { background: rgba(6, 214, 160, 0.18); border-color: rgba(6, 214, 160, 0.6); box-shadow: 0 0 20px rgba(6,214,160,0.3); transform: translateY(-2px); }
 
       /* Report Menu */
       .report-menu {
@@ -593,6 +610,82 @@
       .cp-anim .msg { background: linear-gradient(135deg, #ff6496, #ff3278); color: #fff; padding: 16px 32px; border-radius: 50px; font-family: 'League Spartan', sans-serif; font-size: 28px; font-weight: 700; box-shadow: 0 15px 40px rgba(255, 100, 150, 0.6); margin-top: 16px; border: 2px solid rgba(255,255,255,0.3); }
       @keyframes zoomFade { 0% { transform: scale(0); opacity: 0; } 20% { transform: scale(1.2); opacity: 1; } 80% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
       @keyframes floatUpFade { 0% { transform: translateY(60px); opacity: 0; } 20% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(-30px); opacity: 1; } 100% { transform: translateY(-80px); opacity: 0; } }
+
+      /* ══ TIP TIER ANIMATIONS ══ */
+      /* Tier 1 (0-49): Starter/Bronze Tip — uses 49.png */
+      .tip-t1 { position:fixed; inset:0; pointer-events:none; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0; animation:tipT4Enter 4.5s cubic-bezier(0.34,1.56,0.64,1) forwards; background:rgba(0,0,0,0); }
+      .tip-t1 .tip-meme-frame { position:relative; border-radius:24px; overflow:hidden; border:3px solid #ff758c; box-shadow:0 0 60px rgba(255,117,140,0.8),0 0 120px rgba(255,117,140,0.4),0 30px 80px rgba(0,0,0,0.8); animation:tipMemeGlow 1s ease infinite alternate; }
+      .tip-t1 .tip-meme-frame img { width:260px; height:195px; object-fit:cover; display:block; filter:saturate(1.2) contrast(1.05); }
+      .tip-t1 .tip-meme-frame::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,117,140,0.15),transparent 50%,rgba(255,117,140,0.15)); pointer-events:none; }
+      .tip-t1 .tip-caption { background:linear-gradient(135deg,rgba(20,10,15,0.95),rgba(40,15,25,0.98)); border:2px solid rgba(255,117,140,0.6); border-radius:16px; padding:12px 28px; margin-top:12px; text-align:center; backdrop-filter:blur(20px); box-shadow:0 10px 40px rgba(255,117,140,0.3); }
+      .tip-t1 .tip-caption .tip-label { font-size:11px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(255,117,140,0.8); margin-bottom:4px; font-family:'League Spartan',sans-serif; }
+      .tip-t1 .tip-caption .tip-amount { font-size:32px; font-weight:900; color:#ff758c; font-family:'League Spartan',sans-serif; text-shadow:0 0 20px rgba(255,117,140,0.8); letter-spacing:-1px; }
+      .tip-t1 .tip-caption .tip-sub { font-size:13px; font-weight:600; color:rgba(255,150,170,0.8); font-family:'League Spartan',sans-serif; margin-top:2px; }
+
+      /* Tier 2 (50-99): Super/Silver Tip — uses 50.png */
+      .tip-t2 { position:fixed; inset:0; pointer-events:none; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0; animation:tipT4Enter 4.5s cubic-bezier(0.34,1.56,0.64,1) forwards; background:rgba(0,0,0,0); }
+      .tip-t2 .tip-meme-frame { position:relative; border-radius:24px; overflow:hidden; border:3px solid #00e5ff; box-shadow:0 0 60px rgba(0,229,255,0.8),0 0 120px rgba(0,229,255,0.4),0 30px 80px rgba(0,0,0,0.8); animation:tipMemeGlow 1s ease infinite alternate; }
+      .tip-t2 .tip-meme-frame img { width:260px; height:195px; object-fit:cover; display:block; filter:saturate(1.2) contrast(1.05); }
+      .tip-t2 .tip-meme-frame::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(0,229,255,0.15),transparent 50%,rgba(0,229,255,0.15)); pointer-events:none; }
+      .tip-t2 .tip-caption { background:linear-gradient(135deg,rgba(5,20,30,0.95),rgba(10,35,50,0.98)); border:2px solid rgba(0,229,255,0.6); border-radius:16px; padding:12px 28px; margin-top:12px; text-align:center; backdrop-filter:blur(20px); box-shadow:0 10px 40px rgba(0,229,255,0.3); }
+      .tip-t2 .tip-caption .tip-label { font-size:11px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(0,229,255,0.8); margin-bottom:4px; font-family:'League Spartan',sans-serif; }
+      .tip-t2 .tip-caption .tip-amount { font-size:32px; font-weight:900; color:#00e5ff; font-family:'League Spartan',sans-serif; text-shadow:0 0 20px rgba(0,229,255,0.8); letter-spacing:-1px; }
+      .tip-t2 .tip-caption .tip-sub { font-size:13px; font-weight:600; color:rgba(100,240,255,0.8); font-family:'League Spartan',sans-serif; margin-top:2px; }
+
+      /* Tier 3 (100-499): Gold VIP — uses leo-meme.jpg */
+      .tip-t3 { position:fixed; inset:0; pointer-events:none; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0; animation:tipT4Enter 4.5s cubic-bezier(0.34,1.56,0.64,1) forwards; background:rgba(0,0,0,0); }
+      .tip-t3 .tip-meme-frame { position:relative; border-radius:24px; overflow:hidden; border:3px solid #ffd166; box-shadow:0 0 60px rgba(255,209,102,0.8),0 0 120px rgba(255,150,50,0.4),0 30px 80px rgba(0,0,0,0.8); animation:tipMemeGlow 1s ease infinite alternate; }
+      .tip-t3 .tip-meme-frame img { width:260px; height:195px; object-fit:cover; display:block; filter:saturate(1.3) contrast(1.1); }
+      .tip-t3 .tip-meme-frame::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,209,102,0.15),transparent 50%,rgba(255,150,50,0.15)); pointer-events:none; }
+      .tip-t3 .tip-caption { background:linear-gradient(135deg,rgba(20,15,5,0.95),rgba(40,25,5,0.98)); border:2px solid rgba(255,209,102,0.6); border-radius:16px; padding:12px 28px; margin-top:12px; text-align:center; backdrop-filter:blur(20px); box-shadow:0 10px 40px rgba(255,209,102,0.3); }
+      .tip-t3 .tip-caption .tip-label { font-size:11px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(255,209,102,0.7); margin-bottom:4px; font-family:'League Spartan',sans-serif; }
+      .tip-t3 .tip-caption .tip-amount { font-size:32px; font-weight:900; color:#ffd166; font-family:'League Spartan',sans-serif; text-shadow:0 0 20px rgba(255,209,102,0.8); letter-spacing:-1px; }
+      .tip-t3 .tip-caption .tip-sub { font-size:13px; font-weight:600; color:rgba(255,200,100,0.7); font-family:'League Spartan',sans-serif; margin-top:2px; }
+
+      /* Tier 4 (500-999): Elon Musk - Epic Tip */
+      .tip-t4 { position:fixed; inset:0; pointer-events:none; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0; animation:tipT5Enter 5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+      .tip-t4::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,rgba(124,92,252,0.3) 0%,rgba(0,229,255,0.12) 40%,transparent 70%); animation:tipBgPulse 1s ease infinite alternate; pointer-events:none; }
+      .tip-t4 .tip-meme-frame { position:relative; border-radius:24px; overflow:hidden; border:3px solid transparent; background:linear-gradient(#0a0a14,#0a0a14) padding-box,conic-gradient(from 0deg,#7c5cfc,#00e5ff,#ffd166,#ff6496,#7c5cfc) border-box; box-shadow:0 0 60px rgba(124,92,252,0.8),0 0 120px rgba(0,229,255,0.3),0 40px 100px rgba(0,0,0,0.9); animation:tipFrameGlowPulse 2s ease infinite alternate; }
+      .tip-t4 .tip-meme-frame img { width:280px; height:195px; object-fit:cover; display:block; filter:saturate(1.3) contrast(1.1); }
+      .tip-t4 .tip-meme-frame::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(124,92,252,0.15),transparent 50%,rgba(0,229,255,0.1)); pointer-events:none; }
+      .tip-t4 .tip-caption { background:linear-gradient(135deg,rgba(10,10,25,0.97),rgba(20,15,40,0.98)); border:2px solid rgba(124,92,252,0.5); border-radius:16px; padding:12px 32px; margin-top:14px; text-align:center; backdrop-filter:blur(24px); box-shadow:0 10px 40px rgba(124,92,252,0.4),0 0 30px rgba(0,229,255,0.2); }
+      .tip-t4 .tip-caption .tip-label { font-size:11px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(155,127,254,0.8); margin-bottom:4px; font-family:'League Spartan',sans-serif; }
+      .tip-t4 .tip-caption .tip-amount { font-size:32px; font-weight:900; background:linear-gradient(135deg,#7c5cfc,#00e5ff,#ffd166); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; font-family:'League Spartan',sans-serif; letter-spacing:-1px; text-shadow:none; filter:drop-shadow(0 0 20px rgba(124,92,252,0.8)); }
+      .tip-t4 .tip-caption .tip-sub { font-size:13px; font-weight:600; color:rgba(180,160,255,0.8); font-family:'League Spartan',sans-serif; margin-top:2px; }
+
+      /* Tier 5 (500+): Elon Musk - Epic God-tier */
+      .tip-t5 { position:fixed; inset:0; pointer-events:none; z-index:9999; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:0; animation:tipT5Enter 5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+      .tip-t5::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at center,rgba(124,92,252,0.35) 0%,rgba(0,229,255,0.15) 40%,transparent 70%); animation:tipBgPulse 1s ease infinite alternate; pointer-events:none; }
+      .tip-t5 .tip-meme-frame { position:relative; border-radius:24px; overflow:hidden; border:3px solid transparent; background:linear-gradient(#0a0a14,#0a0a14) padding-box,conic-gradient(from 0deg,#7c5cfc,#00e5ff,#ffd166,#ff6496,#7c5cfc) border-box; box-shadow:0 0 80px rgba(124,92,252,0.9),0 0 160px rgba(0,229,255,0.4),0 40px 100px rgba(0,0,0,0.9); animation:tipFrameGlowPulse 2s ease infinite alternate; }
+      .tip-t5 .tip-meme-frame img { width:300px; height:200px; object-fit:cover; display:block; filter:saturate(1.4) contrast(1.15) brightness(1.05); }
+      .tip-t5 .tip-meme-frame::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(124,92,252,0.2),transparent 50%,rgba(0,229,255,0.1)); pointer-events:none; }
+      .tip-t5 .tip-caption { background:linear-gradient(135deg,rgba(7,7,15,0.97),rgba(15,10,30,0.98)); border:2px solid rgba(124,92,252,0.5); border-radius:16px; padding:12px 32px; margin-top:14px; text-align:center; backdrop-filter:blur(24px); box-shadow:0 10px 50px rgba(124,92,252,0.4),0 0 30px rgba(0,229,255,0.2); }
+      .tip-t5 .tip-caption .tip-label { font-size:11px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:rgba(155,127,254,0.8); margin-bottom:4px; font-family:'League Spartan',sans-serif; }
+      .tip-t5 .tip-caption .tip-amount { font-size:40px; font-weight:900; background:linear-gradient(135deg,#7c5cfc,#00e5ff,#ffd166); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; font-family:'League Spartan',sans-serif; letter-spacing:-2px; text-shadow:none; filter:drop-shadow(0 0 20px rgba(124,92,252,0.8)); }
+      .tip-t5 .tip-caption .tip-sub { font-size:14px; font-weight:700; color:rgba(155,127,254,0.8); font-family:'League Spartan',sans-serif; margin-top:4px; letter-spacing:1px; }
+
+      /* Sender tip sent popup */
+      .tip-sent-pop { position:fixed; inset:0; pointer-events:none; z-index:9999; display:flex; align-items:center; justify-content:center; animation:floatUpFade 3s ease forwards; }
+      .tip-sent-pop .tsp-box { display:flex; flex-direction:column; align-items:center; gap:8px; }
+      .tip-sent-pop .tsp-icon { font-size:64px; animation:tipIconBounce 0.4s ease 4; }
+      .tip-sent-pop .tsp-msg { font-family:'League Spartan',sans-serif; font-weight:800; font-size:22px; padding:12px 30px; border-radius:50px; border:2px solid; letter-spacing:0.3px; }
+      .tip-sent-t1 .tsp-msg { background:rgba(6,214,160,0.12); color:#06d6a0; border-color:rgba(6,214,160,0.5); box-shadow:0 8px 30px rgba(6,214,160,0.25); }
+      .tip-sent-t2 .tsp-msg { background:rgba(0,229,255,0.12); color:#00e5ff; border-color:rgba(0,229,255,0.5); box-shadow:0 8px 30px rgba(0,229,255,0.3); }
+      .tip-sent-t3 .tsp-msg { background:rgba(255,100,0,0.12); color:#ff6600; border-color:rgba(255,100,0,0.5); box-shadow:0 8px 30px rgba(255,100,0,0.35); }
+      .tip-sent-t4 .tsp-msg { background:rgba(255,209,102,0.12); color:#ffd166; border-color:rgba(255,209,102,0.6); box-shadow:0 0 30px rgba(255,209,102,0.4); font-size:26px; }
+      .tip-sent-t5 .tsp-msg { background:linear-gradient(135deg,rgba(124,92,252,0.15),rgba(0,229,255,0.1)); border-color:rgba(124,92,252,0.6); box-shadow:0 0 40px rgba(124,92,252,0.5),0 0 80px rgba(0,229,255,0.2); font-size:28px; background-clip:padding-box; }
+      .tip-sent-t5 .tsp-msg span { background:linear-gradient(135deg,#7c5cfc,#00e5ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+
+      /* Shared tip keyframes */
+      @keyframes tipIconBounce { 0%,100% { transform:scale(1); } 50% { transform:scale(1.25); } }
+      @keyframes tipIconPulse { from { transform:scale(1); filter:drop-shadow(0 0 20px rgba(0,229,255,0.8)); } to { transform:scale(1.12); filter:drop-shadow(0 0 50px rgba(0,229,255,1)); } }
+      @keyframes tipIconShake { 0%,100% { transform:rotate(-4deg); } 50% { transform:rotate(4deg); } }
+      @keyframes tipMsgFlicker { from { box-shadow:0 0 50px rgba(255,80,0,0.9),0 20px 50px rgba(200,50,0,0.6); } to { box-shadow:0 0 80px rgba(255,150,0,1),0 25px 60px rgba(255,80,0,0.8); } }
+      @keyframes tipMemeGlow { from { box-shadow:0 0 40px rgba(255,209,102,0.6),0 0 80px rgba(255,150,50,0.3),0 30px 80px rgba(0,0,0,0.8); } to { box-shadow:0 0 80px rgba(255,209,102,1),0 0 140px rgba(255,180,50,0.6),0 30px 80px rgba(0,0,0,0.8); } }
+      @keyframes tipBgPulse { from { opacity:0.6; } to { opacity:1; } }
+      @keyframes tipFrameGlowPulse { from { box-shadow:0 0 60px rgba(124,92,252,0.8),0 0 120px rgba(0,229,255,0.3),0 40px 100px rgba(0,0,0,0.9); } to { box-shadow:0 0 100px rgba(124,92,252,1),0 0 200px rgba(0,229,255,0.5),0 40px 100px rgba(0,0,0,0.9); } }
+      @keyframes tipT4Enter { 0% { opacity:0; transform:scale(0.3) rotate(-10deg); } 30% { opacity:1; transform:scale(1.08) rotate(2deg); } 50% { transform:scale(1) rotate(0deg); } 80% { opacity:1; transform:scale(1) rotate(0deg); } 100% { opacity:0; transform:scale(0.9) translateY(-40px); } }
+      @keyframes tipT5Enter { 0% { opacity:0; transform:scale(0.1) rotate(15deg); } 25% { opacity:1; transform:scale(1.15) rotate(-3deg); } 45% { transform:scale(1) rotate(0deg); } 80% { opacity:1; transform:scale(1.02); } 100% { opacity:0; transform:scale(0.95) translateY(-50px); } }
       
       .rose-anim-main { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0); font-size: 140px; animation: roseCentralZoom 3.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; filter: drop-shadow(0 0 40px rgba(255, 100, 120, 0.9)); text-shadow: 0 0 50px rgba(255, 100, 120, 0.6); }
       .rose-petal-drift { position: absolute; pointer-events: none; opacity: 0; }
@@ -868,6 +961,7 @@
         <div class="chat-premium-actions-bar" id="chatPremActionsBar">
           <button class="prem-bar-btn" id="mBtnSL" onclick="sendPremiumAction('superlike', 8)">🌟 Super Like (8 🪙)</button>
           <button class="prem-bar-btn" id="mBtnRose" onclick="sendPremiumAction('rose', 3)">🌹 Send Rose (3 🪙)</button>
+          <button class="prem-bar-btn" id="mBtnTip" onclick="sendPremiumAction('tip', 5)" style="border-color: rgba(6, 214, 160, 0.4); background: rgba(6, 214, 160, 0.06); color: var(--gn);">💵 Give Tip</button>
           <button class="prem-bar-btn" id="mBtnOpener" onclick="buyFirstMessageOpener()">💬 AI Opener (3 🪙)</button>
           <button class="prem-bar-btn" id="mBtnRevealInt" onclick="buyRevealInterests()">🎯 Reveal Interests (8 🪙)</button>
           <button class="prem-bar-btn" id="mBtnCp" onclick="sendPremiumAction('compliment', 5)">💌 Compliment (5 🪙)</button>
@@ -952,6 +1046,7 @@
           <button class="action-btn btn-prem-gold cb" id="btnSL" onclick="sendPremiumAction('superlike', 8)" style="display: none;">🌟 Super Like (8 🪙)</button>
           <button class="action-btn btn-prem-pink cb" id="btnCp" onclick="sendPremiumAction('compliment', 5)" style="display: none;">💌 Compliment (5 🪙)</button>
           <button class="action-btn btn-prem-rose cb" id="btnRose" onclick="sendPremiumAction('rose', 3)" style="display: none;">🌹 Send Rose (3 🪙)</button>
+          <button class="action-btn btn-prem-green cb" id="btnTip" onclick="sendPremiumAction('tip', 5)" style="display: none;">💵 Give Tip</button>
           <button class="action-btn btn-prem-cyan cb" id="btnOpener" onclick="buyFirstMessageOpener()" style="display: none;">💬 AI Opener (3 🪙)</button>
           <button class="action-btn btn-prem-cyan cb" id="btnRevealInt" onclick="buyRevealInterests()" style="display: none;">🎯 Reveal Interests (8 🪙)</button>
           <button class="action-btn btn-prem-cyan cb" id="btnRM" onclick="sendRematchRequest()" style="display: none;">🔁 Request Re-match (10 🪙)</button>
@@ -1586,6 +1681,12 @@
             ? "VIP = unlimited"
             : "Sign up 5 · VIP unlimited";
       }
+      function updateChatCoins() {
+        const el = $("chatCoins");
+        if (el && isIn) {
+          el.innerHTML = `🪙 ${user.coins || 0}`;
+        }
+      }
       function setGF(g, el) {
         const pm = isIn && user?.isPremium;
         if (g !== "any" && !pm && gfLeft <= 0) {
@@ -2141,6 +2242,19 @@
           setTimeout(() => d.remove(), 3100);
         });
 
+        sock.on("receive_tip", (data) => {
+          const amt = data?.amount || 5;
+
+          // Instantly update recipient's memory, localStorage, and visible header pill balance
+          if (isIn && user) {
+            user.coins = (user.coins || 0) + amt;
+            localStorage.setItem("sc_user", JSON.stringify(user));
+            updateChatCoins();
+          }
+
+          showTipReceivedAnim(amt);
+        });
+
         sock.on("receive_rose", () => {
           showRoseAnimation();
         });
@@ -2274,14 +2388,128 @@
         }, 4500);
       }
 
+      /* ══ TIP ANIMATIONS ══ */
+      function getTipTier(amt) {
+        if (amt >= 1000) return 5;
+        if (amt >= 500)  return 4;
+        if (amt >= 100)  return 3;
+        if (amt >= 50)   return 2;
+        return 1;
+      }
+
+      function showTipReceivedAnim(amt) {
+        const tier = getTipTier(amt);
+        const d = document.createElement("div");
+
+        if (tier === 1) {
+          d.className = "tip-t1";
+          d.innerHTML = `
+            <div class="tip-meme-frame">
+              <img src="images/49.png" alt="Bronze Tip" />
+            </div>
+            <div class="tip-caption">
+              <div class="tip-label">Bronze Tip 🥉</div>
+              <div class="tip-amount">Tipped +${amt} 🪙</div>
+              <div class="tip-sub">Every coin counts! 💖</div>
+            </div>`;
+          setTimeout(() => d.remove(), 4500);
+        } else if (tier === 2) {
+          d.className = "tip-t2";
+          d.innerHTML = `
+            <div class="tip-meme-frame">
+              <img src="images/50.png" alt="Silver Tip" />
+            </div>
+            <div class="tip-caption">
+              <div class="tip-label">Silver Tip 🥈</div>
+              <div class="tip-amount">Tipped +${amt} 🪙</div>
+              <div class="tip-sub">Awesome support! 🌟</div>
+            </div>`;
+          setTimeout(() => d.remove(), 4500);
+        } else if (tier === 3) {
+          d.className = "tip-t3";
+          d.innerHTML = `
+            <div class="tip-meme-frame">
+              <img src="images/leo-meme.jpg" alt="Gold VIP Tip" />
+            </div>
+            <div class="tip-caption">
+              <div class="tip-label">Gold VIP Tip 🥂</div>
+              <div class="tip-amount">Tipped +${amt} 🪙</div>
+              <div class="tip-sub">"Cheers, old sport!"</div>
+            </div>`;
+          setTimeout(() => d.remove(), 4500);
+        } else if (tier === 4) {
+          d.className = "tip-t4";
+          d.innerHTML = `
+            <div class="tip-meme-frame">
+              <img src="images/Elon-musk-meme.jpg" alt="Epic Elon Tip" />
+            </div>
+            <div class="tip-caption">
+              <div class="tip-label">Epic Elon Tip 🚀</div>
+              <div class="tip-amount">Tipped +${amt} 🪙</div>
+              <div class="tip-sub">"Wait, is this a simulation?"</div>
+            </div>`;
+          setTimeout(() => d.remove(), 4500);
+        } else {
+          d.className = "tip-t5";
+          d.innerHTML = `
+            <div class="tip-meme-frame">
+              <img src="images/1000.png" alt="Legendary Tip" />
+            </div>
+            <div class="tip-caption">
+              <div class="tip-label">⚡ LEGENDARY GOD-TIER TIP ⚡</div>
+              <div class="tip-amount">Tipped +${amt} 🪙</div>
+              <div class="tip-sub">Genius, billionaire, playboy, philanthropist.</div>
+            </div>`;
+          setTimeout(() => d.remove(), 5000);
+        }
+
+        document.body.appendChild(d);
+      }
+
+      function showTipSentAnim(amt) {
+        const tier = getTipTier(amt);
+        const d = document.createElement("div");
+        d.className = `tip-sent-pop tip-sent-t${tier}`;
+
+        const configs = [
+          { icon: "💸", msg: `Sent ${amt} Coins!` },
+          { icon: "⚡💸", msg: `Electric! ${amt} Coins Sent!` },
+          { icon: "🔥💸", msg: `Fire Tip! ${amt} Coins!` },
+          { icon: "🥂💰", msg: `Classy! ${amt} Coins Sent!` },
+          { icon: "🚀💸", msg: `<span>LEGENDARY: ${amt} Coins!</span>` },
+        ];
+        const c = configs[tier - 1];
+        d.innerHTML = `<div class="tsp-box"><div class="tsp-icon">${c.icon}</div><div class="tsp-msg">${c.msg}</div></div>`;
+        document.body.appendChild(d);
+        setTimeout(() => d.remove(), 3000);
+      }
+
       /* ══ PREMIUM ACTIONS ══ */
       function sendPremiumAction(itemId, cost) {
         if (!isIn || !partnerUserId) return;
-        const coins = user?.coins || 0;
-        if (coins < cost) {
-          showToast(`Not enough coins! (Need ${cost}🪙)`, "err");
-          return;
+        let finalCost = cost;
+        if (itemId === "tip") {
+          const coins = user?.coins || 0;
+          let tipAmount = prompt(`Enter tip amount in coins (Minimum 5, You have ${coins} 🪙):`, "5");
+          if (tipAmount === null) return; // user cancelled
+          tipAmount = parseInt(tipAmount);
+          if (isNaN(tipAmount) || tipAmount < 5) {
+            showToast("⚠️ Minimum tip is 5 coins!", "err");
+            return;
+          }
+          if (coins < tipAmount) {
+            showToast(`⚠️ Not enough coins! You only have ${coins} 🪙`, "err");
+            return;
+          }
+          finalCost = tipAmount;
+        } else {
+          const coins = user?.coins || 0;
+          if (coins < cost) {
+            showToast(`Not enough coins! (Need ${cost}🪙)`, "err");
+            return;
+          }
         }
+
         fetch(`${API}/api/user/spend-coins`, {
           method: "POST",
           headers: {
@@ -2289,7 +2517,7 @@
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            amount: cost,
+            amount: finalCost,
             itemId,
             extra: { targetUserId: partnerUserId },
           }),
@@ -2301,10 +2529,12 @@
               localStorage.setItem("sc_user", JSON.stringify(user));
               updateChatCoins();
             }
-            showToast(`Sent ${itemId}!`, "ok");
+            showToast(`Sent ${itemId === "tip" ? finalCost + " Coins Tip" : itemId}!`, "ok");
+            if (itemId === "tip") showTipSentAnim(finalCost);
             sock?.emit(`send_${itemId}`, {
               targetUserId: partnerUserId,
               roomId: room,
+              amount: finalCost
             });
             if (itemId === "superlike") {
               if ($("btnSL")) $("btnSL").disabled = true;
@@ -2925,6 +3155,8 @@
           s === "chatting" && isIn && partnerUserId ? "block" : "none";
         $("btnRose").style.display =
           s === "chatting" && isIn && partnerUserId ? "block" : "none";
+        $("btnTip").style.display =
+          s === "chatting" && isIn && partnerUserId ? "block" : "none";
         $("btnOpener").style.display =
           s === "chatting" && isIn && partnerUserId && !openerUsedInChat
             ? "block"
@@ -2939,6 +3171,7 @@
           $("btnSL").disabled = false;
           $("btnCp").disabled = false;
           $("btnRose").disabled = false;
+          $("btnTip").disabled = false;
           $("btnOpener").disabled = false;
           $("btnRevealInt").disabled = false;
         }
@@ -2981,11 +3214,12 @@
         if (ribbon) {
           if (s === "chatting") {
             ribbon.style.display = "flex";
-            const mSL = $("mBtnSL"), mCp = $("mBtnCp"), mRose = $("mBtnRose"), mOpener = $("mBtnOpener"), mRevealInt = $("mBtnRevealInt"), mRM = $("mBtnRM"), mAddFriend = $("mBtnAddFriend"), mReport = $("mBtnReport");
+            const mSL = $("mBtnSL"), mCp = $("mBtnCp"), mRose = $("mBtnRose"), mTip = $("mBtnTip"), mOpener = $("mBtnOpener"), mRevealInt = $("mBtnRevealInt"), mRM = $("mBtnRM"), mAddFriend = $("mBtnAddFriend"), mReport = $("mBtnReport");
             const canPremium = isIn && partnerUserId;
             if (mSL) { mSL.style.display = canPremium ? "inline-flex" : "none"; mSL.disabled = false; }
             if (mCp) { mCp.style.display = canPremium ? "inline-flex" : "none"; mCp.disabled = false; }
             if (mRose) { mRose.style.display = canPremium ? "inline-flex" : "none"; mRose.disabled = false; }
+            if (mTip) { mTip.style.display = canPremium ? "inline-flex" : "none"; mTip.disabled = false; }
             if (mOpener) { mOpener.style.display = (canPremium && !openerUsedInChat) ? "inline-flex" : "none"; mOpener.disabled = false; }
             if (mRevealInt) { mRevealInt.style.display = (canPremium && !interestsRevealed) ? "inline-flex" : "none"; mRevealInt.disabled = false; }
             if (mRM) mRM.style.display = "none";
@@ -2993,10 +3227,11 @@
             if (mReport) mReport.style.display = (canPremium && !rpSent) ? "inline-flex" : "none";
           } else if (s === "disconnected") {
             ribbon.style.display = "flex";
-            const mSL = $("mBtnSL"), mCp = $("mBtnCp"), mRose = $("mBtnRose"), mOpener = $("mBtnOpener"), mRevealInt = $("mBtnRevealInt"), mRM = $("mBtnRM"), mAddFriend = $("mBtnAddFriend"), mReport = $("mBtnReport");
+            const mSL = $("mBtnSL"), mCp = $("mBtnCp"), mRose = $("mBtnRose"), mTip = $("mBtnTip"), mOpener = $("mBtnOpener"), mRevealInt = $("mBtnRevealInt"), mRM = $("mBtnRM"), mAddFriend = $("mBtnAddFriend"), mReport = $("mBtnReport");
             if (mSL) mSL.style.display = "none";
             if (mCp) mCp.style.display = "none";
             if (mRose) mRose.style.display = "none";
+            if (mTip) mTip.style.display = "none";
             if (mOpener) mOpener.style.display = "none";
             if (mRevealInt) mRevealInt.style.display = "none";
             if (mAddFriend) mAddFriend.style.display = "none";
@@ -3200,6 +3435,11 @@
 
       function addBub(content, isMe, ts, type, replyTo = null, messageId = null, isEdited = false, status = "sent") {
         document.getElementById("tbub")?.remove();
+        if (!isFriendChat && !openerUsedInChat) {
+          openerUsedInChat = true;
+          if ($("btnOpener")) $("btnOpener").style.display = "none";
+          if ($("mBtnOpener")) $("mBtnOpener").style.display = "none";
+        }
         const row = document.createElement("div");
         row.className = "mr " + (isMe ? "me" : "them");
         if (isMe) {

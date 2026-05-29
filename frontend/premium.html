@@ -516,38 +516,59 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 /* ═══════════════════════════════ COINS SECTION ═══════════════════════════════ */
 .coins-packs {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
   margin-bottom: 56px;
 }
 .coin-pack {
-  background: var(--glass);
-  border: 1px solid var(--bd);
-  border-radius: 20px;
-  padding: 20px 16px;
+  background: linear-gradient(145deg, rgba(18,17,36,.85), rgba(10,9,22,.90));
+  border: 1.5px solid rgba(124,92,252,.12);
+  border-radius: 24px;
+  padding: 28px 20px 24px;
   text-align: center;
   position: relative;
   overflow: hidden;
-  transition: all .3s;
-  backdrop-filter: blur(10px);
+  transition: transform .35s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow .35s ease, border-color .35s ease;
+  backdrop-filter: blur(14px);
   font-family: 'League Spartan', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 290px;
 }
-.coin-pack:hover { transform: translateY(-5px); border-color: var(--b2); box-shadow: 0 18px 38px rgba(0,0,0,.45); }
+.coin-pack:hover {
+  transform: translateY(-8px);
+  border-color: rgba(124,92,252,.35);
+  box-shadow: 0 20px 45px rgba(0,0,0,.55), 0 0 25px rgba(124,92,252,.12);
+}
 .coin-pack.popular {
-  border-color: rgba(255,209,102,.45);
-  background: rgba(255,209,102,.04);
+  border-color: rgba(255,209,102,.35);
+  background: linear-gradient(145deg, rgba(32,28,18,.90), rgba(18,15,8,.95));
 }
-.coin-pack.popular:hover { box-shadow: 0 18px 38px rgba(255,209,102,.2); }
+.coin-pack.popular:hover {
+  border-color: rgba(255,209,102,.6);
+  box-shadow: 0 20px 45px rgba(0,0,0,.55), 0 0 25px rgba(255,209,102,.15);
+}
+.coin-pack.mega {
+  border-color: rgba(0,229,255,.3);
+  background: linear-gradient(145deg, rgba(8,28,32,.90), rgba(4,14,16,.95));
+}
+.coin-pack.mega:hover {
+  border-color: rgba(0,229,255,.6);
+  box-shadow: 0 20px 45px rgba(0,0,0,.55), 0 0 25px rgba(0,229,255,.15);
+}
 .coin-pop-badge {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 14px;
+  right: 14px;
   background: var(--gd);
   color: #0a0a14;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 700;
-  padding: 3px 9px;
+  padding: 3px 11px;
   border-radius: 50px;
+  box-shadow: 0 4px 10px rgba(255,209,102,.3);
 }
 .coin-amount {
   display: flex;
@@ -556,42 +577,59 @@ nav.scrolled { background: rgba(7,7,15,.95); }
   gap: 8px;
   font-family: 'League Spartan', sans-serif;
   font-weight: 800;
-  font-size: 28px;
-  margin-bottom: 4px;
+  font-size: 30px;
+  margin-bottom: 2px;
+  color: var(--tx);
+  filter: drop-shadow(0 2px 8px rgba(255,255,255,.05));
+}
+.coin-amount span:first-child {
+  filter: drop-shadow(0 2px 8px rgba(255, 209, 102, 0.45));
 }
 .coin-label {
   font-family: 'League Spartan', sans-serif;
-  font-size: 13px;
+  font-size: 13.5px;
   font-weight: 700;
-  margin-bottom: 2px;
+  color: var(--t2);
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
 }
 .coin-price {
   font-family: 'League Spartan', sans-serif;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--gd);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 .coin-btn {
   width: 100%;
-  padding: 9px;
-  border-radius: 10px;
-  font-size: 12px;
+  padding: 11px;
+  border-radius: 12px;
+  font-size: 13px;
   font-weight: 700;
-  transition: all .25s;
+  transition: all .25s ease;
+  cursor: pointer;
 }
 .coin-btn.outline {
-  background: transparent;
-  border: 1px solid var(--bd);
+  background: rgba(255,255,255,.02);
+  border: 1.5px solid var(--bd);
   color: var(--t2);
 }
-.coin-btn.outline:hover { border-color: var(--b2); color: var(--pr2); background: rgba(124,92,252,.07); }
+.coin-btn.outline:hover {
+  border-color: var(--b2);
+  color: var(--pr2);
+  background: rgba(124,92,252,.08);
+  transform: translateY(-1px);
+}
 .coin-btn.solid {
   background: linear-gradient(135deg, var(--gd), var(--gd2));
   color: #0a0a14;
+  border: none;
   box-shadow: 0 4px 14px rgba(255,209,102,.28);
 }
-.coin-btn.solid:hover { box-shadow: 0 6px 22px rgba(255,209,102,.45); transform: translateY(-1px); }
+.coin-btn.solid:hover {
+  box-shadow: 0 8px 22px rgba(255,209,102,.45);
+  transform: translateY(-2px);
+}
 
 /* ═══════════════════════════════ SHOP GRID ═══════════════════════════════ */
 .shop-grid {
@@ -954,6 +992,159 @@ nav.scrolled { background: rgba(7,7,15,.95); }
   box-shadow: 0 0 15px rgba(255, 209, 102, 0.12);
 }
 
+/* ═══════════════════════════════ PREMIUM TOUCH EFFECTS ═══════════════════════════════ */
+.coin-pack, .plan-card {
+  position: relative;
+  overflow: hidden;
+}
+/* Shimmer sweep effect */
+.coin-pack::before, .plan-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0) 20%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0) 80%,
+    transparent 100%
+  );
+  transform: skewX(-25deg);
+  transition: none;
+  z-index: 5;
+  pointer-events: none;
+}
+.coin-pack:hover::before, .plan-card:hover::before {
+  left: 150%;
+  transition: left 0.85s ease-in-out;
+}
+
+/* Plan card premium lifts */
+.plan-card:hover {
+  transform: translateY(-10px) scale(1.02) !important;
+  box-shadow: 0 30px 60px rgba(124, 92, 252, 0.22), 0 0 30px rgba(124, 92, 252, 0.08) !important;
+}
+.plan-card.featured:hover {
+  box-shadow: 0 30px 60px rgba(124, 92, 252, 0.35), 0 0 45px rgba(0, 229, 255, 0.15) !important;
+}
+
+/* Button sheen sweeping reflection */
+.plan-btn, .coin-btn, .btn-hero-main {
+  position: relative;
+  overflow: hidden;
+}
+.plan-btn::before, .coin-btn::before, .btn-hero-main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: none;
+  pointer-events: none;
+  z-index: 2;
+}
+.plan-btn:hover::before, .coin-btn:hover::before, .btn-hero-main:hover::before {
+  left: 150%;
+  transition: left 0.75s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Conic Glowing Border for Mega Pack & Popular Coin Pack */
+.coin-pack.popular::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg, rgba(255,209,102,0.1), rgba(255,209,102,0.4), rgba(255,209,102,0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity 0.35s;
+  opacity: 0.5;
+  z-index: 1;
+}
+.coin-pack.popular:hover::after {
+  opacity: 1;
+  background: conic-gradient(from 0deg, rgba(255,209,102,0.4), rgba(255,179,71,1), rgba(255,209,102,0.4));
+  animation: borderRotate 4s linear infinite;
+}
+
+.coin-pack.mega::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 1.5px;
+  background: conic-gradient(from 0deg, rgba(0,229,255,0.1), rgba(0,229,255,0.4), rgba(0,229,255,0.1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: opacity 0.35s;
+  opacity: 0.5;
+  z-index: 1;
+}
+.coin-pack.mega:hover::after {
+  opacity: 1;
+  background: conic-gradient(from 0deg, rgba(0,229,255,0.4), rgba(0,136,255,1), rgba(0,229,255,0.4));
+  animation: borderRotate 4s linear infinite;
+}
+
+@keyframes borderRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Floating abstract glass orbs for Hero Section */
+.hero-orbs-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.35;
+  mix-blend-mode: screen;
+  animation: floatOrb 20s infinite alternate ease-in-out;
+}
+.hero-orb-1 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, var(--pr) 0%, transparent 80%);
+  top: 15%; left: 10%;
+  animation-duration: 25s;
+}
+.hero-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, var(--ac) 0%, transparent 80%);
+  bottom: 10%; right: 5%;
+  animation-duration: 30s;
+  animation-delay: -5s;
+}
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -50px) scale(1.15); }
+  100% { transform: translate(-40px, 40px) scale(0.9); }
+}
+
 
 /* ═══════════════════════════════ RESPONSIVE ═══════════════════════════════ */
 @media (max-width: 700px) {
@@ -970,7 +1161,7 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 }
 @media (max-width: 480px) {
   .badge-grid { grid-template-columns: 1fr 1fr; }
-  .coins-packs { grid-template-columns: 1fr 1fr; }
+  .coins-packs { grid-template-columns: 1fr 1fr; gap: 14px; }
   .hero-cta { flex-direction: column; align-items: center; }
 
   /* Responsive header overrides */
@@ -1020,6 +1211,10 @@ nav.scrolled { background: rgba(7,7,15,.95); }
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
+  <div class="hero-orbs-container">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+  </div>
   <div class="hero-glow"></div>
   <div class="hero-eyebrow">✦ Premium Membership</div>
   <h1>Level up your<br>experience</h1>
@@ -1167,42 +1362,50 @@ nav.scrolled { background: rgba(7,7,15,.95); }
       <p class="section-sub">Coins let you unlock special interactions, boosts and surprises inside chats.</p>
     </div>
     <div class="coins-packs">
+      <!-- Starter Pack -->
       <div class="coin-pack reveal reveal-d1">
         <div class="coin-amount"><span>🪙</span><span>100</span></div>
-        <div class="coin-label">Starter</div>
-        <div class="coin-price">₹29</div>
-        <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Low barrier, impulse buy</div>
+        <div>
+          <div class="coin-label">Starter</div>
+          <div class="coin-price">₹29</div>
+          <div style="font-size: 11.5px; color: var(--t3); line-height: 1.4; margin: 4px 0 16px;">Low barrier, impulse buy</div>
+        </div>
         <button class="coin-btn outline" onclick="payUPI('coins_100',2900,'100 Coins')">Buy Pack</button>
       </div>
+
+      <!-- Popular Pack -->
       <div class="coin-pack popular reveal reveal-d2">
         <div class="coin-pop-badge">Popular ⭐</div>
         <div class="coin-amount" style="color: #ffd166;"><span>🪙</span><span>300</span></div>
-        <div class="coin-label">Popular</div>
-        <div class="coin-price">₹79</div>
-        <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Best value label drives this</div>
+        <div>
+          <div class="coin-label">Popular</div>
+          <div class="coin-price">₹79</div>
+          <div style="font-size: 11.5px; color: var(--t3); line-height: 1.4; margin: 4px 0 16px;">Best value label drives this</div>
+        </div>
         <button class="coin-btn solid" onclick="payUPI('coins_300',7900,'300 Coins')">Buy Pack</button>
       </div>
+
+      <!-- Value Pack -->
       <div class="coin-pack reveal reveal-d3">
         <div class="coin-amount"><span>🪙</span><span>700</span></div>
-        <div class="coin-label">Value</div>
-        <div class="coin-price">₹149</div>
-        <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Feels like a deal vs starter</div>
+        <div>
+          <div class="coin-label">Value</div>
+          <div class="coin-price">₹149</div>
+          <div style="font-size: 11.5px; color: var(--t3); line-height: 1.4; margin: 4px 0 16px;">Feels like a deal vs starter</div>
+        </div>
         <button class="coin-btn outline" onclick="payUPI('coins_700',14900,'700 Coins')">Buy Pack</button>
       </div>
-      <div class="coin-pack reveal reveal-d4">
-        <div class="coin-amount"><span>🪙</span><span>1500</span></div>
-        <div class="coin-label">Mega</div>
-        <div class="coin-price">₹279</div>
-        <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Power users / gifters</div>
-        <button class="coin-btn solid" onclick="payUPI('coins_1500',27900,'1500 Coins')">Best Value</button>
-      </div>
-      <div class="coin-pack reveal reveal-d5" style="border-color: rgba(6,214,160,.35); background: rgba(6,214,160,.02);">
-        <div class="coin-pop-badge" style="background: linear-gradient(135deg, #06d6a0, #00e5ff); color: #0a0a14;">Gift</div>
-        <div class="coin-amount" style="color: #06d6a0;"><span>🎁</span><span>500</span></div>
-        <div class="coin-label">Gift Card</div>
-        <div class="coin-price">₹99</div>
-        <div class="coin-desc" style="font-size: 11.5px; color: var(--t3); margin: 8px 0 16px; min-height: 36px; line-height: 1.4;">Buy for a friend — viral growth</div>
-        <button class="coin-btn outline" style="border-color: rgba(6,214,160,.4); color: #06d6a0;" onclick="payUPI('coins_500',9900,'500 Coins Gift Card')">Gift Pack</button>
+
+      <!-- Mega Pack -->
+      <div class="coin-pack mega reveal reveal-d4">
+        <div class="coin-pop-badge" style="background: linear-gradient(135deg, #00e5ff, #0088ff); color: #0a0a14; box-shadow: 0 4px 10px rgba(0,229,255,.3);">Best Value 💎</div>
+        <div class="coin-amount" style="color: #00e5ff;"><span>🪙</span><span>1500</span></div>
+        <div>
+          <div class="coin-label">Mega</div>
+          <div class="coin-price">₹279</div>
+          <div style="font-size: 11.5px; color: var(--t3); line-height: 1.4; margin: 4px 0 16px;">Power users / gifters</div>
+        </div>
+        <button class="coin-btn solid" style="background: linear-gradient(135deg, #00e5ff, #0088ff); color: #0a0a14; box-shadow: 0 4px 14px rgba(0,229,255,.28); border: none;" onclick="payUPI('coins_1500',27900,'1500 Coins')">Best Value</button>
       </div>
     </div>
 
