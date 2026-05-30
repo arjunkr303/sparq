@@ -1,4 +1,4 @@
-# Sparq v7
+# Sparq
 
 Anonymous stranger chat with location-based matching.
 

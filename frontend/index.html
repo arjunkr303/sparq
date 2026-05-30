@@ -21,6 +21,7 @@
           if (data.glitchtipDsn) {
             Sentry.init({
               dsn: data.glitchtipDsn,
+              tunnel: API + '/api/tunnel', // Route through backend tunnel to bypass ad-blockers (ERR_BLOCKED_BY_CLIENT)
               tracesSampleRate: 0.01,
               autoSessionTracking: false,
               enableLogs: true,
@@ -36,6 +37,10 @@
         .catch(err => console.error('GlitchTip initialization failed:', err));
     })();
   </script>
+  
+  
+  
+  
   
   
 <meta charset="UTF-8"/>

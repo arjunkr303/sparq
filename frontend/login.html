@@ -21,16 +21,26 @@
           if (data.glitchtipDsn) {
             Sentry.init({
               dsn: data.glitchtipDsn,
+              tunnel: API + '/api/tunnel', // Route through backend tunnel to bypass ad-blockers (ERR_BLOCKED_BY_CLIENT)
               tracesSampleRate: 0.01,
               autoSessionTracking: false,
               enableLogs: true,
               debug: true
             });
+            // GlitchTip setup verification: Trigger a test error
+            setTimeout(() => {
+              console.log("⚡ [GlitchTip Verification] Triggering test error...");
+              myUndefinedFunction();
+            }, 1000);
           }
         })
         .catch(err => console.error('GlitchTip initialization failed:', err));
     })();
   </script>
+  
+  
+  
+  
   
   
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
