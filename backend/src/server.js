@@ -15,7 +15,7 @@ const rateLimit = require('express-rate-limit');
 
 const authRoutes    = require('./routes/auth');
 const userRoutes    = require('./routes/user');
-const paymentRoutes = require('./routes/payment');
+const paymentRoutes = require('./routes/payment_route');
 const luckyDrawRoutes = require('./routes/luckyDraw');
 const gifsRoutes    = require('./routes/gifs');
 const setupSocket   = require('./socket/chat');

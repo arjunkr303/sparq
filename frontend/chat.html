@@ -2376,6 +2376,7 @@
               if ($("mBtnAddFriend")) $("mBtnAddFriend").style.display = "none";
             }
 
+            playMatchSound();
             setState("chatting");
             setMobileTab("chat");
             addSys(
@@ -3078,6 +3079,36 @@
               $("mBtnRM").textContent = "🔁 Re-match (10 🪙)";
             }
           });
+      }
+
+      /* ══ MATCH SOUND ══ */
+      function playMatchSound() {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          // Play two ascending chime tones
+          const notes = [
+            { freq: 523.25, start: 0,    dur: 0.18 },  // C5
+            { freq: 659.25, start: 0.15, dur: 0.18 },  // E5
+            { freq: 783.99, start: 0.30, dur: 0.28 },  // G5
+          ];
+          notes.forEach(({ freq, start, dur }) => {
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + start);
+            gain.gain.setValueAtTime(0, ctx.currentTime + start);
+            gain.gain.linearRampToValueAtTime(0.28, ctx.currentTime + start + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + start);
+            osc.stop(ctx.currentTime + start + dur + 0.05);
+          });
+          // Auto-close context after sound finishes
+          setTimeout(() => ctx.close(), 800);
+        } catch (e) {
+          // Silently fail if AudioContext not available
+        }
       }
 
       /* ══ ACTIONS ══ */
