@@ -27,6 +27,37 @@
               enableLogs: true,
               debug: true
             });
+            // GlitchTip setup verification: Trigger both an Issue (error) and a Log (info)
+            setTimeout(() => {
+              console.log("⚡ [GlitchTip Verification] Triggering test error & log...");
+              if (typeof Sentry.captureMessage === 'function') {
+                Sentry.captureMessage("⚡ [GlitchTip Verification] Test Log message triggered!", "info");
+              }
+              myUndefinedFunction();
+            }, 1000);
+          }
+        })
+        .catch(err => console.error('GlitchTip initialization failed:', err));
+    })();
+  </script>
+  <script type="module">
+    import * as Sentry from "@sentry/browser";
+    (function() {
+      const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://127.0.0.1:5000'
+        : 'https://sparq-ou9g.onrender.com';
+      fetch(API + '/api/config')
+        .then(res => res.json())
+        .then(data => {
+          if (data.glitchtipDsn) {
+            Sentry.init({
+              dsn: data.glitchtipDsn,
+              tunnel: API + '/api/tunnel', // Route through backend tunnel to bypass ad-blockers (ERR_BLOCKED_BY_CLIENT)
+              tracesSampleRate: 0.01,
+              autoSessionTracking: false,
+              enableLogs: true,
+              debug: true
+            });
             // GlitchTip setup verification: Trigger a test error
             setTimeout(() => {
               console.log("⚡ [GlitchTip Verification] Triggering test error...");

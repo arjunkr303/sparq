@@ -39,10 +39,10 @@ app.get('/api/health',  (_req, res) => res.json({ status: 'ok', time: new Date()
 app.get('/api/config',  (_req, res) => res.json({ glitchtipDsn: process.env.GLITCHTIP_DSN || null }));
 
 // Sentry/GlitchTip Tunnel Proxy to bypass Ad Blockers (ERR_BLOCKED_BY_CLIENT)
-app.post('/api/tunnel', express.text({ type: '*/*', limit: '50mb' }), async (req, res) => {
+app.post('/api/tunnel', express.raw({ type: '*/*', limit: '50mb' }), async (req, res) => {
   try {
     const envelope = req.body;
-    if (!envelope) return res.status(400).send('Empty envelope');
+    if (!envelope || envelope.length === 0) return res.status(400).send('Empty envelope');
 
     const dsn = process.env.GLITCHTIP_DSN;
     if (!dsn) return res.status(500).send('GlitchTip DSN not configured on backend');
