@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- GlitchTip/Sentry Error Tracking Integration -->
+  <script src="https://browser.sentry-cdn.com/8.0.0/bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    if (typeof Sentry !== 'undefined') {
+      Sentry.init({
+        dsn: "https://ffbe8cbdaaad43a09b6eb8f25e2797a8@app.glitchtip.com/23874",
+        tracesSampleRate: 0.01,
+        autoSessionTracking: false
+      });
+    }
+  </script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Terms & Conditions — Sparq</title>
