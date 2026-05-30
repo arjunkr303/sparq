@@ -2,16 +2,36 @@
 <html lang="en">
 <head>
   <!-- GlitchTip/Sentry Error Tracking Integration -->
-  <script src="https://browser.sentry-cdn.com/8.0.0/bundle.min.js" crossorigin="anonymous"></script>
-  <script>
-    if (typeof Sentry !== 'undefined') {
-      Sentry.init({
-        dsn: "https://ffbe8cbdaaad43a09b6eb8f25e2797a8@app.glitchtip.com/23874",
-        tracesSampleRate: 0.01,
-        autoSessionTracking: false
-      });
+  <script type="importmap">
+    {
+      "imports": {
+        "@sentry/browser": "https://esm.sh/@sentry/browser@8.0.0"
+      }
     }
   </script>
+  <script type="module">
+    import * as Sentry from "@sentry/browser";
+    (function() {
+      const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://127.0.0.1:5000'
+        : 'https://sparq-ou9g.onrender.com';
+      fetch(API + '/api/config')
+        .then(res => res.json())
+        .then(data => {
+          if (data.glitchtipDsn) {
+            Sentry.init({
+              dsn: data.glitchtipDsn,
+              tracesSampleRate: 0.01,
+              autoSessionTracking: false,
+              enableLogs: true
+            });
+          }
+        })
+        .catch(err => console.error('GlitchTip initialization failed:', err));
+    })();
+  </script>
+  
+  
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Login — Sparq</title>
 

@@ -35,6 +35,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/lucky-draw', luckyDrawRoutes);
 app.use('/api/gifs',       gifsRoutes);
 app.get('/api/health',  (_req, res) => res.json({ status: 'ok', time: new Date() }));
+app.get('/api/config',  (_req, res) => res.json({ glitchtipDsn: process.env.GLITCHTIP_DSN || null }));
 app.get('/api/stats',   (_req, res) => res.json({
   onlineNow: io.sockets.sockets.size,
   time: new Date()
