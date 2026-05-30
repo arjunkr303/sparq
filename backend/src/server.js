@@ -1,4 +1,11 @@
 require('dotenv').config();
+const dns       = require('dns');
+
+// Force Node.js to prefer IPv4 DNS resolution over IPv6 to prevent ENETUNREACH errors on networks with no IPv6 access
+if (typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const express   = require('express');
 const http      = require('http');
 const { Server }= require('socket.io');
